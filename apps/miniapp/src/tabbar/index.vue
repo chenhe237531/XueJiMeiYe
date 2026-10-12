@@ -55,7 +55,7 @@ onLoad(() => {
 .item .label { font-size: 11px; }
 .tabbar.elder .item .ic { font-size: 30px; }
 .tabbar.elder .item .label { font-size: 14px; }
-.item.on { color: #8c2b56; }
+.item.on { color: #222222; font-weight: 700; }
 .item.on .label { font-weight: 700; }
 .safe { padding-bottom: env(safe-area-inset-bottom); }
 </style>

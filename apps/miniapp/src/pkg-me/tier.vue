@@ -31,7 +31,7 @@ onLoad(async () => { d.value = await http.get('/app/tier') })
       </view>
       <view class="card stack">
         <text class="t-md">等级规则（公开）</text>
-        <view v-for="r in d.rules" :key="r" class="row gap8" style="align-items: flex-start"><XIcon name="check" :size="18" color="#8C2B56" /><text class="t-sm">{{ r }}</text></view>
+        <view v-for="r in d.rules" :key="r" class="row gap8" style="align-items: flex-start"><XIcon name="check" :size="18" color="var(--brand-ink)" /><text class="t-sm">{{ r }}</text></view>
         <text class="t-xs c3">就医建议、红旗处理、体检推荐不因会员等级而不同。</text>
       </view>
     </view>
@@ -40,13 +40,13 @@ onLoad(async () => { d.value = await http.get('/app/tier') })
 
 <style scoped>
 .tcard { border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 8px; }
-.tC { background: var(--brand-soft); color: var(--brand); }
-.tB { background: #8c2b56; color: #fff; }
+.tC { background: var(--brand-soft); color: var(--brand-ink); }
+.tB { background: var(--brand); color: var(--on-brand); }
 .tA { background: #1e191d; color: #d2b47a; }
 .b { padding: 2px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.18); }
 .tC .b { background: #fff; }
 .trow { display: flex; align-items: center; gap: 4px; padding: 10px 0; border-top: 1px solid var(--line); }
 .trow.head { border-top: 0; font-weight: 700; font-size: var(--fs-sm); }
 .c { width: 64px; text-align: center; }
-.hl { color: var(--brand); font-weight: 700; }
+.hl { color: var(--brand-ink); font-weight: 700; }
 </style>

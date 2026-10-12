@@ -22,10 +22,10 @@ async function save(skip = false) {
   const res: any = skip ? {} : await http.patch('/app/me', { salutation: salutation.value, birthYear: years[yearIdx.value], gender: gender.value }, { loading: '保存中' })
   await xj.loadMe()
   if (res.elderAuto) {
-    await new Promise(r => uni.showModal({ title: '已为您开启乐龄模式', content: '字更大、可以听。可以在"我的 - 设置"里随时切换。', showCancel: false, confirmText: '好的', confirmColor: '#8C2B56', complete: r }))
+    await new Promise(r => uni.showModal({ title: '已为您开启乐龄模式', content: '字更大、可以听。可以在"我的 - 设置"里随时切换。', showCancel: false, confirmText: '好的', confirmColor: '#8A5A00', complete: r }))
   }
   else if (res.askElder) {
-    await new Promise(r => uni.showModal({ title: '要开启乐龄模式吗？', content: '字更大、按钮更大，题目可以朗读。', confirmText: '开启', cancelText: '暂不', confirmColor: '#8C2B56', success: (x) => { if (x.confirm) xj.toggleElder(true) }, complete: r }))
+    await new Promise(r => uni.showModal({ title: '要开启乐龄模式吗？', content: '字更大、按钮更大，题目可以朗读。', confirmText: '开启', cancelText: '暂不', confirmColor: '#8A5A00', success: (x) => { if (x.confirm) xj.toggleElder(true) }, complete: r }))
   }
   go('/pages/index/index')
 }

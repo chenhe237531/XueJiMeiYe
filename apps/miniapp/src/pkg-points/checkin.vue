@@ -34,12 +34,12 @@ async function submit(type: string) {
   <view :class="xj.pageClass">
     <view class="stack" style="padding-top: 12px">
       <view class="card row gap12">
-        <XIcon name="calendar-check" :size="36" color="#8C2B56" />
+        <XIcon name="calendar-check" :size="36" color="var(--brand-ink)" />
         <view class="col flex1"><text class="t-lg">已连续打卡 {{ d.streak }} 天</text><text class="t-sm c2">每次打卡 +2 积分，每天最多 6 分</text></view>
       </view>
       <view v-for="t in TYPES" :key="t.k" class="card stack">
         <view class="row gap8">
-          <XIcon :name="t.icon" :size="24" color="#8C2B56" />
+          <XIcon :name="t.icon" :size="24" color="var(--brand-ink)" />
           <text class="t-lg flex1">{{ t.n }}</text>
           <text v-if="d.today.includes(t.k)" class="tag care">今天已打卡</text>
         </view>
@@ -57,6 +57,6 @@ async function submit(type: string) {
 </template>
 
 <style scoped>
-.chip { height: 40px; padding: 0 16px; border-radius: 20px; background: #f4f2f3; display: flex; align-items: center; }
-.chip.on { background: var(--brand); color: #fff; font-weight: 600; }
+.chip { height: 40px; padding: 0 16px; border-radius: 20px; background: var(--bg); display: flex; align-items: center; }
+.chip.on { background: var(--brand); color: var(--on-brand); font-weight: 600; }
 </style>

@@ -58,7 +58,7 @@ async function demoFill() {
       <view class="card dots">
         <view v-for="(l, i) in [safety, ...dims]" :key="l.code" class="dot-item" @click="openLevel(l)">
           <view class="dot" :class="{ done: l.done, safety: l.code === 'safety', cur: next && next.code === l.code }">
-            <XIcon v-if="l.done" name="check" :size="16" color="#fff" />
+            <XIcon v-if="l.done" name="check" :size="16" color="var(--on-brand)" />
             <text v-else>{{ i }}</text>
           </view>
           <text class="t-xs" :class="{ semi: l.done }">{{ l.short }}</text>
@@ -100,5 +100,5 @@ async function demoFill() {
 .dot { width: 30px; height: 30px; border-radius: 15px; background: #efeaec; display: flex; align-items: center; justify-content: center; font-size: 13px; }
 .dot.done { background: var(--brand); }
 .dot.done.safety { background: var(--care); }
-.dot.cur { background: #fff; border: 2px solid var(--brand); color: var(--brand); font-weight: 700; box-sizing: border-box; }
+.dot.cur { background: #fff; border: 2px solid var(--brand); color: var(--brand-ink); font-weight: 700; box-sizing: border-box; }
 </style>

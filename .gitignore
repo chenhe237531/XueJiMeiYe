@@ -13,3 +13,6 @@ deploy/.bundle
 apps/server/dist
 apps/miniapp/dist
 apps/admin/dist
+
+# 本地截图预览
+.preview/

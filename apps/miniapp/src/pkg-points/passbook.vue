@@ -51,9 +51,9 @@ async function redeem(it: any) {
 </template>
 
 <style scoped>
-.book { background: linear-gradient(160deg, #8c2b56, #6e2144); color: #fff; border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 4px; }
+.book { background: linear-gradient(160deg, #ffe14d, #ffc300); color: var(--on-brand); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 4px; }
 .mini { height: 32px; padding: 0 14px; border-radius: 16px; background: #efeaec; color: #786e74; display: flex; align-items: center; font-size: 13px; margin-left: 8px; }
-.mini.on { background: var(--brand); color: #fff; }
+.mini.on { background: var(--brand); color: var(--on-brand); }
 .lrow { display: flex; gap: 8px; padding: 8px 0; border-top: 1px dashed var(--line-2); font-size: var(--fs-sm); }
 .lrow.head { border-top: 0; color: var(--ink-3); }
 .d { width: 52px; }

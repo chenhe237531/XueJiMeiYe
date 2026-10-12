@@ -26,9 +26,9 @@ void props
 </template>
 
 <style scoped lang="scss">
-.xnav { margin: 0 calc(-1 * var(--pad, 16px)); background: var(--bg, #f4f2f3); position: sticky; top: 0; z-index: 40; }
+.xnav { margin: 0 calc(-1 * var(--pad, 12px)); background: var(--bg, #f5f5f5); position: sticky; top: 0; z-index: 40; }
 .xnav.transparent { background: transparent; position: relative; }
-.bar { height: 48px; display: flex; align-items: center; padding-left: var(--pad, 16px); }
+.bar { height: 48px; display: flex; align-items: center; padding-left: var(--pad, 12px); }
 .back { width: 44px; height: 44px; margin-left: -12px; display: flex; align-items: center; justify-content: center; color: var(--ink); }
 .title { font-size: 18px; font-weight: 600; color: var(--ink); }
 .title.big { font-size: var(--fs-title, 26px); font-weight: 700; }

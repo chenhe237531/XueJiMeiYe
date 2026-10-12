@@ -30,6 +30,6 @@ onLoad(async () => { d.value = await http.get('/app/advisor') })
 </template>
 
 <style scoped>
-.av { width: 72px; height: 72px; border-radius: 24px; background: var(--brand-soft); color: var(--brand); font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.av { width: 72px; height: 72px; border-radius: 24px; background: var(--brand-soft); color: var(--brand-ink); font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 .qr { width: 180px; height: 180px; }
 </style>

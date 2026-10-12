@@ -129,7 +129,7 @@ async function finishLevel() {
     content: r.tip || '谢谢您的配合',
     showCancel: false,
     confirmText: '回到关卡地图',
-    confirmColor: '#8C2B56',
+    confirmColor: '#8A5A00',
     complete: res,
   }))
   uni.navigateBack()
@@ -185,7 +185,7 @@ function voice() {
         </view>
         <view class="row gap16" style="width: 100%">
           <view class="step" @click="sliderVal = Math.max(q.config.min, sliderVal - 1)"><XIcon name="minus" :size="24" /></view>
-          <slider class="flex1" :min="q.config.min" :max="q.config.max" :step="q.config.step || 1" :value="sliderVal" active-color="#8C2B56" block-size="28" @changing="(e) => (sliderVal = e.detail.value)" @change="(e) => (sliderVal = e.detail.value)" />
+          <slider class="flex1" :min="q.config.min" :max="q.config.max" :step="q.config.step || 1" :value="sliderVal" active-color="#F5BE00" block-size="28" @changing="(e) => (sliderVal = e.detail.value)" @change="(e) => (sliderVal = e.detail.value)" />
           <view class="step" @click="sliderVal = Math.min(q.config.max, sliderVal + 1)"><XIcon name="plus" :size="24" /></view>
         </view>
       </view>
@@ -224,6 +224,6 @@ function voice() {
 
 <style scoped>
 .q-title { font-size: var(--fs-title); font-weight: 700; line-height: 1.35; }
-.step { width: 48px; height: 48px; border-radius: 24px; background: var(--brand-soft); color: var(--brand); display: flex; align-items: center; justify-content: center; }
+.step { width: 48px; height: 48px; border-radius: 24px; background: var(--brand-soft); color: var(--brand-ink); display: flex; align-items: center; justify-content: center; }
 .btn.listening { background: var(--brand-dark); }
 </style>

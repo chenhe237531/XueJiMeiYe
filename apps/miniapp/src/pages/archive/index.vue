@@ -39,7 +39,7 @@ onShow(async () => {
       <view class="btn" @click="go('/pkg-auth/login')">登录</view>
     </view>
     <view v-else-if="d && d.index === null && !d.metrics.length" class="card empty stack">
-      <XIcon name="clipboard-heart" :size="48" color="#8C2B56" />
+      <XIcon name="clipboard-heart" :size="48" color="var(--brand-ink)" />
       <text class="t-md">完成六维测评后，这里会记录您的每一次变化。</text>
       <view class="btn" @click="go('/pkg-assess/intro')">开始六维测评</view>
     </view>

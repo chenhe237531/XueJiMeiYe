@@ -104,7 +104,7 @@ const featuredFirst = (items: any[], featured?: string) => {
             </view>
           </view>
           <view v-for="it in featuredFirst(c.props.items, c.props.featured).rest" :key="it.code" class="tile" @click="open(it, 'entryGrid')">
-            <XIcon :name="it.icon" :size="30" :color="it.code === 'checkup_coupon' ? '#1F6E68' : (night ? '#D2B47A' : '#8C2B56')" />
+            <XIcon :name="it.icon" :size="30" :color="it.code === 'checkup_coupon' ? '#1F6E68' : (night ? '#D2B47A' : 'var(--brand-ink)')" />
             <text class="tile-name">{{ it.name }}</text>
           </view>
         </view>
@@ -192,8 +192,8 @@ const featuredFirst = (items: any[], featured?: string) => {
 .night .toggle.on { background: var(--gold); }
 
 .tier-card { border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-.tier-C { background: var(--brand-soft); color: var(--brand); }
-.tier-B { background: #8c2b56; color: #fff; }
+.tier-C { background: var(--brand-soft); color: var(--brand-ink); }
+.tier-B { background: var(--brand); color: var(--on-brand); }
 .tier-A { background: #1e191d; color: #f2ece8; border: 1px solid rgba(210, 180, 122, 0.3); }
 .tier-A .t-lg { color: #d2b47a; }
 .tier-line { height: 1px; background: currentColor; opacity: 0.2; }
@@ -207,7 +207,7 @@ const featuredFirst = (items: any[], featured?: string) => {
 .tile { height: 100px; border-radius: 20px; background: var(--surface); padding: 14px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; }
 .elder .tile { height: 108px; }
 .tile-name { font-size: var(--fs-md); font-weight: 600; line-height: 1.3; }
-.tile.featured { grid-column: span 2; background: var(--brand); color: #fff; height: 112px; }
+.tile.featured { grid-column: span 2; background: var(--brand); color: var(--on-brand); height: 112px; }
 .night .tile.featured { color: #131013; }
 .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 4px; }
 .g4 { align-items: center; text-align: center; }
@@ -216,7 +216,7 @@ const featuredFirst = (items: any[], featured?: string) => {
 .banner-card { height: 116px; }
 .mcard { padding: 12px; }
 
-.fab { position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 60; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--brand); color: #fff; display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; box-shadow: 0 8px 24px -8px rgba(140, 43, 86, 0.6); }
+.fab { position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 60; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--brand); color: var(--on-brand); display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; box-shadow: 0 8px 24px -8px rgba(204, 150, 0, 0.55); }
 .fab.elder { height: 58px; padding: 0 20px; font-size: 18px; bottom: calc(88px + env(safe-area-inset-bottom)); }
 .fab.night { color: #131013; }
 </style>

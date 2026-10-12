@@ -81,7 +81,7 @@ async function logout() {
 
       <view class="group">
         <view v-for="m in menus" :key="m.name" class="cell" @click="go(m.link)">
-          <XIcon :name="m.icon" :size="22" color="#8C2B56" />
+          <XIcon :name="m.icon" :size="22" color="var(--brand-ink)" />
           <text class="flex1 t-md">{{ m.name }}</text>
           <text v-if="m.key === 'msg' && xj.me.unreadMessages" class="tag alert">{{ xj.me.unreadMessages }}</text>
           <text v-if="m.key === 'family' && xj.me.familyPending" class="tag alert">待确认</text>
@@ -92,7 +92,7 @@ async function logout() {
 
       <view class="group">
         <view class="cell" @click="xj.toggleElder()">
-          <XIcon name="accessible" :size="22" color="#8C2B56" />
+          <XIcon name="accessible" :size="22" color="var(--brand-ink)" />
           <text class="flex1 t-md">乐龄模式</text>
           <text class="t-sm c2">{{ xj.elderMode ? '已开启' : '已关闭' }}</text>
         </view>
@@ -106,8 +106,8 @@ async function logout() {
 </template>
 
 <style scoped>
-.avatar { width: 56px; height: 56px; border-radius: 18px; background: var(--brand-soft); color: var(--brand); font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-.passbook { background: var(--brand); color: #fff; border-radius: 20px; padding: 18px; }
+.avatar { width: 56px; height: 56px; border-radius: 18px; background: var(--brand-soft); color: var(--brand-ink); font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.passbook { background: var(--brand); color: var(--on-brand); border-radius: 20px; padding: 18px; }
 .quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .q { align-items: center; }
 </style>

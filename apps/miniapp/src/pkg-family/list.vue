@@ -81,7 +81,7 @@ onShareAppMessage(() => ({ title: `${xj.me?.salutation || ''}邀请您成为她�
         <text class="t-sm c2 semi">{{ l.name }}可以看到什么</text>
         <view v-for="p in PERMS" :key="p.k" class="row gap12">
           <view class="col flex1"><text class="t-md">{{ p.n }}</text><text class="t-sm c2">{{ p.d }}</text></view>
-          <switch :checked="l.permissions.includes(p.k)" color="#8C2B56" @change="togglePerm(l, p.k)" />
+          <switch :checked="l.permissions.includes(p.k)" color="#F5BE00" @change="togglePerm(l, p.k)" />
         </view>
         <text class="t-sm c2" @click="unlink(l)">不想继续分享时，可以<text class="link" style="color: #5c5358; text-decoration: underline">解除绑定</text></text>
       </view>
@@ -90,7 +90,7 @@ onShareAppMessage(() => ({ title: `${xj.me?.salutation || ''}邀请您成为她�
         <text class="t-md">{{ l.name }}申请作为您的{{ REL[l.relation] }}绑定</text>
         <text class="t-sm">请勾选允许查看的内容（单独同意 C6）</text>
         <view v-for="p in PERMS" :key="p.k" class="row gap8" @click="togglePending(l.id, p.k)">
-          <view class="check" :class="{ on: (pendingPerms[l.id] || []).includes(p.k) }"><XIcon v-if="(pendingPerms[l.id] || []).includes(p.k)" name="check" :size="16" color="#fff" /></view>
+          <view class="check" :class="{ on: (pendingPerms[l.id] || []).includes(p.k) }"><XIcon v-if="(pendingPerms[l.id] || []).includes(p.k)" name="check" :size="16" color="var(--on-brand)" /></view>
           <text class="t-body">{{ p.n }}</text>
         </view>
         <view class="btn" @click="confirmLink(l)">确认绑定</view>
@@ -141,9 +141,9 @@ onShareAppMessage(() => ({ title: `${xj.me?.salutation || ''}邀请您成为她�
 
 <style scoped>
 .av { width: 52px; height: 52px; border-radius: 16px; background: var(--care-soft); color: var(--care); font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-.av.care { background: var(--brand-soft); color: var(--brand); }
-.chip { height: 40px; padding: 0 16px; border-radius: 20px; background: #f4f2f3; display: flex; align-items: center; }
-.chip.on { background: var(--brand); color: #fff; font-weight: 600; }
+.av.care { background: var(--brand-soft); color: var(--brand-ink); }
+.chip { height: 40px; padding: 0 16px; border-radius: 20px; background: var(--bg); display: flex; align-items: center; }
+.chip.on { background: var(--brand); color: var(--on-brand); font-weight: 600; }
 .invite { background: #f7f3f5; border-radius: 14px; padding: 12px; }
 .check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #c9a35e; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
 .check.on { background: var(--brand); border-color: var(--brand); }

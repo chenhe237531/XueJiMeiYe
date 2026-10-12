@@ -65,12 +65,12 @@ async function skip() {
       <view class="card hint stack">
         <text class="t-body">请在有人陪同、身边有稳固椅子时进行。头晕或疼痛请立即停止。</text>
         <view class="row gap8" @click="company = !company">
-          <view class="check" :class="{ on: company }"><XIcon v-if="company" name="check" :size="16" color="#fff" /></view>
+          <view class="check" :class="{ on: company }"><XIcon v-if="company" name="check" :size="16" color="var(--on-brand)" /></view>
           <text class="t-md">身边有人陪同</text>
         </view>
       </view>
       <view class="photo-slot row gap12" style="height: 96px; flex-direction: row; padding: 0 16px; justify-content: flex-start">
-        <view class="play"><XIcon name="player-play" :size="22" color="#8C2B56" /></view>
+        <view class="play"><XIcon name="player-play" :size="22" color="var(--brand-ink)" /></view>
         <view class="col" style="align-items: flex-start"><text class="t-md" style="color: #1e191c">先看示范</text><text class="t-sm">10 秒视频，起身再坐下（待替换门店示范视频）</text></view>
       </view>
       <view class="col" style="align-items: center; padding: 16px 0">

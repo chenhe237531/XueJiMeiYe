@@ -55,9 +55,9 @@ onLoad(async (q: any) => {
 
 <style scoped>
 .chip { display: inline-flex; height: 36px; align-items: center; padding: 0 14px; margin-right: 8px; border-radius: 18px; background: #fff; font-size: var(--fs-sm); }
-.chip.on { background: var(--brand); color: #fff; font-weight: 600; }
+.chip.on { background: var(--brand); color: var(--on-brand); font-weight: 600; }
 .seg { flex: 1; height: 40px; border-radius: 20px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); }
-.seg.on { background: var(--brand-soft); color: var(--brand); font-weight: 700; }
+.seg.on { background: var(--brand-soft); color: var(--brand-ink); font-weight: 700; }
 .lgd { width: 10px; height: 10px; border-radius: 6px; border: 2.5px solid; background: #fff; }
 .lgd.ref { border: 0; border-radius: 2px; background: #e6f1ef; }
 </style>

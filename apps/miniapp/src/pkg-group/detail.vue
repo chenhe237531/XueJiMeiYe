@@ -41,7 +41,7 @@ async function join(g: any) {
         </view>
         <text class="t-xs c2">{{ a.groupSize }} 人成团 · {{ a.hours }} 小时内有效 · {{ a.needVisit ? '需到店' : '' }}</text>
         <view v-for="g in a.openGroups" :key="g.id" class="row gap12 og">
-          <XIcon name="users" color="#8C2B56" />
+          <XIcon name="users" color="var(--brand-ink)" />
           <view class="col flex1"><text class="t-md">{{ g.members.join('、') }} 的团</text><text class="t-xs c2">还差 {{ a.groupSize - g.members.length }} 人 · {{ g.expiresAt }} 截止</text></view>
           <view class="btn small" @click="join(g)">参团</view>
         </view>

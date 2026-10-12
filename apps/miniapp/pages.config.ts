@@ -5,9 +5,9 @@ export default defineUniPages({
   globalStyle: {
     navigationStyle: 'default',
     navigationBarTitleText: '雪姬美业',
-    navigationBarBackgroundColor: '#F4F2F3',
+    navigationBarBackgroundColor: '#FFFFFF',
     navigationBarTextStyle: 'black',
-    backgroundColor: '#F4F2F3',
+    backgroundColor: '#F5F5F5',
   },
   easycom: {
     autoscan: true,

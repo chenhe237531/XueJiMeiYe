@@ -20,7 +20,7 @@ export function toast(title: string) {
 
 export function confirm(title: string, content: string, confirmText = '确认'): Promise<boolean> {
   return new Promise((resolve) => {
-    uni.showModal({ title, content, confirmText, cancelText: '再想想', confirmColor: '#8C2B56', success: r => resolve(!!r.confirm), fail: () => resolve(false) })
+    uni.showModal({ title, content, confirmText, cancelText: '再想想', confirmColor: '#8A5A00', success: r => resolve(!!r.confirm), fail: () => resolve(false) })
   })
 }
 
@@ -121,10 +121,10 @@ export function radarSvg(scores: Record<string, number>, prev?: Record<string, n
   }
   const ring = (k: number) => DIMS.map((_, i) => pt(i, R * k)).join(' ')
   const poly = (s: Record<string, number>) => DIMS.map((d, i) => pt(i, R * Math.max(0.06, (s?.[d.code] ?? 0) / 100))).join(' ')
-  const line = opts.dark ? '#3A3237' : '#E7E1E4'
-  const fill = opts.dark ? '#211C20' : '#F7F3F5'
-  const stroke = opts.dark ? '#D2B47A' : '#8C2B56'
-  const area = opts.dark ? 'rgba(210,180,122,0.18)' : 'rgba(140,43,86,0.14)'
+  const line = opts.dark ? '#3A3237' : '#E6E6E6'
+  const fill = opts.dark ? '#211C20' : '#F7F7F7'
+  const stroke = opts.dark ? '#D2B47A' : '#C98A00'
+  const area = opts.dark ? 'rgba(210,180,122,0.18)' : 'rgba(255,209,0,0.3)'
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`
   svg += `<polygon points="${ring(1)}" fill="${fill}" stroke="${line}"/>`
   svg += `<polygon points="${ring(0.66)}" fill="none" stroke="${line}"/><polygon points="${ring(0.33)}" fill="none" stroke="${line}"/>`
@@ -149,7 +149,7 @@ export function radarLabels(scores: Record<string, number>) {
   })
 }
 
-const SRC_COLOR: Record<string, string> = { HOSPITAL: '#1F6E68', STORE: '#8C2B56', SELF: '#6B5E66' }
+const SRC_COLOR: Record<string, string> = { HOSPITAL: '#1F6E68', STORE: '#C98A00', SELF: '#666666' }
 
 /** 指标趋势折线图，每个点按来源着色 */
 export function lineSvg(points: { date: string, value: number, source?: string }[], opts: { width?: number, height?: number, refLow?: number | null, refHigh?: number | null } = {}) {
@@ -170,12 +170,12 @@ export function lineSvg(points: { date: string, value: number, source?: string }
   if (opts.refLow != null && opts.refHigh != null) svg += `<rect x="${pad.l}" y="${y(opts.refHigh)}" width="${W - pad.l - pad.r}" height="${Math.max(1, y(opts.refLow) - y(opts.refHigh))}" fill="#E6F1EF" opacity="0.7"/>`
   for (let k = 0; k <= 3; k++) {
     const v = min + ((max - min) * k) / 3
-    svg += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="#EFEAEC"/><text x="${pad.l - 6}" y="${y(v) + 4}" font-size="10" fill="#786E74" text-anchor="end">${Math.round(v * 10) / 10}</text>`
+    svg += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="#EEEEEE"/><text x="${pad.l - 6}" y="${y(v) + 4}" font-size="10" fill="#767676" text-anchor="end">${Math.round(v * 10) / 10}</text>`
   }
-  svg += `<polyline points="${points.map((p, i) => `${x(i)},${y(p.value)}`).join(' ')}" fill="none" stroke="#8C2B56" stroke-width="2" stroke-linejoin="round"/>`
+  svg += `<polyline points="${points.map((p, i) => `${x(i)},${y(p.value)}`).join(' ')}" fill="none" stroke="#C98A00" stroke-width="2" stroke-linejoin="round"/>`
   points.forEach((p, i) => {
     svg += `<circle cx="${x(i)}" cy="${y(p.value)}" r="4.5" fill="#fff" stroke="${SRC_COLOR[p.source || 'STORE']}" stroke-width="2.5"/>`
-    if (points.length <= 8 || i % Math.ceil(points.length / 6) === 0) svg += `<text x="${x(i)}" y="${H - 8}" font-size="10" fill="#786E74" text-anchor="middle">${p.date}</text>`
+    if (points.length <= 8 || i % Math.ceil(points.length / 6) === 0) svg += `<text x="${x(i)}" y="${H - 8}" font-size="10" fill="#767676" text-anchor="middle">${p.date}</text>`
   })
   svg += '</svg>'
   return svgUri(svg)
@@ -183,7 +183,7 @@ export function lineSvg(points: { date: string, value: number, source?: string }
 
 export const SOURCE_STYLE: Record<string, { name: string, bg: string, fg: string }> = {
   HOSPITAL: { name: '医院出具', bg: '#E6F1EF', fg: '#1F6E68' },
-  STORE: { name: '门店测量', bg: '#F4E7ED', fg: '#8C2B56' },
+  STORE: { name: '门店测量', bg: '#FFF8DC', fg: '#8A5A00' },
   SELF: { name: '本人记录', bg: '#EFEAEC', fg: '#463E43' },
 }
 

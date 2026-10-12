@@ -1,14 +1,18 @@
 /**
- * 雪姬美业 · 设计令牌（小程序页面总图 v2 精修版）
- * 莓果 #8C2B56 品牌与操作；医疗青 #1F6E68 只用于就医与安全；提示黄只用于健康提示；警示红只用于紧急。
- * 圆角：容器 20、内部元素 14、标签 8、按钮全圆角。乐龄模式整体放大字号与触控区域（设计文档 5.4）。
+ * 雪姬美业 · 设计令牌（小程序页面总图 v2 精修版；版式向美团门店页靠拢，见 GitHub issue #1）
+ * 品牌黄 #FFD100（参考美团，按钮上用深色字 --on-brand）用于主操作与选中态；品牌文字 / 图标用深琥珀 --brand-ink；医疗青 #1F6E68 只用于就医与安全；提示黄只用于健康提示；警示红只用于紧急；
+ * 价格橙红只用于门店项目价格与优惠标签，健康相关页面不使用。
+ * 中性灰背景 + 白卡片；圆角：容器 12、内部元素 8、标签 4、按钮全圆角。
+ * 标准模式紧凑排版；乐龄模式放大字号、间距与触控区域（设计文档 5.4），正文对比度不低于 4.5:1。
  */
 
 page {
-  --brand: #8c2b56;
-  --brand-dark: #74224a;
-  --brand-soft: #f4e7ed;
-  --brand-line: #e3c7d4;
+  --brand: #ffd100;
+  --brand-dark: #f5be00;
+  --brand-soft: #fff8dc;
+  --brand-line: #ffe58a;
+  --brand-ink: #8a5a00;
+  --on-brand: #222222;
   --care: #1f6e68;
   --care-dark: #164f4a;
   --care-soft: #e6f1ef;
@@ -19,19 +23,27 @@ page {
   --warn-ink: #7a4a08;
   --alert: #b3261e;
   --alert-soft: #fcebe9;
-  --bg: #f4f2f3;
+  --price: #f2481b;
+  --price-ink: #d9380b;
+  --price-soft: #fff3ee;
+  --price-line: #f7c2ae;
+  --star: #ffa31a;
+  --bg: #f5f5f5;
   --surface: #ffffff;
-  --ink: #1e191c;
-  --ink-2: #5c5358;
-  --ink-3: #786e74;
-  --line: #efeaec;
-  --line-2: #e7e1e4;
-  --placeholder: #eae5e8;
+  --ink: #222222;
+  --ink-2: #555555;
+  --ink-3: #767676;
+  --line: #eeeeee;
+  --line-2: #e6e6e6;
+  --placeholder: #ebebeb;
+  --r-card: 12px;
+  --r-inner: 8px;
+  --r-tag: 4px;
   --gold: #d2b47a;
   --night: #131013;
   --night-2: #1e191d;
-  background: #f4f2f3;
-  color: #1e191c;
+  background: #f5f5f5;
+  color: #222222;
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 }
 
@@ -44,9 +56,10 @@ page {
   --fs-xl: 21px;
   --fs-title: 24px;
   --fs-hero: 30px;
-  --btn-h: 52px;
-  --gap: 12px;
-  --pad: 16px;
+  --btn-h: 48px;
+  --gap: 10px;
+  --pad: 12px;
+  --card-pad: 12px;
   min-height: 100vh;
   box-sizing: border-box;
   padding: 0 var(--pad) 32px;
@@ -67,7 +80,8 @@ page {
   --fs-hero: 34px;
   --btn-h: 60px;
   --gap: 16px;
-  --pad: 18px;
+  --pad: 16px;
+  --card-pad: 16px;
   line-height: 1.7;
 }
 
@@ -89,8 +103,15 @@ page {
   --line-2: rgba(255, 255, 255, 0.12);
   --placeholder: #2a2328;
   --brand: #d2b47a;
+  --brand-dark: #b99a5e;
   --brand-soft: rgba(210, 180, 122, 0.14);
   --brand-line: rgba(210, 180, 122, 0.4);
+  --brand-ink: #d2b47a;
+  --on-brand: #131013;
+  --price: #ff7a45;
+  --price-ink: #ff8f61;
+  --price-soft: rgba(255, 122, 69, 0.1);
+  --price-line: rgba(255, 122, 69, 0.45);
 }
 
 .num {
@@ -109,7 +130,7 @@ page {
 .t-xs { font-size: var(--fs-xs); }
 .c2 { color: var(--ink-2); }
 .c3 { color: var(--ink-3); }
-.c-brand { color: var(--brand); }
+.c-brand { color: var(--brand-ink); }
 .c-care { color: var(--care); }
 .c-alert { color: var(--alert); }
 .c-warn { color: var(--warn-ink); }
@@ -137,12 +158,12 @@ page {
 /* ───── 容器 ───── */
 .card {
   background: var(--surface);
-  border-radius: 20px;
-  padding: 16px;
+  border-radius: var(--r-card);
+  padding: var(--card-pad);
   box-sizing: border-box;
 }
 .card.raised {
-  box-shadow: 0 1px 2px rgba(60, 24, 44, 0.05), 0 16px 32px -16px rgba(60, 24, 44, 0.16);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 20px -12px rgba(0, 0, 0, 0.14);
 }
 .card.care {
   background: var(--care-soft);
@@ -155,14 +176,14 @@ page {
 }
 .group {
   background: var(--surface);
-  border-radius: 20px;
-  padding: 0 16px;
+  border-radius: var(--r-card);
+  padding: 0 var(--card-pad);
 }
 .cell {
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 56px;
+  min-height: 52px;
   padding: 10px 0;
   box-sizing: border-box;
 }
@@ -173,25 +194,28 @@ page {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 8px;
-  font-size: var(--fs-lg);
+  margin-top: 6px;
+  font-size: var(--fs-md);
   font-weight: 700;
 }
+.elder .section-title { font-size: var(--fs-lg); }
 
 /* ───── 标签 ───── */
 .tag {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: 8px;
+  padding: 1px 6px;
+  border-radius: var(--r-tag);
   font-size: var(--fs-xs);
   font-weight: 600;
   background: var(--brand-soft);
-  color: var(--brand);
+  color: var(--brand-ink);
   white-space: nowrap;
 }
 .tag.care { background: var(--care-soft); color: var(--care); }
-.tag.gray { background: #efeaec; color: #463e43; }
+.tag.gray { background: #f2f2f2; color: #555555; }
+.tag.line { background: transparent; color: var(--ink-2); border: 1px solid var(--line-2); font-weight: 500; }
+.tag.promo { background: var(--price-soft); color: var(--price-ink); border: 1px solid var(--price-line); font-weight: 500; }
 .tag.alert { background: var(--alert-soft); color: var(--alert); }
 .tag.warn { background: var(--hint); color: var(--warn-ink); }
 .tag.gold { background: rgba(210, 180, 122, 0.16); color: #a9823a; }
@@ -207,22 +231,22 @@ page {
   white-space: nowrap;
   border-radius: 999px;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   font-size: var(--fs-lg);
   font-weight: 700;
   box-sizing: border-box;
   text-align: center;
 }
 .btn:active { opacity: 0.85; }
-.btn.ghost { background: var(--surface); color: var(--brand); border: 1.5px solid var(--brand); }
+.btn.ghost { background: var(--surface); color: var(--brand-ink); border: 1.5px solid var(--brand-dark); }
 .btn.plain { background: var(--surface); color: #3b3337; border: 1px solid #e0d8dc; font-weight: 600; }
 .btn.care { background: var(--care); }
 .btn.alert { background: var(--alert); }
 .btn.gold { background: var(--gold); color: #131013; }
 .btn.small { height: 40px; font-size: var(--fs-sm); padding: 0 16px; }
 .elder .btn.small { height: 46px; font-size: var(--fs-body); }
-.btn.disabled { background: #d8d0d4; color: #fff; border: 0; }
-.link { color: var(--brand); font-weight: 600; }
+.btn.disabled { background: #e0e0e0; color: #8c8c8c; border: 0; }
+.link { color: var(--brand-ink); font-weight: 600; }
 
 .pill {
   display: inline-flex;
@@ -233,7 +257,7 @@ page {
   border-radius: 999px;
   background: var(--surface);
   border: 1.5px solid var(--brand-line);
-  color: var(--brand);
+  color: var(--brand-ink);
   font-size: var(--fs-sm);
   font-weight: 600;
 }
@@ -247,7 +271,8 @@ page {
   bottom: 0;
   z-index: 50;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  background: rgba(244, 242, 243, 0.96);
+  background: var(--surface);
+  box-shadow: 0 -1px 0 var(--line), 0 -6px 16px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -262,7 +287,7 @@ page {
   gap: 14px;
   min-height: 60px;
   padding: 12px 18px;
-  border-radius: 20px;
+  border-radius: var(--r-card);
   background: var(--surface);
   border: 1px solid var(--line-2);
   font-size: var(--fs-lg);
@@ -270,12 +295,12 @@ page {
   box-sizing: border-box;
 }
 .elder .option { min-height: 76px; font-size: 22px; }
-.option.on { background: #fbf4f7; border: 2px solid var(--brand); color: var(--brand); font-weight: 700; }
+.option.on { background: var(--brand-soft); border: 2px solid var(--brand-dark); color: var(--ink); font-weight: 700; }
 .option .dot {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 2px solid #c9bec4;
+  border: 2px solid #c4c4c4;
   flex-shrink: 0;
   box-sizing: border-box;
 }
@@ -291,7 +316,7 @@ page {
 .photo-slot {
   background: var(--placeholder);
   color: var(--ink-3);
-  border-radius: 14px;
+  border-radius: var(--r-inner);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -304,14 +329,14 @@ page {
 .icon-box {
   width: 40px;
   height: 40px;
-  border-radius: 14px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   font-size: 22px;
   background: var(--brand-soft);
-  color: var(--brand);
+  color: var(--brand-ink);
 }
 .icon-box.care { background: var(--care-soft); color: var(--care); }
 .icon-box.gray { background: var(--line); color: var(--ink-2); }
@@ -320,9 +345,9 @@ page {
 .empty { padding: 48px 16px; text-align: center; color: var(--ink-2); }
 
 .input {
-  height: 52px;
-  padding: 0 16px;
-  border-radius: 14px;
+  height: 48px;
+  padding: 0 14px;
+  border-radius: var(--r-inner);
   background: var(--surface);
   border: 1px solid var(--line-2);
   font-size: var(--fs-md);
@@ -332,10 +357,39 @@ page {
 .textarea {
   width: 100%;
   min-height: 96px;
-  padding: 12px 16px;
-  border-radius: 14px;
+  padding: 12px 14px;
+  border-radius: var(--r-inner);
   background: var(--surface);
   border: 1px solid var(--line-2);
   font-size: var(--fs-md);
   box-sizing: border-box;
 }
+
+/* ───── 价格（门店项目专用：¥ 小、数字大、门市价删除线） ───── */
+.price { display: inline-flex; align-items: baseline; color: var(--price); font-weight: 700; white-space: nowrap; }
+.price .yen { font-size: var(--fs-sm); margin-right: 1px; }
+.price .amt { font-size: var(--fs-xl); line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.price-orig { color: var(--ink-3); font-size: var(--fs-xs); text-decoration: line-through; white-space: nowrap; }
+
+/* ───── 评分星级 ───── */
+.stars { position: relative; display: inline-flex; color: #dddddd; font-size: 13px; line-height: 1; letter-spacing: 1px; }
+.stars .on { position: absolute; left: 0; top: 0; overflow: hidden; white-space: nowrap; color: var(--star); }
+.elder .stars { font-size: 16px; }
+
+/* ───── 项目缩略图（实拍图到位前用插画占位） ───── */
+.thumb {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  border-radius: var(--r-inner);
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.92);
+}
+.elder .thumb { width: 92px; height: 92px; }
+.thumb.face { background: linear-gradient(135deg, #ffd9c7 0%, #f08c6a 100%); }
+.thumb.body { background: linear-gradient(135deg, #e8d3b5 0%, #9d6b4f 100%); }
+.thumb .thumb-label { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 0; background: rgba(0, 0, 0, 0.28); font-size: 10px; text-align: center; color: #fff; }

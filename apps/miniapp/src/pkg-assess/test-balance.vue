@@ -61,7 +61,7 @@ async function skip() {
       <view class="card hint stack">
         <text class="t-body">只做睁眼测试。请扶好椅背、有人陪同，感到不稳马上放下脚。</text>
         <view class="row gap8" @click="company = !company">
-          <view class="check" :class="{ on: company }"><XIcon v-if="company" name="check" :size="16" color="#fff" /></view>
+          <view class="check" :class="{ on: company }"><XIcon v-if="company" name="check" :size="16" color="var(--on-brand)" /></view>
           <text class="t-md">身边有人陪同</text>
         </view>
       </view>

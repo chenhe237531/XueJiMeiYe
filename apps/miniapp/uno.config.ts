@@ -78,6 +78,9 @@ export default defineConfig({
     'i-tabler-building-store',
     'i-tabler-star',
     'i-tabler-calendar-plus',
+    'i-tabler-massage',
+    'i-tabler-copy',
+    'i-tabler-user-heart',
     'i-tabler-clipboard-heart',
     'i-tabler-message-heart',
     'i-tabler-sparkles',
@@ -187,10 +190,10 @@ export default defineConfig({
   theme: {
     colors: {
       /** 主题色，用法如: text-primary */
-      primary: '#8C2B56',
-      brand: '#8C2B56',
+      primary: '#FFD100',
+      brand: 'var(--brand-ink)', // 文字 / 图标用的品牌色（随乐龄 / 臻享皮肤变化）；黄色底用 var(--brand)
       care: '#1F6E68',
-      ink: '#1E191C',
+      ink: '#222222',
       gold: '#D2B47A',
     },
     fontSize: {

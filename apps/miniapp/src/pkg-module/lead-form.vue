@@ -31,7 +31,7 @@ async function submit() {
     if (f.required && (form.value[f.key] === undefined || form.value[f.key] === '')) return toast(`请填写：${f.label}`)
   }
   const res: any = await http.post('/app/leads', { moduleCode: m.value.code, form: form.value, ackNotices: uni.getStorageSync('xj_ack') || [] }, { loading: '提交中' })
-  await new Promise(r => uni.showModal({ title: '已提交', content: `顾问会在 ${res.slaHours} 小时内联系您。`, showCancel: false, confirmText: '好的', confirmColor: '#8C2B56', complete: r }))
+  await new Promise(r => uni.showModal({ title: '已提交', content: `顾问会在 ${res.slaHours} 小时内联系您。`, showCancel: false, confirmText: '好的', confirmColor: '#8A5A00', complete: r }))
   back()
 }
 </script>
@@ -65,7 +65,7 @@ async function submit() {
 </template>
 
 <style scoped>
-.step { width: 44px; height: 44px; border-radius: 22px; background: var(--brand-soft); color: var(--brand); font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-.chip { height: 44px; padding: 0 18px; border-radius: 22px; background: #f4f2f3; display: flex; align-items: center; font-size: var(--fs-body); }
-.chip.on { background: var(--brand); color: #fff; font-weight: 600; }
+.step { width: 44px; height: 44px; border-radius: 22px; background: var(--brand-soft); color: var(--brand-ink); font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.chip { height: 44px; padding: 0 18px; border-radius: 22px; background: var(--bg); display: flex; align-items: center; font-size: var(--fs-body); }
+.chip.on { background: var(--brand); color: var(--on-brand); font-weight: 600; }
 </style>

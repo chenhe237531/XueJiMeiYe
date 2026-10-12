@@ -118,7 +118,7 @@ onShow(() => {
 
     <template v-else>
       <view class="row gap12" style="padding-bottom: 10px">
-        <view class="avatar"><XIcon name="sparkles" :size="26" color="#8C2B56" /></view>
+        <view class="avatar"><XIcon name="sparkles" :size="26" color="var(--brand-ink)" /></view>
         <view class="col flex1">
           <view class="row gap8">
             <text class="t-lg">{{ session?.persona?.name || '小镜' }}</text>
@@ -190,16 +190,16 @@ onShow(() => {
 
 <style scoped lang="scss">
 .mirror-page { display: flex; flex-direction: column; height: 100vh; padding-bottom: 0; }
-.avatar { width: 52px; height: 52px; border-radius: 26px; background: linear-gradient(145deg, #ffffff, #f4e7ed); border: 1px solid #e3c7d4; display: flex; align-items: center; justify-content: center; }
+.avatar { width: 52px; height: 52px; border-radius: 26px; background: linear-gradient(145deg, #ffffff, #fff8dc); border: 1px solid #ffe58a; display: flex; align-items: center; justify-content: center; }
 .chat { flex: 1; min-height: 0; }
 .msg { display: flex; flex-direction: column; margin-top: 14px; }
 .msg.user { align-items: flex-end; }
 .bubble { max-width: 84%; padding: 12px 16px; font-size: var(--fs-md); line-height: 1.6; box-sizing: border-box; }
-.msg.user .bubble { background: var(--brand); color: #fff; border-radius: 20px 6px 20px 20px; }
+.msg.user .bubble { background: var(--brand); color: var(--on-brand); border-radius: 20px 6px 20px 20px; }
 .msg.assistant .bubble { background: #fff; border-radius: 6px 20px 20px 20px; }
 .elder .bubble { font-size: 19px; }
 .txt { white-space: pre-wrap; }
-.mini-pill { display: flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; border-radius: 14px; border: 1px solid #e3c7d4; color: var(--brand); font-size: 13px; font-weight: 600; }
+.mini-pill { display: flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; border-radius: 14px; border: 1px solid #ffe58a; color: var(--brand-ink); font-size: 13px; font-weight: 600; }
 .safety { margin-top: 10px; width: 84%; border: 1px solid #f3c9c4; }
 .composer { padding: 10px 0 calc(76px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; }
 .elder .composer { padding-bottom: calc(86px + env(safe-area-inset-bottom)); }

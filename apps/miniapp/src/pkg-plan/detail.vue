@@ -28,7 +28,7 @@ function read() {
 <template>
   <view :class="[...xj.pageClass, 'has-footer']">
     <view v-if="d && !d.plan" class="card empty stack" style="margin-top: 16px">
-      <XIcon name="clipboard-heart" :size="48" color="#8C2B56" />
+      <XIcon name="clipboard-heart" :size="48" color="var(--brand-ink)" />
       <text class="t-md">{{ d.preparing ? '顾问正在为您整理方案，审核后会发给您' : '完成六维测评后，顾问会为您整理养护方案' }}</text>
       <view v-if="!d.preparing" class="btn" @click="go('/pkg-assess/intro')">开始六维测评</view>
     </view>

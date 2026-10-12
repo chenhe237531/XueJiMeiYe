@@ -13,7 +13,7 @@ const form = ref<any>({ date: '', time: '09:30', from: '', to: '门店', people:
 async function submit() {
   if (!form.value.date || !form.value.from) return toast('请填写日期和上车地点')
   const res: any = await http.post('/app/transport/requests', form.value, { loading: '提交中' })
-  await new Promise(r => uni.showModal({ title: '已提交', content: `门店会确认车辆和司机后通知您（单号 ${res.leadNo}）。`, showCancel: false, confirmText: '好的', confirmColor: '#8C2B56', complete: r }))
+  await new Promise(r => uni.showModal({ title: '已提交', content: `门店会确认车辆和司机后通知您（单号 ${res.leadNo}）。`, showCancel: false, confirmText: '好的', confirmColor: '#8A5A00', complete: r }))
   back()
 }
 </script>
@@ -43,6 +43,6 @@ async function submit() {
 </template>
 
 <style scoped>
-.chip { height: 44px; padding: 0 18px; border-radius: 22px; background: #f4f2f3; display: flex; align-items: center; }
-.chip.on { background: var(--brand); color: #fff; font-weight: 600; }
+.chip { height: 44px; padding: 0 18px; border-radius: 22px; background: var(--bg); display: flex; align-items: center; }
+.chip.on { background: var(--brand); color: var(--on-brand); font-weight: 600; }
 </style>

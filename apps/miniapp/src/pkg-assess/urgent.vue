@@ -24,9 +24,9 @@ const page = ref<any>(uni.getStorageSync('xj_urgent') || { title: '您提到的�
       <view class="btn ghost" style="height: 64px; font-size: 21px" @click="go('/pkg-me/advisor')"><XIcon name="headset" :size="22" /><text>联系我的顾问</text></view>
       <view class="card" style="background: #f6f4f5">
         <view class="col gap12 t-md" style="font-weight: 400">
-          <view class="row gap8"><XIcon name="clock" color="#8C2B56" /><text>您的顾问会在 1 小时内给您打电话</text></view>
-          <view class="row gap8"><XIcon name="heart" color="#8C2B56" /><text>门店项目先暂停，身体最要紧</text></view>
-          <view class="row gap8"><XIcon name="check" color="#8C2B56" /><text>已答的题目都保存好了</text></view>
+          <view class="row gap8"><XIcon name="clock" color="var(--brand-ink)" /><text>您的顾问会在 1 小时内给您打电话</text></view>
+          <view class="row gap8"><XIcon name="heart" color="var(--brand-ink)" /><text>门店项目先暂停，身体最要紧</text></view>
+          <view class="row gap8"><XIcon name="check" color="var(--brand-ink)" /><text>已答的题目都保存好了</text></view>
         </view>
       </view>
       <text class="t-md c2" style="text-align: center; padding: 8px" @click="back()">返回继续测评</text>

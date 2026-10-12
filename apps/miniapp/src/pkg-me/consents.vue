@@ -52,5 +52,5 @@ async function revoke(c: any) {
 
 <style scoped>
 .mini { height: 30px; padding: 0 14px; border-radius: 15px; border: 1px solid #e0d8dc; display: flex; align-items: center; font-size: 13px; color: #3b3337; }
-.mini.on { border-color: var(--brand); color: var(--brand); font-weight: 600; }
+.mini.on { border-color: var(--brand); color: var(--brand-ink); font-weight: 600; }
 </style>

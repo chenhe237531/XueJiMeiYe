@@ -39,7 +39,7 @@ function subscribe() {
       <view class="group">
         <view class="cell">
           <view class="col flex1"><text class="t-md">乐龄模式</text><text class="t-sm c2">字更大、按钮更大、题目和报告可以朗读</text></view>
-          <switch :checked="xj.elderMode" color="#8C2B56" @change="(e) => xj.toggleElder(e.detail.value)" />
+          <switch :checked="xj.elderMode" color="#F5BE00" @change="(e) => xj.toggleElder(e.detail.value)" />
         </view>
         <view class="cell">
           <view class="col flex1"><text class="t-md">语言</text><text class="t-sm c2">粤语语音在 V1.2 上线</text></view>
@@ -50,11 +50,11 @@ function subscribe() {
         </view>
         <view class="cell">
           <view class="col flex1"><text class="t-md">个性化推荐</text><text class="t-sm c2">关闭后首页按默认顺序展示，价格和权益不受影响</text></view>
-          <switch :checked="personalization" color="#8C2B56" @change="(e) => set('personalization', e.detail.value)" />
+          <switch :checked="personalization" color="#F5BE00" @change="(e) => set('personalization', e.detail.value)" />
         </view>
         <view class="cell">
           <view class="col flex1"><text class="t-md">小镜自动朗读</text><text class="t-sm c2">乐龄模式下，小镜的回复自动播放</text></view>
-          <switch :checked="autoRead" color="#8C2B56" @change="(e) => set('autoRead', e.detail.value)" />
+          <switch :checked="autoRead" color="#F5BE00" @change="(e) => set('autoRead', e.detail.value)" />
         </view>
         <view class="cell" @click="subscribe">
           <view class="col flex1"><text class="t-md">消息通知</text><text class="t-sm c2">预约成功、体检前一天、报告回传</text></view>
@@ -66,6 +66,6 @@ function subscribe() {
 </template>
 
 <style scoped>
-.seg { padding: 6px 12px; border-radius: 16px; background: #f4f2f3; font-size: var(--fs-sm); }
-.seg.on { background: var(--brand); color: #fff; font-weight: 600; }
+.seg { padding: 6px 12px; border-radius: 16px; background: var(--bg); font-size: var(--fs-sm); }
+.seg.on { background: var(--brand); color: var(--on-brand); font-weight: 600; }
 </style>

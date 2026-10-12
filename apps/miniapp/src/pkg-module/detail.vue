@@ -28,7 +28,7 @@ function submit() {
   if (m.value.entryType === 'miniprogram') {
     // #ifdef MP-WEIXIN
     const cfg = m.value.entryConfig || {}
-    uni.showModal({ title: '提示', content: cfg.tip || '即将前往商城', confirmColor: '#8C2B56', success: (r) => { if (r.confirm) uni.navigateToMiniProgram({ appId: cfg.appId, path: cfg.path, fail: () => toast('商城小程序待配置') }) } })
+    uni.showModal({ title: '提示', content: cfg.tip || '即将前往商城', confirmColor: '#8A5A00', success: (r) => { if (r.confirm) uni.navigateToMiniProgram({ appId: cfg.appId, path: cfg.path, fail: () => toast('商城小程序待配置') }) } })
     // #endif
     // #ifndef MP-WEIXIN
     toast(`${m.value.entryConfig?.tip || '即将前往商城'}（小程序内可跳转）`)
@@ -62,7 +62,7 @@ function submit() {
         <text class="t-xs c3">{{ d.priceNote || '以合作方最终报价为准' }}</text>
       </view>
       <view v-if="d.highlights?.length" class="hl">
-        <view v-for="h in d.highlights" :key="h" class="hl-item"><XIcon name="circle-check" :size="20" color="#8C2B56" /><text class="t-sm">{{ h }}</text></view>
+        <view v-for="h in d.highlights" :key="h" class="hl-item"><XIcon name="circle-check" :size="20" color="var(--brand-ink)" /><text class="t-sm">{{ h }}</text></view>
       </view>
       <view v-if="d.suitable" class="row gap8"><text class="t-sm c2">适合人群</text><text class="t-sm">{{ d.suitable }}</text></view>
       <view v-if="d.content?.length" class="col gap8">
@@ -72,7 +72,7 @@ function submit() {
       <view v-for="n in m.healthNotices" :key="n.id" class="card hint stack">
         <view class="row gap8" style="align-items: flex-start"><XIcon name="info-circle" :size="20" /><text class="t-body">{{ n.tags?.length ? '根据您的健康档案：' : '' }}{{ n.text }}</text></view>
         <view v-if="n.requireAck" class="row gap8" @click="toggleAck(n.id)">
-          <view class="check" :class="{ on: acked.includes(n.id) }"><XIcon v-if="acked.includes(n.id)" name="check" :size="16" color="#fff" /></view>
+          <view class="check" :class="{ on: acked.includes(n.id) }"><XIcon v-if="acked.includes(n.id)" name="check" :size="16" color="var(--on-brand)" /></view>
           <text class="t-md">我已了解</text>
         </view>
       </view>

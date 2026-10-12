@@ -50,8 +50,8 @@ function open(r: any) {
 
 <style scoped>
 .chip { display: inline-flex; height: 36px; align-items: center; padding: 0 14px; margin-right: 8px; border-radius: 18px; background: #fff; font-size: var(--fs-sm); }
-.chip.on { background: var(--brand); color: #fff; font-weight: 600; }
+.chip.on { background: var(--brand); color: var(--on-brand); font-weight: 600; }
 .timeline { position: relative; padding-left: 18px; border-left: 2px solid var(--line-2); margin-left: 6px; }
 .node { position: relative; margin-bottom: 12px; }
-.dot { position: absolute; left: -26px; top: 18px; width: 12px; height: 12px; border-radius: 6px; border: 2px solid #f4f2f3; }
+.dot { position: absolute; left: -26px; top: 18px; width: 12px; height: 12px; border-radius: 6px; border: 2px solid var(--bg); }
 </style>

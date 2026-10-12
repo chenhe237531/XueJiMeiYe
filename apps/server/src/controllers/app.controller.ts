@@ -610,7 +610,7 @@ export class AppController {
     const c = u ? await this.prisma.customer.findUnique({ where: { id: u.id } }) : null
     const store = (c?.storeId ? await this.prisma.store.findUnique({ where: { id: c.storeId } }) : null) || (await this.prisma.store.findFirst({ orderBy: { id: 'asc' } }))
     const projects = await this.prisma.project.findMany({ where: { onMeituan: true, status: 'active' }, orderBy: { code: 'asc' } })
-    const view = (p: any) => ({ code: p.code, name: p.name, shortName: p.shortName, durationMin: p.durationMin, priceRef: p.priceRef, groupPrice: p.groupPrice, priceNote: p.priceNote, audience: p.audience, salesNote: p.salesNote })
+    const view = (p: any) => ({ code: p.code, name: p.name, shortName: p.shortName, category: p.category, durationMin: p.durationMin, priceRef: p.priceRef, groupPrice: p.groupPrice, priceNote: p.priceNote, audience: p.audience, salesNote: p.salesNote })
     if (u) await this.wf.event(u.id, 'module_view', { moduleCode: 'store_services' })
     return {
       store: store && { id: store.id, name: store.name, address: store.address, mall: store.mall, district: store.district, phone: store.phone, openHours: store.openHours, category: store.category, facilities: store.facilities, promises: store.promises, rating: store.rating, reviewCount: store.reviewCount },

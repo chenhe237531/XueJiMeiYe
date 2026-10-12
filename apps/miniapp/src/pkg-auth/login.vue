@@ -58,7 +58,7 @@ async function demo(p: any) {
       <input v-model="phone" class="input" type="number" maxlength="11" placeholder="请输入手机号">
       <text class="t-xs c3">演示环境：输入任意手机号即可登录。老客户按手机号匹配，继承原有等级、门店和顾问。</text>
       <view class="row gap8" @click="agreed = !agreed">
-        <view class="check" :class="{ on: agreed }"><XIcon v-if="agreed" name="check" :size="16" color="#fff" /></view>
+        <view class="check" :class="{ on: agreed }"><XIcon v-if="agreed" name="check" :size="16" color="var(--on-brand)" /></view>
         <text class="t-sm c2">我已阅读并同意<text class="link" @click.stop="showC1 = !showC1">《用户协议与隐私政策》</text></text>
       </view>
       <view v-if="showC1" class="card hint t-sm">提供平台基本服务；收集微信标识、手机号、称呼、出生年份、性别、使用记录；保存到账号注销为止。健康信息另行单独征得您的同意。</view>
@@ -82,7 +82,7 @@ async function demo(p: any) {
 <style scoped lang="scss">
 .check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #c9bec4; display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0; }
 .check.on { background: var(--brand); border-color: var(--brand); }
-.avatar { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; background: var(--brand-soft); color: var(--brand); }
+.avatar { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; background: var(--brand-soft); color: var(--brand-ink); }
 .avatar.tA { background: #1e191d; color: #d2b47a; }
-.avatar.tB { background: #8c2b56; color: #fff; }
+.avatar.tB { background: var(--brand); color: var(--on-brand); }
 </style>

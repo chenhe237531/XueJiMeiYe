@@ -47,8 +47,8 @@ function flip(idx: number) {
       </view>
       <view class="grid" :style="{ gridTemplateColumns: `repeat(${level === 3 ? 3 : 4}, minmax(0, 1fr))` }">
         <view v-for="(c, i) in cards" :key="c.id" class="cardx" :class="{ up: c.matched || open.includes(i), matched: c.matched }" @click="flip(i)">
-          <XIcon v-if="c.matched || open.includes(i)" :name="c.icon" :size="34" color="#8C2B56" />
-          <XIcon v-else name="sparkles" :size="22" color="#fff" />
+          <XIcon v-if="c.matched || open.includes(i)" :name="c.icon" :size="34" color="var(--brand-ink)" />
+          <XIcon v-else name="sparkles" :size="22" color="var(--on-brand)" />
         </view>
       </view>
       <view class="row-between t-body"><text>已翻 {{ moves }} 次</text><text class="link" @click="start()">重新开始</text></view>
@@ -59,7 +59,7 @@ function flip(idx: number) {
 
 <style scoped>
 .seg { flex: 1; height: 44px; border-radius: 22px; background: #fff; display: flex; align-items: center; justify-content: center; }
-.seg.on { background: var(--brand); color: #fff; font-weight: 700; }
+.seg.on { background: var(--brand); color: var(--on-brand); font-weight: 700; }
 .grid { display: grid; gap: 10px; }
 .cardx { aspect-ratio: 1; min-height: 72px; border-radius: 16px; background: var(--brand); display: flex; align-items: center; justify-content: center; }
 .cardx.up { background: #fff; border: 2px solid var(--brand-line); }
