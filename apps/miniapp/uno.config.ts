@@ -175,6 +175,7 @@ export default defineConfig({
     'i-tabler-bus',
     'i-tabler-messages',
     'i-tabler-notes',
+    'i-tabler-wifi-off',
   ],
   rules: [
     [

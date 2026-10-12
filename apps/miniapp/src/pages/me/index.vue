@@ -69,10 +69,10 @@ async function logout() {
           </view>
           <text class="t-xs" style="opacity: 0.82">获得后 12 个月内有效</text>
         </view>
-        <text class="t-md">去兑换</text>
+        <view class="redeem">去兑换<XIcon name="chevron-right" :size="16" /></view>
       </view>
 
-      <view class="card quick">
+      <view class="card raised quick">
         <view v-for="q in quick" :key="q.name" class="col gap6 q" @click="go(q.link)">
           <view class="icon-box" :class="q.name === '体检券' ? 'care' : ''"><XIcon :name="q.icon" /></view>
           <text class="t-sm">{{ q.name }}</text>
@@ -106,8 +106,10 @@ async function logout() {
 </template>
 
 <style scoped>
-.avatar { width: 56px; height: 56px; border-radius: 18px; background: var(--brand-soft); color: var(--brand-ink); font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-.passbook { background: var(--brand); color: var(--on-brand); border-radius: 20px; padding: 18px; }
+.avatar { width: 56px; height: 56px; border-radius: 18px; background: linear-gradient(145deg, #fff8dc, #ffe58a); border: 1px solid var(--brand-line); color: var(--brand-ink); font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.passbook { position: relative; overflow: hidden; background: linear-gradient(135deg, #ffe04d 0%, #ffd100 48%, #f5be00 100%); color: var(--on-brand); border-radius: 20px; padding: 18px; box-shadow: 0 10px 24px -12px rgba(204, 150, 0, 0.55); }
+.passbook::after { content: ''; position: absolute; right: -28px; top: -36px; width: 120px; height: 120px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); pointer-events: none; }
+.redeem { display: flex; align-items: center; gap: 2px; height: 34px; padding: 0 12px 0 14px; border-radius: 999px; background: rgba(34, 34, 34, 0.86); color: #ffd100; font-size: var(--fs-sm); font-weight: 600; }
 .quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .q { align-items: center; }
 </style>

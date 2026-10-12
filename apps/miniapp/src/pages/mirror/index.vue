@@ -195,8 +195,8 @@ onShow(() => {
 .msg { display: flex; flex-direction: column; margin-top: 14px; }
 .msg.user { align-items: flex-end; }
 .bubble { max-width: 84%; padding: 12px 16px; font-size: var(--fs-md); line-height: 1.6; box-sizing: border-box; }
-.msg.user .bubble { background: var(--brand); color: var(--on-brand); border-radius: 20px 6px 20px 20px; }
-.msg.assistant .bubble { background: #fff; border-radius: 6px 20px 20px 20px; }
+.msg.user .bubble { background: var(--brand); color: var(--on-brand); border-radius: 20px 6px 20px 20px; box-shadow: 0 4px 12px -6px rgba(204, 150, 0, 0.5); }
+.msg.assistant .bubble { background: #fff; border: 1px solid var(--line); border-radius: 6px 20px 20px 20px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03); }
 .elder .bubble { font-size: 19px; }
 .txt { white-space: pre-wrap; }
 .mini-pill { display: flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; border-radius: 14px; border: 1px solid #ffe58a; color: var(--brand-ink); font-size: 13px; font-weight: 600; }
@@ -204,8 +204,10 @@ onShow(() => {
 .composer { padding: 10px 0 calc(76px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; }
 .elder .composer { padding-bottom: calc(86px + env(safe-area-inset-bottom)); }
 .topics { white-space: nowrap; }
-.topic { display: inline-flex; height: 36px; align-items: center; padding: 0 14px; border-radius: 18px; background: #fff; color: #3b3337; font-size: var(--fs-sm); flex-shrink: 0; }
+.topic { display: inline-flex; height: 36px; align-items: center; padding: 0 14px; border-radius: 18px; background: #fff; border: 1px solid var(--line-2); color: #3b3337; font-size: var(--fs-sm); flex-shrink: 0; }
+.topic:active { background: var(--brand-soft); border-color: var(--brand-line); color: var(--brand-ink); }
 .elder .topic { height: 44px; font-size: 16px; }
 .kbd { width: 52px; height: 52px; border-radius: 26px; background: #fff; border: 1px solid #e0d8dc; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.kbd:active { background: var(--brand-soft); border-color: var(--brand-line); }
 .btn.listening { background: var(--brand-dark); }
 </style>

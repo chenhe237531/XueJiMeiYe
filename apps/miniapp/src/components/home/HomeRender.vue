@@ -117,7 +117,7 @@ const featuredFirst = (items: any[], featured?: string) => {
       </view>
 
       <!-- 轮播（乐龄模式停用自动轮播） -->
-      <swiper v-else-if="c.type === 'banner'" class="banner" :autoplay="c.props.autoplay" circular :indicator-dots="c.props.items.length > 1">
+      <swiper v-else-if="c.type === 'banner'" class="banner" :autoplay="c.props.autoplay" circular :indicator-dots="c.props.items.length > 1" indicator-color="rgba(34, 24, 40, 0.14)" indicator-active-color="#f5be00">
         <swiper-item v-for="it in c.props.items" :key="it.code">
           <view class="card row gap12 banner-card" @click="open(it, 'banner')">
             <view class="photo-slot" style="width: 84px; height: 84px"><XIcon :name="it.icon" :size="24" /><text>实拍位</text></view>
@@ -191,23 +191,23 @@ const featuredFirst = (items: any[], featured?: string) => {
 .toggle.on .knob { left: 23px; }
 .night .toggle.on { background: var(--gold); }
 
-.tier-card { border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.tier-card { border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 10px 24px -16px rgba(34, 24, 40, 0.35); }
 .tier-C { background: var(--brand-soft); color: var(--brand-ink); }
 .tier-B { background: var(--brand); color: var(--on-brand); }
 .tier-A { background: #1e191d; color: #f2ece8; border: 1px solid rgba(210, 180, 122, 0.3); }
 .tier-A .t-lg { color: #d2b47a; }
 .tier-line { height: 1px; background: currentColor; opacity: 0.2; }
-.benefit { padding: 2px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.16); }
+.benefit { padding: 2px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.28); }
 .tier-C .benefit { background: #fff; }
 
 .health { padding-bottom: 4px; }
 .todo { border-top: 1px solid var(--line); padding: 14px 0 12px; margin-top: 12px; }
 
 .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.tile { height: 100px; border-radius: 20px; background: var(--surface); padding: 14px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; }
+.tile { height: 100px; border-radius: 20px; background: var(--surface); padding: 14px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 8px 18px -14px rgba(34, 24, 40, 0.28); }
 .elder .tile { height: 108px; }
 .tile-name { font-size: var(--fs-md); font-weight: 600; line-height: 1.3; }
-.tile.featured { grid-column: span 2; background: var(--brand); color: var(--on-brand); height: 112px; }
+.tile.featured { grid-column: span 2; background: var(--brand); color: var(--on-brand); height: 112px; box-shadow: 0 10px 22px -12px rgba(204, 150, 0, 0.55); }
 .night .tile.featured { color: #131013; }
 .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 4px; }
 .g4 { align-items: center; text-align: center; }
