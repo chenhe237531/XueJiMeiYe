@@ -13,9 +13,10 @@ import { PlanService } from '../services/plan.service'
 import { TierService } from '../services/tier.service'
 import { WorkflowService } from '../services/workflow.service'
 import { screenProject } from '../engine'
+import { INTAKE_FORM, mapIntake } from '../engine/intake'
 
 const LEAD_STATUS: Record<string, string> = { new: '新线索', contacted: '已联系', negotiating: '洽谈中', won: '已成交', lost: '已丢单' }
-const LEAD_TYPE: Record<string, string> = { travel: '文旅', overseas_vip: '海外 VIP', transport: '接送', gift: '礼盒', checkup: '高端体检', other: '其他' }
+const LEAD_TYPE: Record<string, string> = { travel: '文旅', overseas_vip: '海外 VIP', transport: '接送', gift: '礼盒', checkup: '高端体检', visit: '到店预约', other: '其他' }
 const ALERT_LEVEL: Record<string, string> = { L3: 'L3 紧急就医', L2: 'L2 优先就医', high: '魔镜高风险', watch: '关注' }
 const ALERT_SOURCE: Record<string, string> = { assessment: '测评', measurement: '门店测量', mirror: '魔镜', staff: '员工上报' }
 
@@ -604,6 +605,45 @@ export class AdminController {
     await this.prisma.serviceCheck.create({ data: { customerId: Number(body.customerId), projectCode: body.projectCode, staffName: u.name, result: body.result } })
     await this.wf.audit(this.actor(u), 'service.check', { type: 'customer', id: Number(body.customerId), customerId: Number(body.customerId) }, body)
     return { ok: true }
+  }
+
+  // ───────── 门店《健康档案表（女）》数字化 ─────────
+
+  @Get('intake/form')
+  intakeForm() {
+    return INTAKE_FORM
+  }
+
+  /** 录入：顾问 / 店长 / 健康顾问；客户未在线授权 C2 时，须确认已签署纸质授权（渠道 paper） */
+  @Post('customers/:id/intakes')
+  async createIntake(@CurrentUser() u: StaffUser, @Param('id', ParseIntPipe) id: number, @Body() body: { data: any, paperConsent?: boolean, consultant?: string }) {
+    requireRole(u, ['advisor', 'store_manager', 'health_advisor'])
+    const c = await this.prisma.customer.findUnique({ where: { id } })
+    if (!c) throw Err.notFound()
+    let channel = 'self'
+    if (!(await this.wf.hasConsent(id, 'C2'))) {
+      if (!body.paperConsent) throw Err.bad('客户尚未授权健康信息处理（C2），请先请客户签署纸质授权并勾选确认')
+      await this.wf.grantConsent(id, 'C2', true, { source: 'health_intake_form' }, 'paper')
+      channel = 'paper'
+    }
+    const { tags, notes, urgent } = mapIntake(body.data || {})
+    const intake = await this.prisma.healthIntake.create({ data: { customerId: id, data: body.data || {}, tags, staffName: u.name, consultant: body.consultant, consentChannel: channel } })
+    for (const t of tags) await this.wf.setTag(id, t, 'staff', intake.id)
+    await this.wf.addRecord({ customerId: id, recordType: 'service', sourceLabel: 'SELF', title: '门店健康档案表', summary: `本人自述，${u.name}协助填写${tags.length ? `；生成 ${tags.length} 个健康标签` : ''}`, refTable: 'health_intake', refId: intake.id, storeId: c.storeId })
+    if (urgent.length) {
+      await this.wf.createAlert({ customerId: id, source: 'staff', sourceRefId: intake.id, level: 'L2', ruleCodes: [`INTAKE_${intake.id}`], title: `健康档案表登记近 1 周不适：${urgent.join('、')}，需健康顾问评估` })
+    }
+    await this.wf.audit(this.actor(u), 'health.intake.create', { type: 'health_intake', id: intake.id, customerId: id }, { tags })
+    return { id: intake.id, tags, notes, alert: urgent.length > 0 }
+  }
+
+  /** 查看完整档案表：仅健康顾问 / 超管，写审计 */
+  @Get('customers/:id/intakes')
+  async intakes(@CurrentUser() u: StaffUser, @Param('id', ParseIntPipe) id: number) {
+    requireRole(u, ['health_advisor'])
+    await this.wf.audit(this.actor(u), 'health.view', { type: 'health_intake', customerId: id })
+    const list = await this.prisma.healthIntake.findMany({ where: { customerId: id }, orderBy: { id: 'desc' } })
+    return list.map(i => ({ ...i, createdAt: fmt(i.createdAt), tagNames: ((i.tags as string[]) || []).map(t => tagName(t)) }))
   }
 
   @Get('customers-search')

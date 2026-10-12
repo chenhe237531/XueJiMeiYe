@@ -83,7 +83,7 @@ async function readAll() {
       ]" :key="c.k" :xs="12" :sm="6" class="mb-4">
         <el-card shadow="never">
           <div class="text-sm text-gray-500">{{ c.n }}</div>
-          <div class="text-3xl font-bold mt-1" :class="{ 'text-red-700': c.warn && d.cards[c.k] }">{{ d.cards[c.k] }}<span class="text-sm font-normal ml-1">{{ c.u }}</span></div>
+          <div class="text-3xl font-bold mt-1" :class="{ 'text-red-700': (c as any).warn && d.cards[c.k] }">{{ d.cards[c.k] }}<span class="text-sm font-normal ml-1">{{ c.u }}</span></div>
         </el-card>
       </el-col>
     </el-row>

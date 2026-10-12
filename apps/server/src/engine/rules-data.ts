@@ -55,20 +55,31 @@ export const PROJECT_ATTRS: Record<string, string> = {
   body_shaping: '塑形类', strong_aroma: '浓香精油、熏香', exercise: '运动训练',
 }
 
-export const PROJECTS = [
-  { code: 'P01', name: '面部年轻化护理', dimension: 'skin', attributes: ['manual', 'facial_device'], durationMin: 75, priceRef: 680 },
-  { code: 'P02', name: '肩颈舒缓护理', dimension: 'posture', attributes: ['manual'], durationMin: 60, priceRef: 398 },
-  { code: 'P03', name: '腹部温养舒缓护理', dimension: 'fitness', attributes: ['abdominal', 'heat'], durationMin: 60, priceRef: 468 },
-  { code: 'P04', name: '背部舒压护理', dimension: 'posture', attributes: ['manual', 'deep_pressure'], durationMin: 60, priceRef: 428 },
-  { code: 'P05', name: '睡眠舒压 SPA', dimension: 'mind', attributes: ['manual', 'strong_aroma'], durationMin: 90, priceRef: 588 },
-  { code: 'P06', name: '体态评估与形体调理', dimension: 'posture', attributes: ['manual', 'deep_pressure'], durationMin: 60, priceRef: 498 },
-  { code: 'P07', name: '体成分检测与纤体管理', dimension: 'shape', attributes: ['bia_measure', 'body_shaping'], durationMin: 45, priceRef: 368 },
-  { code: 'P08', name: '轻体能训练课（负重与平衡）', dimension: 'fitness', attributes: ['exercise'], durationMin: 45, priceRef: 168 },
-  { code: 'P09', name: '正念减压课', dimension: 'mind', attributes: [], durationMin: 45, priceRef: 128 },
-  { code: 'P10', name: '产后形体修复护理', dimension: 'shape', attributes: ['abdominal', 'body_shaping'], durationMin: 60, priceRef: 528 },
-  { code: 'P11', name: '汗蒸舒缓', dimension: 'fitness', attributes: ['high_temp_bath', 'heat'], durationMin: 40, priceRef: 198 },
-  { code: 'P12', name: '科技美肤（射频 / 光电类）', dimension: 'skin', attributes: ['rf_energy', 'facial_device'], durationMin: 60, priceRef: 980 },
-  { code: 'P13', name: '腿部舒缓护理', dimension: 'shape', attributes: ['manual', 'leg_massage'], durationMin: 50, priceRef: 368 },
+/**
+ * 门店项目库：已上架项目来自五月花店美团团购（2026-10 快照，价格为公开团购价，对所有客户一致，4.15）；
+ * status=planned 为方案包需要、门店筹备中的项目；status=blocked 为合规未通过、不进入方案引擎的项目。
+ * 项目属性（禁忌筛查用）按项目描述初步标注，需商学院与设备厂家说明书确认【待确认】。
+ */
+export const PROJECTS: any[] = [
+  { code: 'P01', name: '人鱼水光面部护理（深层补水 收缩毛孔）', shortName: '人鱼水光面部护理', dimension: 'skin', category: 'face', attributes: ['manual', 'facial_device'], durationMin: 60, priceRef: 599, groupPrice: 291, priceNote: '新客价，90 天最低价', audience: '全面部 · 仅限女性', salesNote: '年售 20', onMeituan: true },
+  { code: 'P02', name: '招牌 SPA · 60 分钟沉浸式手仪双护（按摩推拿放松）', shortName: '招牌 SPA 手仪双护', dimension: 'posture', category: 'body', attributes: ['manual'], durationMin: 60, priceRef: 238, groupPrice: 55.8, priceNote: '3 次养生调理卡 ¥194（单次 ¥64.67）', audience: '男女通用', salesNote: '年售 60+', onMeituan: true },
+  { code: 'P03', name: '腹部温养舒缓护理', shortName: '腹部温养护理', dimension: 'fitness', category: 'planned', attributes: ['abdominal', 'heat'], durationMin: 60, status: 'planned' },
+  { code: 'P04', name: '90 分钟 SPA 按摩（手仪推拿 + 草本热敷）', shortName: '90 分钟 SPA 按摩', dimension: 'posture', category: 'body', attributes: ['manual', 'deep_pressure', 'heat'], durationMin: 90, priceRef: 388, groupPrice: 85, audience: '男女通用', salesNote: '年售 26', onMeituan: true },
+  { code: 'P05', name: '120 分钟全身精油 SPA（指压按摩 + 草本精华热敷）', shortName: '全身精油 SPA', dimension: 'mind', category: 'body', attributes: ['manual', 'deep_pressure', 'heat', 'strong_aroma'], durationMin: 120, priceRef: 888, groupPrice: 279.01, audience: '男女通用', salesNote: '年售 27', onMeituan: true },
+  { code: 'P06', name: '体态评估与形体调理', shortName: '体态调理', dimension: 'posture', category: 'planned', attributes: ['manual', 'deep_pressure'], durationMin: 60, status: 'planned' },
+  { code: 'P07', name: '体成分检测与纤体管理', shortName: '体成分管理', dimension: 'shape', category: 'planned', attributes: ['bia_measure', 'body_shaping'], durationMin: 45, status: 'planned' },
+  { code: 'P08', name: '轻体能训练课（负重与平衡）', shortName: '轻体能课', dimension: 'fitness', category: 'planned', attributes: ['exercise'], durationMin: 45, status: 'planned' },
+  { code: 'P09', name: '正念减压课', shortName: '正念减压课', dimension: 'mind', category: 'planned', attributes: [], durationMin: 45, status: 'planned' },
+  { code: 'P10', name: '产后形体修复护理', shortName: '产后修复护理', dimension: 'shape', category: 'planned', attributes: ['abdominal', 'body_shaping'], durationMin: 60, status: 'planned' },
+  { code: 'P11', name: '汗蒸舒缓', shortName: '汗蒸', dimension: 'fitness', category: 'planned', attributes: ['high_temp_bath', 'heat'], durationMin: 40, status: 'planned' },
+  { code: 'P12', name: '菲络嘉面部补水灌注修护（深层补水保湿）', shortName: '菲络嘉补水修护', dimension: 'skin', category: 'face', attributes: ['manual', 'facial_device'], durationMin: 90, priceRef: 888, groupPrice: 490, audience: '全面部 · 仅限女性', salesNote: '年售 7', onMeituan: true },
+  { code: 'P13', name: '腿部舒缓护理', shortName: '腿部舒缓', dimension: 'shape', category: 'planned', attributes: ['manual', 'leg_massage'], durationMin: 50, status: 'planned' },
+  { code: 'P14', name: '60 分钟深层清洁（POLA 去黑头 清洁毛孔粉刺）', shortName: 'POLA 深层清洁', dimension: 'skin', category: 'face', attributes: ['manual', 'facial_device'], durationMin: 60, priceRef: 238.8, groupPrice: 58.48, priceNote: '3 次卡 ¥191（单次 ¥63.67）', audience: '全面部 · 仅限女性', salesNote: '年售 200+ · 本店复购第 1', onMeituan: true },
+  { code: 'P15', name: '清洁补水（POLA 净透毛孔 + 水润肌面部补水）', shortName: '清洁补水', dimension: 'skin', category: 'face', attributes: ['manual', 'facial_device'], durationMin: 75, priceRef: 398, groupPrice: 91.8, audience: '全面部 · 仅限女性', salesNote: '年售 200+', onMeituan: true },
+  { code: 'P16', name: '痘肌护理（手工清痘 改善闭口粉刺 淡化痘印）', shortName: '痘肌护理', dimension: 'skin', category: 'face', attributes: ['manual'], durationMin: 40, priceRef: 299, groupPrice: 62.9, priceNote: '新客价', audience: '仅限女性', salesNote: '年售 10', onMeituan: true },
+  { code: 'P17', name: '巧克力焕肤透亮（去黑头 毛孔净透 补水保湿）', shortName: '巧克力焕肤', dimension: 'skin', category: 'face', attributes: ['manual', 'facial_device'], durationMin: 60, priceRef: 499, groupPrice: 230, audience: '全面部 · 仅限女性', salesNote: '年售 34', onMeituan: true },
+  { code: 'P18', name: '冰雪星辰美白套组（美白嫩肤）', shortName: '冰雪星辰美白', dimension: 'skin', category: 'face', attributes: ['manual', 'facial_device'], durationMin: 75, priceRef: 1288, groupPrice: 428, priceNote: '新客价，180 天最低价', audience: '全面部 · 仅限女性', salesNote: '新上架', onMeituan: true },
+  { code: 'P19', name: '德国鹰眼全身健康评估（美团在售）', shortName: '鹰眼评估', dimension: 'assess', category: 'assess', attributes: [], priceRef: 129, groupPrice: 59.9, audience: '男女通用', salesNote: '年售 2', onMeituan: true, status: 'blocked', complianceNote: '设备准入待审核（4.10）：报告含脏器疾病风险、药物禁忌与草药治疗内容，不进入客户端、不参与方案引擎和就医推荐；团购标题"全身 558 项健康评估"及报告措辞需法务审核（附录 I）' },
 ]
 
 const ALL = '*'
@@ -78,7 +89,7 @@ export const CONTRAINDICATIONS = [
   { code: 'CI03', tags: ['anticoagulant'], attributes: ['manual'], effect: 'warn', text: '手法力度放轻，留意瘀青' },
   { code: 'CI04', tags: ['sensory_reduced'], attributes: ['heat', 'high_temp_bath'], effect: 'block', text: '皮肤感觉迟钝，有烫伤风险' },
   { code: 'CI05', tags: ['htn_uncontrolled'], attributes: ['high_temp_bath'], effect: 'block', text: '血压不稳定，不做高温项目' },
-  { code: 'CI06', tags: ['htn_uncontrolled', 'htn_unknown'], attributes: ['heat'], effect: 'warn', text: '操作前测血压' },
+  { code: 'CI06', tags: ['htn_uncontrolled', 'htn_unknown', 'bp_high_self', 'bp_high'], attributes: ['heat'], effect: 'warn', text: '操作前测血压' },
   { code: 'CI07', tags: ['dx_heart'], attributes: ['high_temp_bath'], effect: 'block', text: '有心脏病，不做高温项目' },
   { code: 'CI08', tags: ['osteoporosis_high'], attributes: ['deep_pressure', 'spinal_manipulation'], effect: 'block', text: '骨质疏松高风险，只用轻手法' },
   { code: 'CI09', tags: ['osteoporosis_mid'], attributes: ['deep_pressure'], effect: 'warn', text: '手法力度放轻' },
@@ -94,20 +105,25 @@ export const CONTRAINDICATIONS = [
   { code: 'CI19', tags: ['doctor_hold_heat'], attributes: ['heat', 'high_temp_bath'], effect: 'block', text: '医生建议暂停热疗类' },
   { code: 'CI20', tags: ['doctor_hold_device'], attributes: ['rf_energy', 'electrical', 'facial_device'], effect: 'block', text: '医生建议暂停仪器类' },
   { code: 'CI21', tags: ['doctor_hold_all'], attributes: [ALL], effect: 'block', text: '医生建议暂停全部门店项目' },
+  { code: 'CI22', tags: ['gyn_condition'], attributes: ['abdominal', 'heat'], effect: 'warn', text: '有子宫肌瘤或增生史，腹部和热敷项目前确认医生意见【医生确认】' },
+  { code: 'CI23', tags: ['skin_sensitive'], attributes: ['facial_device'], effect: 'warn', text: '敏感泛红肌肤，仪器类先做小范围测试、降低强度' },
+  { code: 'CI24', tags: ['allergy_history'], attributes: ['strong_aroma', 'facial_device'], effect: 'warn', text: '有过敏史，确认精油和护肤品成分' },
 ]
 
 // ───────── 附录 E：方案包 ─────────
 export const PACKAGES = [
   { code: 'PK10', name: '就医优先计划', priority: 1, triggerText: '存在 L2 / L3', trigger: { '==': [{ var: 'redFlagActive' }, true] }, items: [], medicalLinks: [], weeks: null, target: '存在红旗症状的客户' },
-  { code: 'PK05', name: '骨骼与防跌倒计划', priority: 2, triggerText: '年龄 ≥ 50，且 osteoporosis_*、fall_risk、chair_stand_low、sarcf_positive 任一', trigger: { and: [age('>=', 50), anyTag(['osteoporosis_mid', 'osteoporosis_high', 'fall_risk', 'chair_stand_low', 'sarcf_positive'])] }, items: [{ project: 'P06', freq: '每 2 周 1 次（轻手法，医生确认后开始）' }, { project: 'P08', freq: '每周 2 次，工作日上午' }, { project: 'P02', freq: '每周 1 次' }], medicalLinks: ['M3', 'M11'], weeks: 12, target: '50 岁以上，骨骼或跌倒风险' },
-  { code: 'PK04', name: '更年期管理计划', priority: 3, triggerText: 'hot_flash，或 W01 = 可能进入更年期', trigger: { or: [tag('hot_flash'), eq('W01', 'peri')] }, items: [{ project: 'P05', freq: '每周 1 次' }, { project: 'P06', freq: '每 2 周 1 次' }, { project: 'P01', freq: '每 2 周 1 次' }], medicalLinks: ['M2'], weeks: 12, target: '更年期女性' },
-  { code: 'PK01', name: '经期养护 3 个月计划', priority: 4, triggerText: 'menstrual_irregular 或 dysmenorrhea', trigger: anyTag(['menstrual_irregular', 'dysmenorrhea']), items: [{ project: 'P03', freq: '经前 1 周、经后 1 周各 1 次（经期暂停）' }, { project: 'P05', freq: '每周 1 次' }, { project: 'P09', freq: '每周 1 次' }], medicalLinks: ['M1'], weeks: 12, target: '经期不适' },
+  { code: 'PK05', name: '骨骼与防跌倒计划', priority: 2, triggerText: '年龄 ≥ 50，且 osteoporosis_*、fall_risk、chair_stand_low、sarcf_positive 任一', trigger: { and: [age('>=', 50), anyTag(['osteoporosis_mid', 'osteoporosis_high', 'fall_risk', 'chair_stand_low', 'sarcf_positive'])] }, items: [{ project: 'P02', freq: '每周 1 次（轻手法）' }, { project: 'P06', freq: '每 2 周 1 次（轻手法，医生确认后开始）' }, { project: 'P08', freq: '每周 2 次，工作日上午' }], medicalLinks: ['M3', 'M11'], weeks: 12, target: '50 岁以上，骨骼或跌倒风险' },
+  { code: 'PK04', name: '更年期管理计划', priority: 3, triggerText: 'hot_flash，或 W01 = 可能进入更年期', trigger: { or: [tag('hot_flash'), eq('W01', 'peri')] }, items: [{ project: 'P05', freq: '每 2 周 1 次' }, { project: 'P01', freq: '每 2 周 1 次' }, { project: 'P09', freq: '每周 1 次' }], medicalLinks: ['M2'], weeks: 12, target: '更年期女性' },
+  { code: 'PK01', name: '经期养护 3 个月计划', priority: 4, triggerText: 'menstrual_irregular 或 dysmenorrhea', trigger: anyTag(['menstrual_irregular', 'dysmenorrhea']), items: [{ project: 'P02', freq: '经前 1 周、经后 1 周各 1 次（经期暂停）' }, { project: 'P03', freq: '每月 1 次（经期暂停）' }, { project: 'P09', freq: '每周 1 次' }], medicalLinks: ['M1'], weeks: 12, target: '经期不适' },
   { code: 'PK02', name: '产后修复计划', priority: 5, triggerText: 'postpartum（产后 ≥ 42 天）', trigger: { and: [tag('postpartum'), { '!': tag('postpartum_42d') }] }, items: [{ project: 'P10', freq: '每周 1 次' }, { project: 'P07', freq: '每月 1 次' }, { project: 'P02', freq: '每周 1 次' }], medicalLinks: ['M8'], weeks: 12, target: '产后 42 天至 1 年' },
-  { code: 'PK03', name: '睡眠与压力计划', priority: 6, triggerText: 'sleep_chronic 或 mood_positive，或心灵维度 < 60', trigger: { or: [anyTag(['sleep_chronic', 'mood_positive']), { '<': [{ var: 'd.mind' }, 60] }] }, items: [{ project: 'P05', freq: '每周 1 次' }, { project: 'P09', freq: '每周 1 次' }, { project: 'P02', freq: '每周 1 次' }], medicalLinks: ['M5', 'M6'], weeks: 8, target: '睡眠或情绪困扰' },
-  { code: 'PK08', name: '慢病生活管理计划', priority: 7, triggerText: 'dx_hypertension、dx_diabetes、dx_lipid 任一，且年龄 ≥ 55', trigger: { and: [anyTag(['dx_hypertension', 'dx_diabetes', 'dx_lipid']), age('>=', 55)] }, items: [{ project: 'P08', freq: '每周 2 次' }, { project: 'P09', freq: '每周 1 次' }], medicalLinks: ['M13', 'M7'], weeks: null, target: '55 岁以上慢病客户' },
-  { code: 'PK07', name: '体重与代谢计划', priority: 8, triggerText: 'metabolic_risk，或体型维度 < 60', trigger: { or: [tag('metabolic_risk'), { '<': [{ var: 'd.shape' }, 60] }] }, items: [{ project: 'P07', freq: '每月 1 次' }, { project: 'P08', freq: '每周 2 次' }], medicalLinks: ['M7'], weeks: 12, target: '体重与代谢' },
-  { code: 'PK09', name: '乐龄焕颜计划', priority: 9, triggerText: '年龄 ≥ 55，且肌肤或轮廓维度 < 70', trigger: { and: [age('>=', 55), { or: [{ '<': [{ var: 'd.skin' }, 70] }, { '<': [{ var: 'd.contour' }, 70] }] }] }, items: [{ project: 'P01', freq: '每 2 周 1 次' }, { project: 'P02', freq: '每周 1 次' }], medicalLinks: [], weeks: 12, target: '55 岁以上焕颜' },
-  { code: 'PK06', name: '六维年轻化计划', priority: 10, triggerText: '默认（以上都不满足）', trigger: true, items: [{ project: 'P01', freq: '每 2 周 1 次' }, { project: 'P05', freq: '每周 1 次' }, { project: 'P12', freq: '每月 1 次（通过禁忌时）' }], medicalLinks: [], weeks: 12, target: '所有客户' },
+  { code: 'PK03', name: '睡眠与压力计划', priority: 6, triggerText: 'sleep_chronic 或 mood_positive，或心灵维度 < 60', trigger: { or: [anyTag(['sleep_chronic', 'mood_positive']), { '<': [{ var: 'd.mind' }, 60] }] }, items: [{ project: 'P05', freq: '每 2 周 1 次' }, { project: 'P02', freq: '每周 1 次' }, { project: 'P09', freq: '每周 1 次' }], medicalLinks: ['M5', 'M6'], weeks: 8, target: '睡眠或情绪困扰' },
+  { code: 'PK08', name: '慢病生活管理计划', priority: 7, triggerText: 'dx_hypertension、dx_diabetes、dx_lipid 任一，且年龄 ≥ 55', trigger: { and: [anyTag(['dx_hypertension', 'dx_diabetes', 'dx_lipid']), age('>=', 55)] }, items: [{ project: 'P02', freq: '每周 1 次' }, { project: 'P08', freq: '每周 2 次' }, { project: 'P09', freq: '每周 1 次' }], medicalLinks: ['M13', 'M7'], weeks: null, target: '55 岁以上慢病客户' },
+  { code: 'PK07', name: '体重与代谢计划', priority: 8, triggerText: 'metabolic_risk，或体型维度 < 60', trigger: { or: [tag('metabolic_risk'), { '<': [{ var: 'd.shape' }, 60] }] }, items: [{ project: 'P07', freq: '每月 1 次' }, { project: 'P08', freq: '每周 2 次' }, { project: 'P04', freq: '每 2 周 1 次' }], medicalLinks: ['M7'], weeks: 12, target: '体重与代谢' },
+  { code: 'PK09', name: '乐龄焕颜计划', priority: 9, triggerText: '年龄 ≥ 55，且肌肤或轮廓维度 < 70', trigger: { and: [age('>=', 55), { or: [{ '<': [{ var: 'd.skin' }, 70] }, { '<': [{ var: 'd.contour' }, 70] }] }] }, items: [{ project: 'P01', freq: '每 2 周 1 次' }, { project: 'P12', freq: '每月 1 次' }, { project: 'P02', freq: '每周 1 次' }], medicalLinks: [], weeks: 12, target: '55 岁以上焕颜' },
+  { code: 'PK11', name: '痘肌净护计划', priority: 10, triggerText: '肌肤困扰含"痘痘"（skin_acne）', trigger: tag('skin_acne'), items: [{ project: 'P16', freq: '每周 1 次，4 次后评估' }, { project: 'P14', freq: '每月 1 次' }], medicalLinks: [], weeks: 8, target: '痘痘、闭口粉刺困扰' },
+  { code: 'PK12', name: '清透焕亮计划', priority: 11, triggerText: '肌肤困扰含毛孔粗大、暗沉或色斑（skin_pores / skin_dull / skin_spots）', trigger: anyTag(['skin_pores', 'skin_dull', 'skin_spots']), items: [{ project: 'P15', freq: '每 2 周 1 次' }, { project: 'P17', freq: '每月 1 次' }], medicalLinks: [], weeks: 8, target: '毛孔、暗沉、色斑困扰' },
+  { code: 'PK06', name: '六维年轻化计划', priority: 12, triggerText: '默认（以上都不满足）', trigger: true, items: [{ project: 'P14', freq: '每月 1 次' }, { project: 'P01', freq: '每 2 周 1 次' }, { project: 'P02', freq: '每周 1 次' }], medicalLinks: [], weeks: 12, target: '所有客户' },
 ]
 
 // ───────── 附录 F：医疗服务与体检套餐 ─────────
@@ -137,15 +153,18 @@ export const LIFESTYLE_TIPS = [
   { code: 'L_CALCIUM', text: '每天喝一杯奶或吃豆制品，补充钙。', textElder: '每天一杯奶，或吃点豆腐。', tags: ['osteoporosis_mid', 'osteoporosis_high', 'dx_osteoporosis'] },
   { code: 'L_SUN', text: '天气好时到户外晒 15–20 分钟太阳。', textElder: '天好时出门晒晒太阳。', tags: ['osteoporosis_mid', 'osteoporosis_high', 'sarcf_positive'] },
   { code: 'L_ANTI_SLIP', text: '浴室铺防滑垫，夜里起床先开灯。', textElder: '浴室放防滑垫，起夜先开灯。', tags: ['fall_risk', 'chair_stand_low', 'balance_low'] },
-  { code: 'L_SLEEP_ROUTINE', text: '固定时间上床和起床，睡前一小时少看手机。', textElder: '按时睡、按时起，睡前少看手机。', tags: ['sleep_chronic', 'hot_flash'] },
+  { code: 'L_SLEEP_ROUTINE', text: '固定时间上床和起床，睡前一小时少看手机。', textElder: '按时睡、按时起，睡前少看手机。', tags: ['sleep_chronic', 'hot_flash', 'sleep_issue'] },
   { code: 'L_MOOD_SHARE', text: '心里有事时找家人或朋友聊聊，也可以和小镜说说。', textElder: '有心事，找人聊聊。', tags: ['mood_positive', 'lonely'] },
   { code: 'L_WALK', text: '每周至少 5 天快走 30 分钟。', textElder: '每天走走路，半小时就好。', tags: ['metabolic_risk', 'dx_hypertension', 'dx_diabetes', 'dx_lipid'] },
   { code: 'L_DIET', text: '少油少盐，晚饭七分饱。', textElder: '少油少盐，晚饭吃七分饱。', tags: ['metabolic_risk', 'dx_hypertension', 'dx_lipid', 'dx_diabetes'] },
-  { code: 'L_BP_LOG', text: '在家定时量血压并记下来，复诊时带给医生看。', textElder: '在家量血压，记在本子上。', tags: ['dx_hypertension', 'htn_uncontrolled', 'htn_unknown', 'bp_high'] },
+  { code: 'L_BP_LOG', text: '在家定时量血压并记下来，复诊时带给医生看。', textElder: '在家量血压，记在本子上。', tags: ['dx_hypertension', 'htn_uncontrolled', 'htn_unknown', 'bp_high', 'bp_high_self'] },
   { code: 'L_SUNSCREEN', text: '出门前涂防晒，阴天也要涂。', textElder: '出门记得涂防晒。', tags: ['skin_care_low'] },
   { code: 'L_PERIOD_WARM', text: '经期注意保暖，少吃生冷，记录经期日记。', textElder: '经期注意保暖。', tags: ['menstrual_irregular', 'dysmenorrhea'] },
   { code: 'L_PELVIC', text: '每天做 3 组盆底肌练习（凯格尔运动）。', textElder: '每天练练盆底肌。', tags: ['pelvic_floor', 'postpartum'] },
   { code: 'L_STRETCH', text: '久坐 1 小时起身活动肩颈 5 分钟。', textElder: '坐一小时，起来动一动。', tags: ['pain_chronic'] },
+  { code: 'L_CLEANSE', text: '早晚温和清洁，长痘期间不要用手挤。', textElder: '早晚洗脸，长痘别用手挤。', tags: ['skin_acne', 'skin_pores'] },
+  { code: 'L_BOWEL', text: '每天吃够蔬菜和粗粮，多喝水，固定时间如厕；便秘持续或便中带血请就医。', textElder: '多吃菜、多喝水，按时上厕所；便血要看医生。', tags: ['constipation'] },
+  { code: 'L_HYDRATE', text: '洁面后 3 分钟内涂保湿，每天喝够 6–8 杯水。', textElder: '洗脸后马上抹保湿，多喝水。', tags: ['skin_dry', 'skin_dull', 'skin_aging'] },
 ]
 
 // ───────── 附录 I：禁用词 ─────────
@@ -175,8 +194,10 @@ export const TAG_NAMES: Record<string, string> = {
   osteoporosis_mid: '骨质疏松中风险', osteoporosis_high: '骨质疏松高风险', fall_risk: '跌倒风险', pain_chronic: '慢性酸痛',
   sleep_chronic: '长期睡眠困扰', mood_positive: '情绪筛查阳性', lonely: '常感孤单', menstrual_irregular: '月经不规律',
   dysmenorrhea: '痛经', hot_flash: '潮热', pregnancy_related: '怀孕 / 备孕', postpartum: '产后', postpartum_42d: '产后 42 天内',
-  pelvic_floor: '盆底问题', screening_due: '筛查到期', metabolic_risk: '代谢风险', bp_high: '门店血压偏高', fh_breast_ovary: '乳腺 / 卵巢癌家族史',
+  pelvic_floor: '盆底问题', screening_due: '筛查到期', metabolic_risk: '代谢风险', bp_high: '门店血压偏高', bp_high_self: '自述血压偏高', sleep_issue: '自述睡眠欠佳', constipation: '经常便秘', fh_breast_ovary: '乳腺 / 卵巢癌家族史',
   fh_hip_fracture: '髋部骨折家族史', red_flag_active: '红旗未关闭', doctor_hold_manual: '医生：暂停手法类', doctor_hold_heavy_manual: '医生：暂停重手法',
   doctor_hold_heat: '医生：暂停热疗类', doctor_hold_device: '医生：暂停仪器类', doctor_hold_all: '医生：暂停全部项目',
+  skin_acne: '痘痘困扰', skin_pores: '毛孔粗大', skin_dull: '暗沉', skin_spots: '色斑', skin_dry: '干燥', skin_sensitive: '敏感泛红', skin_aging: '细纹松弛',
+  gyn_condition: '子宫肌瘤 / 增生史', allergy_history: '过敏史', dx_thyroid_abnormal: '甲状腺异常', surgery_history: '既往手术',
   skin_type_dry: '干性皮肤', skin_type_oily: '油性皮肤', skin_type_combo: '混合皮肤', skin_type_sensitive: '敏感皮肤', skin_care_low: '护肤习惯待加强',
 }

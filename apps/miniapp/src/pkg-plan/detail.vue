@@ -62,9 +62,14 @@ function read() {
       <view v-if="c.storeItems?.length" class="card stack">
         <text class="t-sm c2 semi">门店安排</text>
         <view v-for="s in c.storeItems" :key="s.project" class="item">
-          <view class="row-between"><text class="t-md">{{ s.name }}</text><text class="t-sm c2">{{ s.freq }}</text></view>
+          <view class="row-between" style="align-items: flex-start"><text class="t-md flex1">{{ s.name }}</text><text class="t-sm c2" style="margin-left: 8px">{{ s.freq }}</text></view>
           <text class="t-sm c2">{{ s.why }}</text>
+          <view class="row gap8 mt8">
+            <text v-if="s.planned" class="tag gray">门店筹备中</text>
+            <text v-else-if="s.groupPrice" class="tag">团购价 ¥{{ s.groupPrice }}</text>
+          </view>
         </view>
+        <text class="t-sm c-brand semi" @click="go('/pkg-module/store')">查看门店全部项目与价格</text>
       </view>
 
       <view v-if="c.lifestyle?.length" class="stack">

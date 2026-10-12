@@ -273,7 +273,7 @@ export interface SkeletonInput {
   redHits: RuleLike[]
   riskHits: (RuleLike & { tags?: string[] })[]
   packages: PackageLike[]
-  projects: { code: string, name: string, attributes: string[] }[]
+  projects: { code: string, name: string, attributes: string[], status?: string, groupPrice?: number | null, priceRef?: number | null, shortName?: string | null }[]
   ciRules: RuleLike[]
   lifestyleTips: { code: string, tags?: string[] | null }[]
   medicalServices: { code: string, name: string }[]
@@ -342,7 +342,10 @@ export function buildSkeleton(input: SkeletonInput) {
         continue
       }
       if (skeleton.storeItems.length >= 4) continue
-      skeleton.storeItems.push({ project: proj.code, name: proj.name, freq: item.freq, flags: warns.map(w => `warn:${w.tag}`), warnTexts: warns.map(w => w.text) })
+      skeleton.storeItems.push({
+        project: proj.code, name: proj.name, freq: item.freq, flags: warns.map(w => `warn:${w.tag}`), warnTexts: warns.map(w => w.text),
+        planned: proj.status === 'planned', groupPrice: proj.groupPrice ?? null, priceRef: proj.priceRef ?? null,
+      })
     }
   }
 

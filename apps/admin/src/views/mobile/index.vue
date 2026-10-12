@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import { get, post } from "@/api/xj";
 import { currentUser } from "@/api/user";
 import { message } from "@/utils/message";
+import XIntakeForm from "@/components/XIntakeForm/index.vue";
 
 defineOptions({ name: "MobileWorkbench" });
 const router = useRouter();
@@ -19,6 +20,8 @@ const assistCode = ref("");
 const projects = ref<any[]>([]);
 const check = ref<any>({ customerId: null, projectCode: "", confirmed: false });
 const checkRes = ref<any>(null);
+const intakeCustomer = ref<number | null>(null);
+const intakeKey = ref(0);
 
 async function loadTasks() {
   tasks.value = (await get("/admin/tasks")).sort((a: any, b: any) => (b.title.includes("紧急") ? 1 : 0) - (a.title.includes("紧急") ? 1 : 0));
@@ -73,7 +76,7 @@ async function confirmCheck() {
       <el-button size="small" @click="router.push('/welcome')">电脑版</el-button>
     </div>
     <div class="m-tabs">
-      <div v-for="t in [['tasks', '任务'], ['customer', '客户'], ['coupon', '核销'], ['assist', '陪填'], ['check', '服务确认']]" :key="t[0]" class="m-tab" :class="{ on: tab === t[0] }" @click="tab = t[0]">{{ t[1] }}</div>
+      <div v-for="t in [['tasks', '任务'], ['customer', '客户'], ['intake', '建档'], ['coupon', '核销'], ['assist', '陪填'], ['check', '确认']]" :key="t[0]" class="m-tab" :class="{ on: tab === t[0] }" @click="tab = t[0]">{{ t[1] }}</div>
     </div>
 
     <div v-if="tab === 'tasks'">
@@ -107,6 +110,14 @@ async function confirmCheck() {
       </div>
     </div>
 
+    <div v-if="tab === 'intake'" class="m-card">
+      <div class="font-bold mb-2">门店健康档案表</div>
+      <el-select v-model="intakeCustomer" size="large" filterable remote :remote-method="async (x: string) => (customers = x ? await get('/admin/customers-search', { q: x }) : [])" placeholder="选择客户（称呼或手机尾号）" class="w-full mb-2">
+        <el-option v-for="c in customers" :key="c.id" :label="`${c.salutation}（尾号 ${c.phoneTail}）`" :value="c.id" />
+      </el-select>
+      <XIntakeForm v-if="intakeCustomer" :key="intakeKey" :customer-id="intakeCustomer" compact @saved="intakeKey++" />
+    </div>
+
     <div v-if="tab === 'coupon'" class="m-card">
       <div class="font-bold mb-2">体检券到店领取 / 活动签到</div>
       <el-input v-model="couponNo" size="large" placeholder="扫码或输入券号，如 TJ12345678" />
@@ -127,7 +138,7 @@ async function confirmCheck() {
         <el-option v-for="c in customers" :key="c.id" :label="`${c.salutation}（尾号 ${c.phoneTail}）`" :value="c.id" />
       </el-select>
       <el-select v-model="check.projectCode" size="large" placeholder="选择项目" class="w-full mb-2" @change="preview">
-        <el-option v-for="p in projects" :key="p.code" :label="p.name" :value="p.code" />
+        <el-option v-for="p in projects.filter((x) => x.status !== 'blocked')" :key="p.code" :label="p.name" :value="p.code" />
       </el-select>
       <template v-if="checkRes">
         <el-alert v-for="b in checkRes.blocks" :key="b.code" type="error" :closable="false" class="mb-2" :title="`禁止：${b.text}（${b.code}）`" />
@@ -145,7 +156,7 @@ async function confirmCheck() {
 .m-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .m-title { font-size: 22px; font-weight: 700; }
 .m-sub { font-size: 13px; color: #786e74; }
-.m-tabs { display: grid; grid-template-columns: repeat(5, 1fr); background: #fff; border-radius: 14px; padding: 4px; margin-bottom: 12px; }
+.m-tabs { display: grid; grid-template-columns: repeat(6, 1fr); background: #fff; border-radius: 14px; padding: 4px; margin-bottom: 12px; }
 .m-tab { text-align: center; padding: 10px 0; border-radius: 10px; font-size: 14px; }
 .m-tab.on { background: #8c2b56; color: #fff; font-weight: 700; }
 .m-card { background: #fff; border-radius: 16px; padding: 14px; margin-bottom: 10px; }

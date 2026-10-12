@@ -33,7 +33,8 @@ export class EngineService {
   }
 
   async projects() {
-    return (await this.prisma.project.findMany({ where: { status: 'active' } })).map(p => ({ ...p, attributes: (p.attributes as string[]) || [] }))
+    // 已上架 + 筹备中的项目参与方案引擎；合规未通过（blocked）的项目不参与
+    return (await this.prisma.project.findMany({ where: { status: { in: ['active', 'planned'] } } })).map(p => ({ ...p, attributes: (p.attributes as string[]) || [] }))
   }
 
   async lifestyle() {

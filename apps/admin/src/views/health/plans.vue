@@ -84,7 +84,7 @@ const REVIEW: Record<string, string> = { pending: "待审核", approved: "已通
           <el-tag v-if="cur.customer.elderMode">乐龄版</el-tag>
         </div>
         <el-alert v-if="cur.validation?.fallbackReason" type="info" :closable="false" :title="cur.validation.fallbackReason" class="mb-2" />
-        <el-alert v-for="(a, i) in cur.validation?.attempts || []" :key="i" :type="a.ok ? 'success' : 'warning'" :closable="false" class="mb-2" :title="`AI 第 ${i + 1} 次输出校验：${a.ok ? '通过（结构 / 骨架一致 / 禁用词）' : a.errors.join('；')}`" />
+        <el-alert v-for="(a, i) in cur.validation?.attempts || []" :key="i" :type="a.ok ? 'success' : 'warning'" :closable="false" class="mb-2" :title="`AI 第 ${Number(i) + 1} 次输出校验：${a.ok ? '通过（结构 / 骨架一致 / 禁用词）' : a.errors.join('；')}`" />
         <el-tabs v-model="tab">
           <el-tab-pane label="客户版" name="customer">
             <template v-if="!editing">

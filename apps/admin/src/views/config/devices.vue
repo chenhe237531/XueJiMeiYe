@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { get, post } from "@/api/xj";
 import { message } from "@/utils/message";
+import { ElMessageBox } from "element-plus";
 
 defineOptions({ name: "ConfigDevices" });
 const devices = ref<any[]>([]);
@@ -14,6 +15,10 @@ async function load() { devices.value = await get("/admin/devices"); }
 onMounted(load);
 async function search(q: string) { customers.value = q ? await get("/admin/customers-search", { q }, { silent: true }) : []; }
 async function review(d: any, status: string) {
+  if (status === "approved" && d.reviewNote) {
+    const ok = await ElMessageBox.confirm(`该设备存在合规待办：${d.reviewNote}\n\n确认法务与合规已审核通过、注册证/检测原理已核实后再准入。`, "准入前确认", { type: "warning", confirmButtonText: "已核实，准入", cancelButtonText: "取消" }).catch(() => false);
+    if (!ok) return;
+  }
   await post(`/admin/devices/${d.id}/review`, { status, note: status === "approved" ? "核实注册证与检测原理，指标限白名单" : "未核实检测原理，数据不得进入用户端" });
   message("已更新准入状态", { type: "success" });
   load();
@@ -30,6 +35,7 @@ async function submit() {
   <div>
     <el-card shadow="never" class="mb-4">
       <template #header><b>设备登记与准入</b><span class="text-xs text-gray-400 ml-2">只有"已准入"的设备，其测量数据才进入客户档案（4.10.2）</span></template>
+      <el-alert v-for="d in devices.filter((x) => x.admissionStatus === 'pending' && x.reviewNote)" :key="d.id" type="warning" :closable="false" show-icon class="mb-2" :title="`${d.name}：待合规审核`" :description="d.reviewNote" />
       <el-table :data="devices" size="small" stripe>
         <el-table-column prop="name" label="设备" width="170" />
         <el-table-column prop="store" label="门店" min-width="160" />

@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { get, patch, post, RISK_TYPE } from "@/api/xj";
 import { message } from "@/utils/message";
 import { currentUser } from "@/api/user";
+import XIntakeForm from "@/components/XIntakeForm/index.vue";
 
 defineOptions({ name: "CustomerDetail" });
 const route = useRoute();
@@ -18,6 +19,11 @@ const tierDlg = ref(false);
 const tierForm = ref<any>({ tier: "B", note: "" });
 const fu = ref<any>({ method: "phone", content: "" });
 const staff = ref<any[]>([]);
+const intakes = ref<any[]>([]);
+const intakeFormKey = ref(0);
+async function loadIntakes() {
+  if (["super_admin", "health_advisor"].includes(me.role)) intakes.value = await get(`/admin/customers/${id}/intakes`, undefined, { silent: true }).catch(() => []);
+}
 
 async function load() { d.value = await get(`/admin/customers/${id}`); }
 onMounted(async () => {
@@ -27,6 +33,7 @@ onMounted(async () => {
 
 async function onTab(name: string) {
   if (name === "health" && !health.value && d.value.canViewHealth) health.value = await get(`/admin/customers/${id}/health`);
+  if (name === "intake") loadIntakes();
   if (name === "audit") audit.value = await get(`/admin/customers/${id}/audit`, undefined, { silent: true }).catch(() => []);
 }
 async function adjustTier() {
@@ -123,6 +130,24 @@ const CONSENT_NAMES: Record<string, string> = { C1: "用户协议与隐私政策
               </el-timeline-item>
             </el-timeline>
           </template>
+        </el-tab-pane>
+
+        <el-tab-pane label="健康档案表" name="intake">
+          <el-alert type="info" :closable="false" class="mb-3" title="门店《健康档案表（女）》数字化：顾问 / 健康管理师协助客户填写，生成的健康标签参与禁忌筛查和方案引擎。住址不再收集（数据最小化）。" />
+          <template v-if="['super_admin','health_advisor'].includes(me.role)">
+            <el-collapse v-if="intakes.length" class="mb-4">
+              <el-collapse-item v-for="i in intakes" :key="i.id" :title="`${i.createdAt} · ${i.staffName} 录入 · 授权渠道 ${i.consentChannel}`">
+                <div class="mb-2"><el-tag v-for="t in i.tagNames" :key="t" class="mr-1 mb-1">{{ t }}</el-tag></div>
+                <el-descriptions :column="3" border size="small">
+                  <el-descriptions-item v-for="(v, k) in i.data" :key="k" :label="String(k)">{{ Array.isArray(v) ? v.join('、') : v }}</el-descriptions-item>
+                </el-descriptions>
+              </el-collapse-item>
+            </el-collapse>
+            <el-empty v-else description="暂无档案表" :image-size="50" />
+          </template>
+          <el-alert v-else type="warning" :closable="false" class="mb-3" title="您可以录入档案表；已录入的完整内容仅健康顾问可见。" />
+          <el-divider content-position="left">新增档案表</el-divider>
+          <XIntakeForm :key="intakeFormKey" :customer-id="id" @saved="intakeFormKey++; loadIntakes(); load()" />
         </el-tab-pane>
 
         <el-tab-pane label="消费" name="consumption">

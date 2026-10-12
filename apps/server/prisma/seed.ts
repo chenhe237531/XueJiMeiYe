@@ -43,7 +43,12 @@ async function main() {
 
   // ───────── 组织 ─────────
   const stores = [
-    await prisma.store.create({ data: { code: 'WYH', name: '雪姬AI智能健康美容体验馆（五月花店）', district: '[所在区域]', address: '[门店地址，待补充]', phone: '[门店电话]', bedCount: 10, openHours: '10:00-21:00', idleSlots: '工作日 10:00-16:00' } }),
+    await prisma.store.create({ data: {
+      code: 'WYH', name: '雪姬AI智能健康美容体验馆（五月花店）', district: '北京路商业区', address: '北京路五月花商场九楼 902A / 902B 铺', mall: '五月花商业广场（中山五路店）',
+      phone: '[门店电话，待补充]', bedCount: 10, openHours: '10:00-22:00', idleSlots: '工作日 10:00-16:00', category: '综合美容 SPA',
+      facilities: ['高清电视', '充电宝', '沙发位', 'VIP 包房'], promises: ['无推销办卡', '无隐形消费', '不满意重做', '保证正品', '一对一服务', '一次性用品'],
+      rating: 4.8, reviewCount: 191,
+    } }),
     await prisma.store.create({ data: { code: 'D02', name: '雪姬美业·演示二店', district: '[示例]', address: '[示例地址]', bedCount: 8 } }),
     await prisma.store.create({ data: { code: 'D03', name: '雪姬美业·演示三店', district: '[示例]', address: '[示例地址]', bedCount: 8 } }),
   ]
@@ -85,7 +90,7 @@ async function main() {
     if (date.day() === 0) continue
     for (const p of CHECKUP_PACKAGES) await prisma.checkupSlot.create({ data: { hospitalId: hospital.id, packageCode: p.code, date: date.format('YYYY-MM-DD'), capacity: p.code === 'CP01' ? 12 : 8, booked: d > 0 ? between(0, 4) : 0 } })
   }
-  for (const p of PROJECTS) await prisma.project.create({ data: { ...p, defaultFreq: '每周 1 次' } })
+  for (const p of PROJECTS) await prisma.project.create({ data: { status: 'active', ...p, defaultFreq: '每周 1 次' } })
   for (const p of PACKAGES) await prisma.planPackage.create({ data: { code: p.code, name: p.name, target: p.target, trigger: p.trigger as any, triggerText: p.triggerText, priority: p.priority, items: p.items, medicalLinks: p.medicalLinks, weeks: p.weeks } })
   for (const r of RED_FLAGS) await prisma.rule.create({ data: { code: r.code, kind: 'red_flag', level: r.level, source: r.source, conditionText: r.conditionText, condition: r.condition as any, action: { services: r.services, tags: r.tags || [], hotline: !!(r as any).hotline }, customerText: r.customerText, staffAction: r.staffAction, doctorConfirmed: false } })
   for (const r of RISK_SIGNALS) await prisma.rule.create({ data: { code: r.code, kind: 'risk_signal', level: 'L1', conditionText: r.conditionText, condition: r.condition as any, action: { services: r.services, tags: r.tags || [], tagsIf: (r as any).tagsIf || [], reason: r.reason, factKeys: (r as any).factKeys || [], interest: !!(r as any).interest } } })
@@ -119,7 +124,12 @@ async function main() {
   const dBody = await prisma.device.create({ data: { storeId: stores[0].id, name: '人体成分分析仪', model: '[型号]', manufacturer: '[厂家]', isMedicalDevice: false, approvedUse: '[按说明书填写]', principle: '生物电阻抗法', admissionStatus: 'approved', reviewNote: '指标限白名单，不出疾病结论', reviewedAt: new Date() } })
   const dBp = await prisma.device.create({ data: { storeId: stores[0].id, name: '电子血压计', model: '[型号]', manufacturer: '[厂家]', isMedicalDevice: true, registrationNo: '[注册证号]', approvedUse: '[注册证适用范围原文]', principle: '示波法', admissionStatus: 'approved', reviewedAt: new Date() } })
   const dSkin = await prisma.device.create({ data: { storeId: stores[0].id, name: '皮肤检测仪', model: '[型号]', manufacturer: '[厂家]', isMedicalDevice: false, principle: '电容法水分测试', admissionStatus: 'approved', reviewedAt: new Date() } })
-  await prisma.device.create({ data: { storeId: stores[0].id, name: '鹰眼设备', model: '[待核实]', manufacturer: '[待核实]', isMedicalDevice: false, principle: '[待核实检测原理]', admissionStatus: 'pending', reviewNote: '核实注册证和检测原理之前，数据不得接入用户端' } })
+  await prisma.device.create({ data: {
+    storeId: stores[0].id, name: '德国鹰眼（全身健康评估系统）', model: '[待核实]', manufacturer: '[待核实]', isMedicalDevice: false,
+    approvedUse: '[待核实] 报告自述：本设备系统不是医疗器械，不作为医疗诊断证明和处方使用，属于移动健康电子软件产品，用于健康管理健康评估筛查',
+    principle: '[待核实检测原理]', admissionStatus: 'pending',
+    reviewNote: '暂不准入（4.10）：报告包含脏器疾病风险、器官功能、药物禁忌与草药治疗等内容，超出生活美容范围；数据不进入客户端、不参与方案引擎与就医推荐。美团团购标题"全身 558 项健康评估"与报告措辞需法务审核（附录 I 禁用"全身扫描""器官功能检测"）。',
+  } })
   const dHosp = await prisma.device.create({ data: { name: '医院回传指标（系统）', isMedicalDevice: true, principle: '合作医院回传的结构化指标', admissionStatus: 'approved' } })
   await prisma.deviceMetric.createMany({ data: [
     { deviceId: dBody.id, code: 'WEIGHT', name: '体重', unit: 'kg', direction: 'range', refSource: '厂家说明书' },
@@ -143,6 +153,16 @@ async function main() {
   const li = await C({ salutation: '李女士', name: '李婷', phone: '13800000003', birthYear: 1991, tier: 'B', advisorId: amin.id, isDemo: true, demoTitle: '尊享会员（35 岁）' })
   const zhou = await C({ salutation: '小周', name: '周敏', phone: '13800000005', birthYear: 1992, tier: 'C', advisorId: amin.id, isDemo: true, demoTitle: '家人视角（王阿姨的女儿）', source: 'family_invite' })
   const huang = await C({ salutation: '黄阿姨', name: '黄丽', phone: '13800000006', birthYear: 1968, tier: 'B', elderMode: true, advisorId: amin.id, isDemo: true, demoTitle: '尊享 · 就医优先示例（L2）' })
+
+  // 门店健康档案表（纸质表数字化）示例：虚构数据，仅用于演示
+  {
+    const { mapIntake } = await import('../src/engine/intake')
+    const data = { height: 155, weight: 53, births: '2 胎及以上', bp: '偏高', bpValue: '138/86', lipid: '不清楚', glucose: '正常', allergy: ['无'], skin: ['干燥', '色斑'], hair: ['白发多'], nails: ['正常'], eyes: ['干涩'], stoolDaily: '能', stoolSticky: '否', constipation: '偶尔', dryMouth: '是', urineYellow: '否', urineOdor: '否', urineFoam: '否', urineCloudy: '否', thyroid: '正常', leucorrhea: '不便填写', fibroid: '否', hyperplasia: '是', menstruation: ['已绝经'], sleep: ['易醒', '早醒'], discomfort: '腰背酸，久坐后明显', surgery: '无', chronic: ['高血压'], chronicNote: '服用降压药，自述控制尚可' }
+    const { tags } = mapIntake(data)
+    const intake = await prisma.healthIntake.create({ data: { customerId: wang.id, data, tags, staffName: '阿敏', consultant: '阿敏', consentChannel: 'self', createdAt: dayjs('2026-06-14 10:00').toDate() } })
+    for (const t of tags) await prisma.healthTag.create({ data: { customerId: wang.id, tagCode: t, source: 'staff', sourceRefId: intake.id, createdAt: dayjs('2026-06-14 10:00').toDate() } })
+    await prisma.record.create({ data: { customerId: wang.id, recordType: 'service', sourceLabel: 'SELF', title: '门店健康档案表', summary: `本人自述，阿敏协助填写；生成 ${tags.length} 个健康标签`, refTable: 'health_intake', refId: intake.id, storeId: stores[0].id, occurredAt: dayjs('2026-06-14 10:00').toDate() } })
+  }
 
   const surnames = ['张', '黄', '林', '梁', '吴', '何', '郑', '谢', '罗', '冯', '邓', '曾', '彭', '苏', '叶', '蔡', '许', '杜', '潘', '钟', '卢', '江', '郭', '马']
   const others: any[] = []

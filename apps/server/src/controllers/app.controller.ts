@@ -602,6 +602,26 @@ export class AppController {
     return { advisor: a ? { name: a.name, phone: a.phone } : null, store, vip: c?.tier === 'A', responseHours: c?.tier === 'A' ? 4 : 24 }
   }
 
+  /** 门店与项目（价格为公开团购价，对所有客户一致，4.15） */
+  @Get('store')
+  @Aud('app')
+  @OptionalAuth()
+  async store(@CurrentUser() u?: CustomerUser) {
+    const c = u ? await this.prisma.customer.findUnique({ where: { id: u.id } }) : null
+    const store = (c?.storeId ? await this.prisma.store.findUnique({ where: { id: c.storeId } }) : null) || (await this.prisma.store.findFirst({ orderBy: { id: 'asc' } }))
+    const projects = await this.prisma.project.findMany({ where: { onMeituan: true, status: 'active' }, orderBy: { code: 'asc' } })
+    const view = (p: any) => ({ code: p.code, name: p.name, shortName: p.shortName, durationMin: p.durationMin, priceRef: p.priceRef, groupPrice: p.groupPrice, priceNote: p.priceNote, audience: p.audience, salesNote: p.salesNote })
+    if (u) await this.wf.event(u.id, 'module_view', { moduleCode: 'store_services' })
+    return {
+      store: store && { id: store.id, name: store.name, address: store.address, mall: store.mall, district: store.district, phone: store.phone, openHours: store.openHours, category: store.category, facilities: store.facilities, promises: store.promises, rating: store.rating, reviewCount: store.reviewCount },
+      groups: [
+        { title: '面部护理', items: projects.filter(p => p.category === 'face').map(view) },
+        { title: '身体 SPA', items: projects.filter(p => p.category === 'body').map(view) },
+      ],
+      priceNote: '价格为美团团购公开价，同一项目对所有客户一致；以门店最终报价为准。',
+    }
+  }
+
   @Get('about')
   async about() {
     const hospitals = await this.prisma.hospital.findMany({ where: { status: 'active' } })

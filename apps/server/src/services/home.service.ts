@@ -19,6 +19,7 @@ export const BUILTIN_LINKS: Record<string, string> = {
   vip_overseas: '/pkg-module/vip',
   vip_transport: '/pkg-module/transport',
   annual_report: '/pages/archive/index',
+  store_services: '/pkg-module/store',
 }
 
 export const TIER_BENEFITS: Record<string, string[]> = {

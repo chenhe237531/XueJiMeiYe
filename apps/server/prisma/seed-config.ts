@@ -73,6 +73,8 @@ export const MODULES: any[] = [
   { code: 'private_events', name: '私享活动', category: 'activity', entryType: 'form', icon: 'glass-full', summary: '秋季私享茶会 · 10 月 26 日', tiers: ['A'], sort: 44, lead: { type: 'other', sla_hours: 24 },
     detail: { priceText: '臻享会员专享', days: '下午 14:30-17:00', highlights: ['岭南茶艺', '养生点心', '每场 12 位'], content: ['在五月花店私享厅举行。'] },
     entryConfig: { type: 'form', fields: [{ key: 'people', label: '人数', type: 'number', required: true, min: 1, max: 2, default: 1 }] } },
+  { code: 'store_services', name: '门店项目', category: 'builtin', entryType: 'builtin', icon: 'building-store', summary: '五月花店团购项目与到店预约', tiers: ['A', 'B', 'C'], sort: 11, lead: { type: 'visit', sla_hours: 24 },
+    entryConfig: { type: 'form', fields: [{ key: 'project', label: '想做的项目', type: 'text', required: true }, { key: 'date', label: '期望日期', type: 'date', required: true }, { key: 'period', label: '时间段', type: 'radio', options: ['上午', '下午', '晚上'], required: true }, { key: 'people', label: '人数', type: 'number', min: 1, max: 4, default: 1 }, { key: 'note', label: '备注', type: 'textarea', placeholder: '如：想约指定美容师、需要 VIP 包房' }] } },
   { code: 'annual_report', name: '年度健康报告', category: 'builtin', entryType: 'builtin', icon: 'report-medical', summary: '一年的变化都在这里', tiers: ['A'], sort: 45, version: 'V1.2' },
 ]
 
@@ -83,14 +85,14 @@ export const LAYOUTS: { tier: string, elderMode: boolean, components: any[] }[] 
     { type: 'entryGrid', props: { columns: 3, modules: ['assessment', 'checkup_coupon', 'mirror', 'buddy_group', 'checkin', 'family'] } },
     { type: 'divider', props: { title: '康养出游' } },
     { type: 'moduleList', props: { modules: ['trip_qingyuan_value'], style: 'card' } },
-    { type: 'moduleList', props: { modules: ['mall_organic', 'daily_quiz'], style: 'list' } },
+    { type: 'moduleList', props: { modules: ['store_services', 'mall_organic', 'daily_quiz'], style: 'list' } },
     { type: 'mirrorFab', props: { label: '和小镜聊聊' } },
   ] },
   { tier: 'C', elderMode: false, components: [
     { type: 'greeting', props: { showElderToggle: true } },
     { type: 'tierCard', props: { showBenefits: true } },
     { type: 'healthCard', props: { showTodos: true, maxTodos: 3 } },
-    { type: 'entryGrid', props: { columns: 4, modules: ['assessment', 'checkup_coupon', 'my_plan', 'mirror', 'checkin', 'buddy_group', 'daily_quiz', 'family'] } },
+    { type: 'entryGrid', props: { columns: 4, modules: ['assessment', 'checkup_coupon', 'my_plan', 'mirror', 'store_services', 'buddy_group', 'daily_quiz', 'family'] } },
     { type: 'divider', props: { title: '康养出游' } },
     { type: 'moduleList', props: { modules: ['trip_qingyuan_value'], style: 'card' } },
     { type: 'moduleList', props: { modules: ['mall_organic', 'memory_cards', 'passbook'], style: 'list' } },
@@ -100,7 +102,7 @@ export const LAYOUTS: { tier: string, elderMode: boolean, components: any[] }[] 
     { type: 'greeting', props: { showElderToggle: true } },
     { type: 'tierCard', props: { showBenefits: true } },
     { type: 'healthCard', props: { showTodos: true, maxTodos: 3 } },
-    { type: 'entryGrid', props: { columns: 4, modules: ['assessment', 'checkup_coupon', 'my_plan', 'mirror', 'passbook', 'lecture', 'buddy_group', 'family'] } },
+    { type: 'entryGrid', props: { columns: 4, modules: ['assessment', 'checkup_coupon', 'my_plan', 'mirror', 'store_services', 'lecture', 'buddy_group', 'family'] } },
     { type: 'banner', props: { modules: ['lecture'], autoplay: true } },
     { type: 'divider', props: { title: '康养精选' } },
     { type: 'moduleList', props: { modules: ['trip_qingyuan_boutique', 'trip_maoming_agarwood', 'trip_hainan_sojourn', 'trip_yunnan'], style: 'card' } },
@@ -113,6 +115,7 @@ export const LAYOUTS: { tier: string, elderMode: boolean, components: any[] }[] 
     { type: 'entryGrid', props: { columns: 3, modules: ['assessment', 'checkup_coupon', 'my_plan', 'mirror', 'lecture', 'family'] } },
     { type: 'divider', props: { title: '康养精选' } },
     { type: 'moduleList', props: { modules: ['trip_qingyuan_boutique', 'trip_hainan_sojourn'], style: 'card' } },
+    { type: 'moduleList', props: { modules: ['store_services'], style: 'list' } },
     { type: 'mirrorFab', props: { label: '和小镜聊聊' } },
   ] },
   { tier: 'A', elderMode: false, components: [
@@ -122,6 +125,7 @@ export const LAYOUTS: { tier: string, elderMode: boolean, components: any[] }[] 
     { type: 'healthCard', props: { showTodos: true, maxTodos: 3 } },
     { type: 'divider', props: { title: '私享' } },
     { type: 'moduleList', props: { modules: ['private_events', 'trip_yunnan', 'trip_maoming_agarwood', 'gift_private'], style: 'card' } },
+    { type: 'moduleList', props: { modules: ['store_services'], style: 'list' } },
     { type: 'mirrorFab', props: { label: '小镜' } },
   ] },
   { tier: 'A', elderMode: true, components: [

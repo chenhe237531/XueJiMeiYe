@@ -108,13 +108,16 @@ async function runTests() {
         </el-table>
       </el-tab-pane>
       <el-tab-pane :label="`门店项目（${projects.length}）`" name="projects">
+        <el-alert type="info" :closable="false" class="mb-2" title="已上架项目来自五月花店美团团购（价格为公开团购价，对所有客户一致）；筹备中项目参与方案但标注“门店筹备中”；合规拦截项目不进入方案引擎。项目属性需商学院与设备说明书确认。" />
         <el-table :data="projects" size="small" stripe>
           <el-table-column prop="code" label="编码" width="64" />
-          <el-table-column prop="name" label="名称" width="200" />
-          <el-table-column prop="dimension" label="维度" width="80" />
-          <el-table-column label="属性标签"><template #default="{ row }"><el-tag v-for="a in row.attributes" :key="a" size="small" type="info" class="mr-1">{{ attrN(a) }}</el-tag></template></el-table-column>
-          <el-table-column prop="durationMin" label="时长(分)" width="80" />
-          <el-table-column prop="priceRef" label="参考价" width="80" />
+          <el-table-column prop="name" label="名称" min-width="230" />
+          <el-table-column label="状态" width="90"><template #default="{ row }"><el-tag size="small" :type="row.status === 'active' ? 'success' : row.status === 'blocked' ? 'danger' : 'info'">{{ ({ active: '已上架', planned: '筹备中', blocked: '合规拦截' } as any)[row.status] }}</el-tag></template></el-table-column>
+          <el-table-column label="团购价 / 门市价" width="130"><template #default="{ row }"><span v-if="row.groupPrice"><b>¥{{ row.groupPrice }}</b> / ¥{{ row.priceRef }}</span><span v-else>—</span></template></el-table-column>
+          <el-table-column prop="salesNote" label="销量" width="140" />
+          <el-table-column prop="audience" label="适用" width="120" />
+          <el-table-column label="属性标签" min-width="180"><template #default="{ row }"><el-tag v-for="a in row.attributes" :key="a" size="small" type="info" class="mr-1">{{ attrN(a) }}</el-tag></template></el-table-column>
+          <el-table-column prop="complianceNote" label="合规说明" min-width="220" show-overflow-tooltip />
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="生活建议库" name="tips">

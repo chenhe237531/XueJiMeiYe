@@ -23,6 +23,12 @@ model Store {
   openHours String?
   bedCount  Int      @default(8)
   idleSlots String?
+  category  String?
+  facilities Json?
+  promises  Json?
+  mall      String?
+  rating    Float?
+  reviewCount Int?
   status    String   @default("active")
   createdAt DateTime @default(now())
 }
@@ -337,13 +343,21 @@ model Project {
   id          Int     @id @default(autoincrement())
   code        String  @unique
   name        String
+  shortName   String?
   dimension   String
+  category    String? // face / body / assess / planned
   attributes  Json
   defaultFreq String?
   durationMin Int?
-  priceRef    Float?
+  priceRef    Float? // 门市价
+  groupPrice  Float? // 美团团购价（公开价格，对所有客户一致）
+  priceNote   String?
+  audience    String? // 男女通用 / 仅限女性
+  salesNote   String? // 年售 200+
+  onMeituan   Boolean @default(false)
   elderNote   String?
-  status      String  @default("active")
+  complianceNote String?
+  status      String  @default("active") // active / planned / blocked
 }
 
 model PlanPackage {
@@ -844,6 +858,18 @@ model AiCallLog {
 model Setting {
   key   String @id
   value Json
+}
+
+/// 门店纸质《健康档案表（女）》数字化（顾问 / 健康管理师录入）
+model HealthIntake {
+  id          Int      @id @default(autoincrement())
+  customerId  Int
+  data        Json
+  tags        Json?
+  staffName   String?
+  consultant  String?
+  consentChannel String @default("paper")
+  createdAt   DateTime @default(now())
 }
 
 model Followup {

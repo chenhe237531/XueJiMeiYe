@@ -75,6 +75,9 @@ export default defineConfig({
   // 动态图标需要在这里配置，或者写在vue页面中注释掉
   safelist: [
     'i-tabler-home',
+    'i-tabler-building-store',
+    'i-tabler-star',
+    'i-tabler-calendar-plus',
     'i-tabler-clipboard-heart',
     'i-tabler-message-heart',
     'i-tabler-sparkles',

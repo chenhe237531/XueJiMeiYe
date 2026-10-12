@@ -139,7 +139,7 @@ export class PlanService {
       if (check.ok) {
         // 用骨架里的名称和频次回填，保证展示一致
         out.customer.medicalItems = out.customer.medicalItems.map((m: any, idx: number) => ({ ...m, name: skeleton.medical[idx].name }))
-        out.customer.storeItems = out.customer.storeItems.map((s: any, idx: number) => ({ ...s, name: skeleton.storeItems[idx].name, freq: skeleton.storeItems[idx].freq }))
+        out.customer.storeItems = out.customer.storeItems.map((s: any, idx: number) => ({ ...s, name: skeleton.storeItems[idx].name, freq: skeleton.storeItems[idx].freq, planned: !!skeleton.storeItems[idx].planned, groupPrice: skeleton.storeItems[idx].groupPrice ?? null }))
         return { content: out, engine: 'ai', validation, model: cfg.model }
       }
       hint = `\n\n上一次输出不合格：${check.errors.join('；')}。请严格按规则重写。`
