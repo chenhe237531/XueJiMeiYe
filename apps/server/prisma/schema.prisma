@@ -1,0 +1,856 @@
+// 雪姬美业六维健康平台 · 数据模型（MVP）
+// 对应设计文档第 11 章。黑客松阶段使用 SQLite，切换 MySQL 只需修改 datasource provider。
+// 简化项：加密字段（*_enc）在 MVP 中以明文存储；RBAC 用 staff.role 单字段表达。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────── 组织与账号 ─────────────
+
+model Store {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  district  String?
+  address   String?
+  phone     String?
+  openHours String?
+  bedCount  Int      @default(8)
+  idleSlots String?
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+}
+
+model Staff {
+  id          Int       @id @default(autoincrement())
+  staffNo     String    @unique
+  name        String
+  username    String    @unique
+  password    String
+  phone       String?
+  role        String // super_admin / ops / store_manager / advisor / health_advisor / finance
+  storeId     Int?
+  dataScope   String    @default("store") // all / store / self
+  status      String    @default("active")
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model Hospital {
+  id              Int      @id @default(autoincrement())
+  name            String
+  level           String?
+  licenseNo       String?
+  hasCheckupScope Boolean  @default(true)
+  address         String?
+  contact         Json?
+  agreement       Json?
+  status          String   @default("active")
+  createdAt       DateTime @default(now())
+}
+
+model HospitalUser {
+  id         Int      @id @default(autoincrement())
+  hospitalId Int
+  name       String
+  username   String   @unique
+  password   String
+  role       String // admin / coordinator / doctor
+  status     String   @default("active")
+  createdAt  DateTime @default(now())
+}
+
+model Partner {
+  id            Int       @id @default(autoincrement())
+  name          String
+  type          String // travel_agency / hot_spring / culture_venue / overseas_medical / other
+  region        String?
+  licenses      Json?
+  contact       Json?
+  contractStart DateTime?
+  contractEnd   DateTime?
+  status        String    @default("active")
+  createdAt     DateTime  @default(now())
+}
+
+// ───────────── 客户 ─────────────
+
+model Customer {
+  id              Int       @id @default(autoincrement())
+  customerNo      String    @unique
+  openid          String?   @unique
+  extCustomerId   String?
+  phone           String?   @unique
+  salutation      String?
+  name            String?
+  gender          String    @default("female")
+  birthYear       Int?
+  storeId         Int?
+  advisorId       Int?
+  tier            String    @default("C")
+  tierKeepUntil   DateTime?
+  tierLockedUntil DateTime?
+  elderMode       Boolean   @default(false)
+  lang            String    @default("zh")
+  personalization Boolean   @default(true)
+  autoRead        Boolean   @default(true)
+  source          String    @default("store_qr")
+  referrerId      Int?
+  status          String    @default("active")
+  isDemo          Boolean   @default(false)
+  demoTitle       String?
+  lastVisitAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model CustomerLabel {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  labelCode  String
+  source     String   @default("system")
+  createdAt  DateTime @default(now())
+}
+
+model HealthTag {
+  id          Int       @id @default(autoincrement())
+  customerId  Int
+  tagCode     String
+  source      String // assessment / hospital / staff / measurement
+  sourceRefId Int?
+  validUntil  DateTime?
+  status      String    @default("active")
+  createdAt   DateTime  @default(now())
+}
+
+model FamilyLink {
+  id          Int       @id @default(autoincrement())
+  elderId     Int
+  familyId    Int?
+  relation    String
+  permissions Json
+  token       String    @unique
+  status      String    @default("pending") // pending / applied / active / revoked
+  invitedBy   String    @default("elder")
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model Qrcode {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  purpose   String
+  storeId   Int?
+  staffId   Int?
+  scanCount Int      @default(0)
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+}
+
+// ───────────── 授权 ─────────────
+
+model ConsentText {
+  id        Int      @id @default(autoincrement())
+  type      String
+  version   String
+  title     String
+  summary   Json
+  content   String
+  required  Boolean  @default(false)
+  status    String   @default("published")
+  createdAt DateTime @default(now())
+}
+
+model ConsentRecord {
+  id          Int       @id @default(autoincrement())
+  customerId  Int
+  type        String
+  textVersion String
+  scope       Json?
+  granted     Boolean
+  channel     String    @default("self")
+  grantedAt   DateTime  @default(now())
+  revokedAt   DateTime?
+}
+
+// ───────────── 消费与分级 ─────────────
+
+model Consumption {
+  id         Int      @id @default(autoincrement())
+  extOrderNo String   @unique
+  customerId Int
+  storeId    Int?
+  category   String
+  paidAmount Float
+  paidAt     DateTime
+  batchId    Int?
+}
+
+model ImportBatch {
+  id        Int      @id @default(autoincrement())
+  kind      String
+  fileName  String?
+  total     Int      @default(0)
+  success   Int      @default(0)
+  failed    Int      @default(0)
+  report    Json?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model TierRule {
+  id             Int       @id @default(autoincrement())
+  version        Int
+  windowMonths   Int       @default(12)
+  categories     Json
+  thresholdA     Float
+  thresholdB     Float
+  keepMonths     Int       @default(3)
+  simulateResult Json?
+  status         String    @default("draft")
+  publishedBy    String?
+  publishedAt    DateTime?
+  createdAt      DateTime  @default(now())
+}
+
+model TierHistory {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  fromTier   String?
+  toTier     String
+  reason     String
+  note       String?
+  operator   String?
+  createdAt  DateTime @default(now())
+}
+
+// ───────────── 模块与首页 ─────────────
+
+model Module {
+  id                 Int       @id @default(autoincrement())
+  code               String    @unique
+  name               String
+  category           String
+  entryType          String
+  entryConfig        Json?
+  icon               String?
+  cover              String?
+  summary            String?
+  detail             Json?
+  visibleTiers       Json
+  visibleStoreIds    Json?
+  elderOk            Boolean   @default(true)
+  healthRules        Json?
+  partnerId          Int?
+  showPartnerLicense Boolean   @default(true)
+  leadConfig         Json?
+  complianceStatus   String    @default("approved")
+  status             String    @default("online")
+  startAt            DateTime?
+  endAt              DateTime?
+  sort               Int       @default(100)
+  version            String    @default("V1.0")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model HomeLayout {
+  id          Int       @id @default(autoincrement())
+  tier        String
+  elderMode   Boolean
+  version     Int
+  components  Json
+  status      String    @default("draft") // draft / published / archived
+  publishedBy String?
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+// ───────────── 测评 ─────────────
+
+model AssessmentTemplate {
+  id          Int       @id @default(autoincrement())
+  version     String
+  name        String
+  status      String    @default("published")
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model AssessmentQuestion {
+  id         Int     @id @default(autoincrement())
+  templateId Int
+  code       String
+  level      String
+  seq        Int
+  type       String // single / multi / slider / number / image_choice / timer / counter
+  title      String
+  voiceText  String?
+  intro      String?
+  options    Json?
+  config     Json?
+  showIf     Json?
+  required   Boolean @default(false)
+  sensitive  Boolean @default(false)
+}
+
+model Assessment {
+  id              Int       @id @default(autoincrement())
+  customerId      Int
+  templateId      Int
+  mode            String    @default("self")
+  assistCode      String?
+  assistedBy      Int?
+  status          String    @default("in_progress")
+  progress        Json?
+  dimensionScores Json?
+  indexScore      Int?
+  riskLevel       String?
+  hitRules        Json?
+  computed        Json?
+  tags            Json?
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+}
+
+model AssessmentAnswer {
+  id           Int      @id @default(autoincrement())
+  assessmentId Int
+  questionCode String
+  level        String
+  answer       Json
+  inputMethod  String   @default("tap")
+  answeredAt   DateTime @default(now())
+
+  @@unique([assessmentId, questionCode])
+}
+
+// ───────────── 规则与方案引擎 ─────────────
+
+model Project {
+  id          Int     @id @default(autoincrement())
+  code        String  @unique
+  name        String
+  dimension   String
+  attributes  Json
+  defaultFreq String?
+  durationMin Int?
+  priceRef    Float?
+  elderNote   String?
+  status      String  @default("active")
+}
+
+model PlanPackage {
+  id                    Int     @id @default(autoincrement())
+  code                  String  @unique
+  name                  String
+  target                String?
+  trigger               Json?
+  triggerText           String?
+  priority              Int
+  items                 Json
+  medicalLinks          Json?
+  weeks                 Int?
+  templateCustomer      String?
+  templateCustomerElder String?
+  status                String  @default("active")
+}
+
+model Rule {
+  id           Int      @id @default(autoincrement())
+  code         String   @unique
+  kind         String // red_flag / risk_signal / contraindication
+  level        String?
+  source       String?
+  conditionText String?
+  condition    Json?
+  action       Json?
+  customerText String?
+  staffAction  String?
+  version      Int      @default(1)
+  doctorConfirmed Boolean @default(false)
+  status       String   @default("active")
+  updatedAt    DateTime @updatedAt
+}
+
+model LifestyleTip {
+  id        Int    @id @default(autoincrement())
+  code      String @unique
+  text      String
+  textElder String?
+  tags      Json?
+}
+
+model Script {
+  id     Int    @id @default(autoincrement())
+  scene  String
+  text   String
+  avoid  Json?
+  status String @default("active")
+}
+
+// ───────────── 档案与设备 ─────────────
+
+model Device {
+  id              Int       @id @default(autoincrement())
+  storeId         Int?
+  name            String
+  model           String?
+  manufacturer    String?
+  isMedicalDevice Boolean   @default(false)
+  registrationNo  String?
+  approvedUse     String?
+  principle       String?
+  admissionStatus String    @default("pending")
+  reviewNote      String?
+  reviewedAt      DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model DeviceMetric {
+  id        Int     @id @default(autoincrement())
+  deviceId  Int
+  code      String
+  name      String
+  unit      String?
+  refLow    Float?
+  refHigh   Float?
+  refSource String?
+  direction String  @default("range")
+}
+
+model Measurement {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  deviceId   Int?
+  storeId    Int?
+  operator   String?
+  metrics    Json
+  measuredAt DateTime
+  method     String   @default("manual")
+}
+
+model Record {
+  id          Int      @id @default(autoincrement())
+  customerId  Int
+  recordType  String // assessment / measurement / hospital_report / service / plan / checkin
+  sourceLabel String // HOSPITAL / STORE / SELF
+  title       String
+  summary     String?
+  refTable    String?
+  refId       Int?
+  storeId     Int?
+  occurredAt  DateTime @default(now())
+  visible     Boolean  @default(true)
+}
+
+model Report {
+  id           Int       @id @default(autoincrement())
+  customerId   Int
+  type         String // assessment / measurement / hospital / annual
+  sourceLabel  String
+  title        String
+  content      Json
+  aiGenerated  Boolean   @default(false)
+  reviewStatus String    @default("auto_published")
+  reviewer     String?
+  reviewedAt   DateTime?
+  publishedAt  DateTime?
+  createdAt    DateTime  @default(now())
+}
+
+// ───────────── 方案 ─────────────
+
+model Plan {
+  id               Int       @id @default(autoincrement())
+  planNo           String    @unique
+  customerId       Int
+  trigger          String
+  assessmentId     Int?
+  riskLevel        String?
+  skeleton         Json
+  contentCustomer  Json?
+  contentAdvisor   Json?
+  contentDoctor    String?
+  engine           String    @default("template")
+  model            String?
+  validation       Json?
+  reviewStatus     String    @default("pending")
+  reviewer         String?
+  reviewedAt       DateTime?
+  reviewNote       String?
+  status           String    @default("draft") // draft / ready / sent / paused / void
+  sentBy           String?
+  sentAt           DateTime?
+  edits            Json?
+  createdAt        DateTime  @default(now())
+}
+
+// ───────────── 体检、转介、线索 ─────────────
+
+model MedicalService {
+  id          Int     @id @default(autoincrement())
+  code        String  @unique
+  name        String
+  dept        String?
+  description String?
+  notice      String?
+  priceType   String  @default("self_pay")
+}
+
+model CheckupPackage {
+  id              Int     @id @default(autoincrement())
+  code            String  @unique
+  hospitalId      Int
+  name            String
+  items           Json
+  elderOnly       Boolean @default(false)
+  agreementPrice  Float?
+  fastingRequired Boolean @default(true)
+  notice          String?
+  status          String  @default("active")
+}
+
+model CheckupSlot {
+  id          Int    @id @default(autoincrement())
+  hospitalId  Int
+  packageCode String
+  date        String
+  capacity    Int
+  booked      Int    @default(0)
+  status      String @default("open")
+
+  @@unique([hospitalId, packageCode, date])
+}
+
+model Coupon {
+  id                 Int       @id @default(autoincrement())
+  couponNo           String    @unique
+  customerId         Int
+  type               String // BASIC / BASIC_ELDER / SPECIAL
+  packageCode        String
+  hospitalId         Int
+  sourceAssessmentId Int?
+  year               Int
+  status             String    @default("issued") // issued / claimed / booked / used / expired / void
+  issuedAt           DateTime  @default(now())
+  claimedAt          DateTime?
+  expiresAt          DateTime?
+  usedAt             DateTime?
+  claimedBy          String?
+  voidReason         String?
+}
+
+model Referral {
+  id                Int       @id @default(autoincrement())
+  referralNo        String    @unique
+  customerId        Int
+  hospitalId        Int
+  services          Json
+  packageCode       String?
+  couponId          Int?
+  level             String?
+  priority          Boolean   @default(false)
+  reasonSummary     String?
+  snapshot          Json
+  consentC3Id       Int?
+  consentC4Id       Int?
+  c4Granted         Boolean   @default(false)
+  status            String    @default("sent")
+  appointmentAt     DateTime?
+  appointmentNotice String?
+  arrivedAt         DateTime?
+  transportNeeded   Boolean   @default(false)
+  storeNote         String?
+  slaDueAt          DateTime?
+  cancelReason      String?
+  rejectReason      String?
+  timeline          Json?
+  createdBy         String?
+  createdAt         DateTime  @default(now())
+}
+
+model ReferralReturn {
+  id                Int       @id @default(autoincrement())
+  referralId        Int       @unique
+  doctorName        String
+  conclusion        String
+  advice            String
+  storeRestrictions Json?
+  recheckDate       String?
+  metrics           Json?
+  plainText         String?
+  createdBy         String?
+  createdAt         DateTime  @default(now())
+}
+
+model Statement {
+  id         Int      @id @default(autoincrement())
+  hospitalId Int
+  month      String
+  items      Json
+  total      Float
+  status     String   @default("pending") // pending / confirmed / disputed
+  note       String?
+  createdAt  DateTime @default(now())
+}
+
+model Lead {
+  id            Int       @id @default(autoincrement())
+  leadNo        String    @unique
+  customerId    Int
+  moduleId      Int?
+  moduleCode    String?
+  moduleName    String?
+  type          String // travel / overseas_vip / transport / gift / checkup / other
+  formData      Json?
+  healthNotices Json?
+  status        String    @default("new") // new / contacted / negotiating / won / lost
+  assigneeId    Int?
+  partnerId     Int?
+  handedOverAt  DateTime?
+  wonAmount     Float?
+  lostReason    String?
+  slaDueAt      DateTime?
+  createdAt     DateTime  @default(now())
+}
+
+model LeadFollowup {
+  id        Int      @id @default(autoincrement())
+  leadId    Int
+  staffName String?
+  method    String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+// ───────────── 积分与互动 ─────────────
+
+model PointsLedger {
+  id           Int      @id @default(autoincrement())
+  customerId   Int
+  change       Int
+  reasonCode   String
+  note         String?
+  balanceAfter Int
+  createdAt    DateTime @default(now())
+}
+
+model Checkin {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  type       String
+  date       String
+  data       Json?
+  createdAt  DateTime @default(now())
+
+  @@unique([customerId, type, date])
+}
+
+model QuizQuestion {
+  id        Int    @id @default(autoincrement())
+  title     String
+  options   Json
+  answer    Int
+  knowledge String
+  status    String @default("active")
+}
+
+model Activity {
+  id           Int      @id @default(autoincrement())
+  code         String   @unique
+  type         String
+  title        String
+  storeIds     Json?
+  startAt      DateTime
+  quota        Int      @default(30)
+  signups      Int      @default(0)
+  visibleTiers Json?
+  status       String   @default("online")
+}
+
+model GroupbuyActivity {
+  id         Int      @id @default(autoincrement())
+  moduleCode String?
+  title      String
+  desc       String?
+  price      Float
+  origPrice  Float?
+  groupSize  Int      @default(2)
+  hours      Int      @default(48)
+  needVisit  Boolean  @default(true)
+  status     String   @default("online")
+}
+
+model GroupbuyGroup {
+  id         Int      @id @default(autoincrement())
+  activityId Int
+  leaderId   Int
+  members    Json
+  status     String   @default("open") // open / success / closed
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+}
+
+// ───────────── 预警与任务 ─────────────
+
+model RiskAlert {
+  id              Int       @id @default(autoincrement())
+  customerId      Int
+  source          String // assessment / measurement / mirror / staff
+  sourceRefId     Int?
+  level           String // L3 / L2 / high / watch
+  ruleCodes       Json?
+  title           String
+  excerpt         String?
+  status          String    @default("open") // open / contacting / closed
+  slaDueAt        DateTime
+  escalationLevel Int       @default(0)
+  contactLogs     Json?
+  conclusion      String?
+  closedBy        String?
+  closedAt        DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model Task {
+  id         Int       @id @default(autoincrement())
+  staffId    Int?
+  customerId Int?
+  type       String
+  refTable   String?
+  refId      Int?
+  title      String
+  dueAt      DateTime
+  status     String    @default("todo") // todo / done / cancelled
+  doneAt     DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model ServiceCheck {
+  id          Int      @id @default(autoincrement())
+  customerId  Int
+  projectCode String
+  staffName   String?
+  result      Json?
+  createdAt   DateTime @default(now())
+}
+
+// ───────────── 魔镜 ─────────────
+
+model MirrorPersona {
+  id              Int    @id @default(autoincrement())
+  name            String
+  tone            String
+  opening         String
+  quickTopics     Json
+  forbiddenTopics Json
+  dailyLimit      Int    @default(100)
+  promptVersion   String @default("P4-v1")
+}
+
+model MirrorSession {
+  id         Int       @id @default(autoincrement())
+  customerId Int
+  lang       String    @default("zh")
+  turns      Int       @default(0)
+  startedAt  DateTime  @default(now())
+  endedAt    DateTime?
+}
+
+model MirrorMessage {
+  id           Int      @id @default(autoincrement())
+  sessionId    Int
+  customerId   Int
+  role         String
+  content      String
+  inputMethod  String   @default("text")
+  riskCategory String?
+  createdAt    DateTime @default(now())
+}
+
+model MirrorMemory {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  category   String
+  text       String
+  status     String   @default("active")
+  createdAt  DateTime @default(now())
+}
+
+// ───────────── 消息、审计、埋点、AI 日志 ─────────────
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  title      String
+  content    String
+  link       String?
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model StaffNotice {
+  id        Int      @id @default(autoincrement())
+  staffId   Int?
+  role      String?
+  level     String   @default("normal")
+  title     String
+  content   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id           Int      @id @default(autoincrement())
+  actorType    String
+  actorId      Int?
+  actorName    String?
+  action       String
+  resourceType String?
+  resourceId   Int?
+  customerId   Int?
+  detail       Json?
+  createdAt    DateTime @default(now())
+}
+
+model EventLog {
+  id         Int      @id @default(autoincrement())
+  customerId Int?
+  event      String
+  props      Json?
+  createdAt  DateTime @default(now())
+}
+
+model AiCallLog {
+  id           Int      @id @default(autoincrement())
+  scene        String
+  model        String?
+  status       String
+  latencyMs    Int?
+  inputTokens  Int?
+  outputTokens Int?
+  error        String?
+  createdAt    DateTime @default(now())
+}
+
+model Setting {
+  key   String @id
+  value Json
+}
+
+model Followup {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  staffName  String?
+  method     String // phone / visit / wecom
+  content    String
+  createdAt  DateTime @default(now())
+}

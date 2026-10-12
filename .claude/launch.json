@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "miniapp-h5", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "xueji-miniapp", "dev:h5"], "port": 9000 },
+    { "name": "admin", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "xueji-admin", "dev"], "port": 8848 }
+  ]
+}

@@ -1,0 +1,15 @@
+node_modules
+dist
+.DS_Store
+*.log
+.env.local
+apps/server/prisma/*.db
+apps/server/prisma/*.db-journal
+apps/server/uploads
+apps/miniapp/src/pages.json
+apps/miniapp/src/manifest.json
+.eslintcache
+deploy/.bundle
+apps/server/dist
+apps/miniapp/dist
+apps/admin/dist

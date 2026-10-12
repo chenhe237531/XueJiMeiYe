@@ -1,0 +1,39 @@
+{
+  "name": "xueji-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "雪姬美业六维健康平台 API（NestJS + Prisma）",
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "prisma:generate": "prisma generate",
+    "db:push": "prisma db push --skip-generate",
+    "db:seed": "ts-node --transpile-only prisma/seed.ts",
+    "db:reset": "node -e \"require('fs').rmSync('prisma/xueji.db',{force:true})\" && prisma db push --skip-generate && ts-node --transpile-only prisma/seed.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/platform-express": "^11.1.6",
+    "@nestjs/serve-static": "^5.0.3",
+    "@prisma/client": "6.19.3",
+    "dayjs": "^1.11.13",
+    "json-logic-js": "^2.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.10",
+    "@types/express": "^5.0.3",
+    "@types/json-logic-js": "^2.0.8",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^22.15.0",
+    "prisma": "6.19.3",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.8.0"
+  }
+}
