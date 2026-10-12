@@ -25,5 +25,5 @@ require("fs").writeFileSync(process.argv[2], JSON.stringify(p, null, 2));
 ' "$ROOT/apps/server/package.json" "$BUNDLE/server/package.json"
 cp -R "$ROOT/apps/admin/dist" "$BUNDLE/admin/dist"
 cp -R "$ROOT/apps/miniapp/dist/build/h5" "$BUNDLE/miniapp/dist/build/h5"
-cp "$ROOT/deploy/remote-setup.sh" "$ROOT/deploy/ecosystem.config.cjs" "$ROOT/deploy/nginx.conf" "$BUNDLE/"
+cp "$ROOT/deploy/remote-setup.sh" "$ROOT/deploy/Dockerfile" "$ROOT/deploy/docker-compose.yml" "$ROOT/deploy/docker-entrypoint.sh" "$ROOT/deploy/.dockerignore" "$ROOT/deploy/nginx.conf" "$BUNDLE/"
 echo "==> 完成：$BUNDLE"

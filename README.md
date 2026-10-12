@@ -12,7 +12,7 @@
 | `apps/miniapp` | 用户端：微信小程序 + H5 演示版 | [unibest](https://github.com/feige996/unibest)（uni-app + Vue3 + TS） |
 | `apps/admin` | 管理端 + 医院端 + 顾问移动工作台 | [pure-admin-thin](https://github.com/pure-admin/pure-admin-thin)（Vue3 + Element Plus） |
 | `apps/server` | API + 规则引擎 + AI 网关 | NestJS + Prisma（SQLite） |
-| `deploy` | 构建、上传、VPS 初始化脚本 | pm2，可选 Nginx |
+| `deploy` | 构建、上传脚本，Docker 运行配置 | Docker Compose，可选 Nginx |
 
 ## 本地运行
 
@@ -48,10 +48,10 @@ pnpm dev:h5
 ## 部署到 VPS
 
 ```bash
-deploy/deploy.sh root@<VPS_IP>
+deploy/deploy.sh root@<服务器地址>
 ```
 
-部署后访问 `http://<VPS_IP>:3000/`（管理端）与 `http://<VPS_IP>:3000/h5/`（小程序 H5 版）。详见迭代文档第 9 章。
+本地构建前端后上传，在 VPS 上用 Docker Compose 构建并运行（`restart: unless-stopped`，开机自启）。部署后访问 `http://<服务器地址>:3000/`（管理端）与 `http://<服务器地址>:3000/h5/`（小程序 H5 版）。详见迭代文档第 9 章。
 
 ## 大模型（可选）
 

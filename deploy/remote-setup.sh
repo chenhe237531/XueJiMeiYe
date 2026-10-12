@@ -1,45 +1,51 @@
 #!/usr/bin/env bash
-# 在 VPS 上执行：安装 Node / pm2、安装 API 依赖、初始化数据库、启动服务
+# 在 VPS 上执行（root）：用 Docker Compose 构建并运行（restart: unless-stopped，开机随 Docker 自启）
 set -euo pipefail
 APP_DIR="${APP_DIR:-/opt/xueji}"
 PORT="${PORT:-3000}"
 cd "$APP_DIR"
 
-if ! command -v node >/dev/null 2>&1 || [ "$(node -p 'process.versions.node.split(".")[0]')" -lt 20 ]; then
-  echo "==> 安装 Node.js 22"
-  if command -v apt-get >/dev/null 2>&1; then
-    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs
-  elif command -v dnf >/dev/null 2>&1 || command -v yum >/dev/null 2>&1; then
-    curl -fsSL https://rpm.nodesource.com/setup_22.x | bash - && (dnf install -y nodejs || yum install -y nodejs)
-  else
-    echo "请先手动安装 Node.js 20+"; exit 1
-  fi
-fi
-command -v pm2 >/dev/null 2>&1 || npm i -g pm2 --registry=https://registry.npmmirror.com
+command -v docker >/dev/null 2>&1 || { echo "请先安装 Docker（含 compose 插件）"; exit 1; }
+mkdir -p data
 
-echo "==> 安装 API 依赖"
-cd "$APP_DIR/server"
-[ -f .env ] || cat > .env <<ENV
-DATABASE_URL="file:./xueji.db"
+# 环境变量文件（首次生成，之后保留）
+if [ ! -f xueji.env ]; then
+  cat > xueji.env <<ENV
 PORT=$PORT
-JWT_SECRET=$(head -c 24 /dev/urandom | base64 | tr -dc A-Za-z0-9 | head -c 32)
+JWT_SECRET=$(head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n')
 AI_BASE_URL=
 AI_API_KEY=
 AI_MODEL=
 ENV
-npm install --registry=https://registry.npmmirror.com --no-audit --no-fund
-PRISMA_ENGINES_MIRROR=https://registry.npmmirror.com/-/binary/prisma npx prisma generate
-if [ ! -f prisma/xueji.db ] || [ "${RESEED:-0}" = "1" ]; then
-  echo "==> 初始化演示数据"
-  rm -f prisma/xueji.db
-  npx prisma db push --skip-generate
-  npx ts-node --transpile-only prisma/seed.ts
-else
-  npx prisma db push --skip-generate
+  chmod 600 xueji.env
 fi
 
-echo "==> 启动服务（pm2）"
-cd "$APP_DIR"
-pm2 startOrReload ecosystem.config.cjs --update-env
-pm2 save >/dev/null
-echo "==> 完成：http://<服务器IP>:$PORT/  管理端；http://<服务器IP>:$PORT/h5/  小程序 H5 版"
+# 从旧的 systemd 部署迁移：保留已有数据库，停用旧服务
+if [ ! -f data/xueji.db ] && [ -f server/prisma/xueji.db ]; then
+  echo "==> 迁移已有数据库到 data/"
+  systemctl stop xueji 2>/dev/null || true
+  cp server/prisma/xueji.db data/xueji.db
+fi
+if systemctl list-unit-files xueji.service >/dev/null 2>&1 && [ -f /etc/systemd/system/xueji.service ]; then
+  echo "==> 停用旧的 systemd 服务（已改为 Docker 运行）"
+  systemctl disable --now xueji 2>/dev/null || true
+  rm -f /etc/systemd/system/xueji.service && systemctl daemon-reload
+  rm -rf runtime server/node_modules server/prisma/xueji.db server/prisma/xueji.db-journal server/.env
+fi
+
+if [ "${RESEED:-0}" = "1" ]; then
+  echo "==> 重置演示数据"
+  rm -f data/xueji.db data/xueji.db-journal
+fi
+chown -R root:root "$APP_DIR" && chown -R 10001:10001 data
+
+echo "==> 构建镜像并启动容器"
+docker compose up -d --build --remove-orphans
+docker image prune -f >/dev/null 2>&1 || true
+
+for i in $(seq 1 60); do
+  curl -fsS "http://127.0.0.1:$PORT/api/v1/app/about" >/dev/null 2>&1 && break
+  sleep 2
+done
+docker compose ps
+curl -fsS -o /dev/null -w "==> 健康检查 /api/v1/app/about -> %{http_code}\n" "http://127.0.0.1:$PORT/api/v1/app/about"
