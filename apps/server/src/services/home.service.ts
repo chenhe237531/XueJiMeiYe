@@ -20,6 +20,9 @@ export const BUILTIN_LINKS: Record<string, string> = {
   vip_transport: '/pkg-module/transport',
   annual_report: '/pages/archive/index',
   store_services: '/pkg-module/store',
+  game_tree: '/pkg-game/tree',
+  game_wheel: '/pkg-game/wheel',
+  game_match3: '/pkg-game/match3',
 }
 
 /** 会员权益（issue #4 图标化）：icon 为 tabler 图标名 */

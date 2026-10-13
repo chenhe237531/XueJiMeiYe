@@ -3,6 +3,7 @@ import { PrismaModule } from './common/prisma.service'
 import { AdminConfigController } from './controllers/admin-config.controller'
 import { AdminAuthController, AdminController } from './controllers/admin.controller'
 import { AppAuthController, AppController, AppHealthController } from './controllers/app.controller'
+import { GameController } from './controllers/game.controller'
 import { HospitalController } from './controllers/hospital.controller'
 import { AiService } from './services/ai.service'
 import { ArchiveService } from './services/archive.service'
@@ -18,7 +19,7 @@ import { JobsService } from './services/jobs.service'
 
 @Module({
   imports: [PrismaModule],
-  controllers: [AppAuthController, AppController, AppHealthController, AdminAuthController, AdminController, AdminConfigController, HospitalController],
+  controllers: [AppAuthController, AppController, AppHealthController, GameController, AdminAuthController, AdminController, AdminConfigController, HospitalController],
   providers: [AiService, WorkflowService, EngineService, PlanService, AssessmentService, HomeService, MirrorService, CheckupService, ArchiveService, TierService, JobsService],
 })
 export class AppModule {}

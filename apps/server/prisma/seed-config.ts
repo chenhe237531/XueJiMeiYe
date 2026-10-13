@@ -36,6 +36,9 @@ export const MODULES: any[] = [
   { code: 'family', name: '家人', category: 'builtin', entryType: 'builtin', icon: 'users', summary: '让子女放心', tiers: ['A', 'B', 'C'], sort: 5 },
   { code: 'passbook', name: '健康存折', category: 'builtin', entryType: 'builtin', icon: 'notebook', summary: '积分换讲座、体验和好物', tiers: ['A', 'B', 'C'], sort: 6, version: 'V1.2' },
   { code: 'checkin', name: '每日打卡', category: 'builtin', entryType: 'builtin', icon: 'calendar-check', summary: '睡眠、运动、喝水', tiers: ['A', 'B', 'C'], sort: 7, version: 'V1.2' },
+  { code: 'game_tree', name: '种健康树', category: 'interactive', entryType: 'builtin', icon: 'plant', summary: '打卡答题攒水滴，长成兑好礼', tiers: ['A', 'B', 'C'], sort: 12, version: 'V1.0' },
+  { code: 'game_wheel', name: '积分转盘', category: 'interactive', entryType: 'builtin', icon: 'refresh', summary: '每天免费一次，转出积分好礼', tiers: ['A', 'B', 'C'], sort: 13, version: 'V1.0' },
+  { code: 'game_match3', name: '消消乐', category: 'interactive', entryType: 'builtin', icon: 'grid-dots', summary: '健康图标三消，通关得积分', tiers: ['A', 'B', 'C'], sort: 14, version: 'V1.0' },
   { code: 'daily_quiz', name: '健康问答', category: 'interactive', entryType: 'builtin', icon: 'bulb', summary: '每天 3 题，答对得积分', tiers: ['B', 'C'], sort: 8, version: 'V1.2' },
   { code: 'memory_cards', name: '记忆翻牌', category: 'interactive', entryType: 'builtin', icon: 'cards', summary: '轻松小游戏', tiers: ['C'], sort: 9, version: 'V1.2' },
   { code: 'buddy_group', name: '结伴拼团', category: 'interactive', entryType: 'builtin', icon: 'users-group', summary: '约上老姐妹一起来', tiers: ['B', 'C'], sort: 10, version: 'V1.2' },
@@ -96,7 +99,7 @@ export const LAYOUTS: { tier: string, elderMode: boolean, components: any[] }[] 
     { type: 'entryGrid', props: { columns: 3, modules: ['assessment', 'checkup_coupon', 'mirror', 'buddy_group', 'checkin', 'family'] } },
     { type: 'divider', props: { title: '康养出游' } },
     { type: 'moduleList', props: { modules: ['trip_qingyuan_value'], style: 'card' } },
-    { type: 'moduleList', props: { modules: ['store_services', 'mall_organic', 'daily_quiz'], style: 'list' } },
+    { type: 'moduleList', props: { modules: ['game_tree', 'store_services', 'mall_organic', 'daily_quiz'], style: 'list' } },
     { type: 'mirrorFab', props: { label: '和小镜聊聊' } },
   ] },
   { tier: 'C', elderMode: false, components: [
@@ -106,7 +109,7 @@ export const LAYOUTS: { tier: string, elderMode: boolean, components: any[] }[] 
     { type: 'entryGrid', props: { columns: 4, modules: ['assessment', 'checkup_coupon', 'my_plan', 'mirror', 'store_services', 'buddy_group', 'daily_quiz', 'family'] } },
     { type: 'divider', props: { title: '康养出游' } },
     { type: 'moduleList', props: { modules: ['trip_qingyuan_value'], style: 'card' } },
-    { type: 'moduleList', props: { modules: ['mall_organic', 'memory_cards', 'passbook'], style: 'list' } },
+    { type: 'moduleList', props: { modules: ['game_tree', 'game_wheel', 'mall_organic', 'memory_cards', 'passbook'], style: 'list' } },
     { type: 'mirrorFab', props: { label: '小镜' } },
   ] },
   { tier: 'B', elderMode: false, components: [
@@ -117,7 +120,7 @@ export const LAYOUTS: { tier: string, elderMode: boolean, components: any[] }[] 
     { type: 'banner', props: { modules: ['lecture'], autoplay: true } },
     { type: 'divider', props: { title: '康养精选' } },
     { type: 'moduleList', props: { modules: ['trip_qingyuan_boutique', 'trip_maoming_agarwood', 'trip_hainan_sojourn', 'trip_yunnan'], style: 'card' } },
-    { type: 'moduleList', props: { modules: ['mall_organic'], style: 'list' } },
+    { type: 'moduleList', props: { modules: ['game_tree', 'game_wheel', 'game_match3', 'mall_organic'], style: 'list' } },
     { type: 'mirrorFab', props: { label: '小镜' } },
   ] },
   { tier: 'B', elderMode: true, components: [
@@ -125,7 +128,7 @@ export const LAYOUTS: { tier: string, elderMode: boolean, components: any[] }[] 
     { type: 'entryGrid', props: { columns: 3, modules: ['assessment', 'checkup_coupon', 'my_plan', 'mirror', 'lecture', 'family'] } },
     { type: 'divider', props: { title: '康养精选' } },
     { type: 'moduleList', props: { modules: ['trip_qingyuan_boutique', 'trip_hainan_sojourn'], style: 'card' } },
-    { type: 'moduleList', props: { modules: ['store_services'], style: 'list' } },
+    { type: 'moduleList', props: { modules: ['game_tree', 'store_services'], style: 'list' } },
     { type: 'mirrorFab', props: { label: '和小镜聊聊' } },
   ] },
   { tier: 'A', elderMode: false, components: [
