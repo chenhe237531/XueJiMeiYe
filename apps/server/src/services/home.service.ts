@@ -77,6 +77,8 @@ export function moduleCard(m: any) {
   return {
     code: m.code, name: m.name, icon: m.icon || 'circle', cover: m.cover || null, summary: m.summary,
     priceText: d.priceText || null, days: d.days || null, link: moduleLink(m), category: m.category, entryType: m.entryType, tone,
+    /** issue #5：商城类模块下发跳转配置（appId/path/h5Url/tip），供首页一步直达；表单配置不下发 */
+    entryConfig: m.entryType === 'miniprogram' ? m.entryConfig : undefined,
   }
 }
 

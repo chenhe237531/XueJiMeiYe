@@ -104,7 +104,7 @@ async function uploadCover(opt: any) {
           <el-col :span="12"><el-form-item label="乐龄可见"><el-switch v-model="form.elderOk" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="详情 detail"><el-input v-model="json.detail" type="textarea" :rows="8" class="mono" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="健康提示"><el-input v-model="json.healthRules" type="textarea" :rows="8" class="mono" placeholder='[{"tags":["htn_uncontrolled"],"text":"……","require_ack":true}]' /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="入口配置"><el-input v-model="json.entryConfig" type="textarea" :rows="8" class="mono" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="入口配置"><el-input v-model="json.entryConfig" type="textarea" :rows="8" class="mono" placeholder='商城跳转：{"type":"miniprogram","appId":"wx开头AppID","path":"pages/index/index","h5Url":"H5商城地址，留空则H5端提示"}；表单：{"type":"form","fields":[…]}' /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="线索配置"><el-input v-model="json.leadConfig" type="textarea" :rows="8" class="mono" /></el-form-item></el-col>
         </el-row>
       </el-form>
