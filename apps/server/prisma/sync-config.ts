@@ -56,12 +56,19 @@ async function main() {
   }
   log('questions', qn)
 
-  // 模块：只新增缺失的，已有模块保留管理端配置
+  // 模块：只新增缺失的，已有模块保留管理端配置；cover 为空时补 seed 占位图（issue #16，不覆盖已配置的实拍图）
   const partners = await prisma.partner.findMany({ orderBy: { id: 'asc' } })
   for (const m of MODULES) {
-    if (await prisma.module.findUnique({ where: { code: m.code } })) continue
+    const exists = await prisma.module.findUnique({ where: { code: m.code } })
+    if (exists) {
+      if (!exists.cover && m.cover) {
+        await prisma.module.update({ where: { code: m.code }, data: { cover: m.cover } })
+        log('module cover +', m.code)
+      }
+      continue
+    }
     await prisma.module.create({ data: {
-      code: m.code, name: m.name, category: m.category, entryType: m.entryType, icon: m.icon, summary: m.summary, visibleTiers: m.tiers, sort: m.sort, version: m.version || 'V1.0',
+      code: m.code, name: m.name, category: m.category, entryType: m.entryType, icon: m.icon, cover: m.cover || null, summary: m.summary, visibleTiers: m.tiers, sort: m.sort, version: m.version || 'V1.0',
       detail: m.detail || {}, entryConfig: m.entryConfig || undefined, healthRules: m.healthRules || [], leadConfig: m.lead ? { ...m.lead, assign: 'advisor' } : undefined,
       partnerId: m.partner !== undefined ? partners[m.partner]?.id : undefined, elderOk: true, complianceStatus: 'approved', status: 'online',
     } })

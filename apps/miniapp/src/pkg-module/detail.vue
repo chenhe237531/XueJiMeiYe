@@ -4,7 +4,7 @@ import XIcon from '@/components/XIcon.vue'
 import XNav from '@/components/XNav.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { go, toast } from '@/xj/utils'
+import { absUrl, go, toast } from '@/xj/utils'
 
 definePage({ style: { navigationStyle: 'custom', navigationBarTitleText: '详情' } })
 
@@ -45,7 +45,7 @@ function submit() {
 <template>
   <view v-if="m" :class="[...xj.pageClass, 'has-footer']" style="padding: 0">
     <view class="hero photo-slot">
-      <image v-if="m.cover && !heroErr" class="hero-img" :src="m.cover" mode="aspectFill" @error="heroErr = true" />
+      <image v-if="m.cover && !heroErr" class="hero-img" :src="absUrl(m.cover)" mode="aspectFill" @error="heroErr = true" />
       <template v-else>
         <XIcon :name="m.icon" :size="40" />
         <text class="t-sm semi">实拍：{{ m.name }}</text>

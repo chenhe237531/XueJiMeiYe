@@ -8,7 +8,7 @@ import XIcon from '@/components/XIcon.vue'
 import XRadar from '@/components/XRadar.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { go, toast } from '@/xj/utils'
+import { go, toast, absUrl } from '@/xj/utils'
 
 const props = defineProps<{ components: any[], night?: boolean }>()
 const xj = useXj()
@@ -218,7 +218,7 @@ const DIMS = [
         <swiper-item v-for="it in c.props.items" :key="it.code">
           <view class="card row gap12 banner-card" @click="open(it, 'banner')">
             <view class="photo-slot" style="width: 84px; height: 84px">
-              <image v-if="it.cover && !imgErr.has(it.code)" class="ph-img" :src="it.cover" mode="aspectFill" @error="imgErr.add(it.code)" />
+              <image v-if="it.cover && !imgErr.has(it.code)" class="ph-img" :src="absUrl(it.cover)" mode="aspectFill" @error="imgErr.add(it.code)" />
               <template v-else><XIcon :name="it.icon" :size="24" /><text>实拍位</text></template>
             </view>
             <view class="col gap4 flex1">
@@ -241,7 +241,7 @@ const DIMS = [
         <template v-if="c.props.style === 'card'">
           <view v-for="it in c.props.items" :key="it.code" class="card row gap12 mcard" @click="open(it, 'moduleList')">
             <view class="photo-slot" :style="{ width: elder ? '92px' : '84px', height: elder ? '92px' : '84px' }">
-              <image v-if="it.cover && !imgErr.has(it.code)" class="ph-img" :src="it.cover" mode="aspectFill" @error="imgErr.add(it.code)" />
+              <image v-if="it.cover && !imgErr.has(it.code)" class="ph-img" :src="absUrl(it.cover)" mode="aspectFill" @error="imgErr.add(it.code)" />
               <template v-else><XIcon :name="it.icon" :size="22" /><text>实拍位</text></template>
             </view>
             <view class="col gap4 flex1">

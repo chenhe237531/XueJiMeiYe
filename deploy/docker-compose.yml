@@ -10,6 +10,9 @@ services:
     network_mode: host
     env_file:
       - ./xueji.env
+    environment:
+      # issue #16：上传目录指到持久卷，容器以非 root 运行时可写、重新部署不丢文件
+      - UPLOAD_DIR=/data/uploads
     volumes:
       - ./data:/data
     logging:
