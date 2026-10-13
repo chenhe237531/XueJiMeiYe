@@ -69,7 +69,7 @@ onShow(async () => {
           <view class="row gap4" style="align-items: baseline">
             <text class="num bold" style="font-size: 28px">{{ m.value }}</text>
             <text class="t-sm c2">{{ m.unit }}</text>
-            <XIcon v-if="m.arrow !== 'flat'" :name="m.arrow === 'up' ? 'arrow-up' : 'arrow-down'" :size="16" :color="m.better === null ? '#786E74' : m.better ? '#6E7F5C' : '#7A4A08'" />
+            <XIcon v-if="m.arrow !== 'flat'" :name="m.arrow === 'up' ? 'arrow-up' : 'arrow-down'" :size="16" :color="m.better === null ? '#786E74' : m.better ? 'var(--care)' : '#7A4A08'" />
           </view>
           <view class="row gap6 t-xs c2">
             <text class="tag" :style="{ background: SOURCE_STYLE[m.source].bg, color: SOURCE_STYLE[m.source].fg }">{{ m.sourceName }}</text>

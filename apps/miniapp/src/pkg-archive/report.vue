@@ -89,12 +89,12 @@ function readAll() {
           <text class="t-md" style="font-weight: 500">{{ c.advice }}</text>
         </view>
         <view v-if="c.plain" class="card care stack">
-          <text class="t-sm semi" style="color: #57664a">通俗版（根据医生原话整理）</text>
+          <text class="t-sm semi" style="color: var(--care-dark)">通俗版（根据医生原话整理）</text>
           <text class="t-body" style="white-space: pre-wrap">{{ c.plain }}</text>
         </view>
         <view class="group">
-          <view v-if="c.recheckDate" class="cell"><XIcon name="calendar-event" color="#6E7F5C" /><text class="flex1 t-md">复查日期</text><text class="t-md semi c-care">{{ c.recheckDate }}</text></view>
-          <view v-for="m in c.metrics" :key="m.code" class="cell"><XIcon name="chart-line" color="#6E7F5C" /><text class="flex1 t-md">{{ m.code === 'BMD_T_LUMBAR' ? '腰椎骨密度 T 值' : m.code }}</text><text class="t-md semi num">{{ m.value }} {{ m.unit }}</text></view>
+          <view v-if="c.recheckDate" class="cell"><XIcon name="calendar-event" color="var(--care)" /><text class="flex1 t-md">复查日期</text><text class="t-md semi c-care">{{ c.recheckDate }}</text></view>
+          <view v-for="m in c.metrics" :key="m.code" class="cell"><XIcon name="chart-line" color="var(--care)" /><text class="flex1 t-md">{{ m.code === 'BMD_T_LUMBAR' ? '腰椎骨密度 T 值' : m.code }}</text><text class="t-md semi num">{{ m.value }} {{ m.unit }}</text></view>
           <view v-if="c.restrictions?.length" class="cell"><XIcon name="alert-triangle" color="#7A4A08" /><text class="flex1 t-md">门店项目调整</text><text class="t-sm c-warn semi">{{ c.restrictions.join('、') }}</text></view>
           <view class="cell" @click="toast('报告原件以临时链接提供，10 分钟有效（演示环境未上传原件）')"><XIcon name="file-text" color="#5C5358" /><text class="flex1 t-md">报告原件 PDF</text><XIcon name="chevron-right" :size="18" color="#786E74" /></view>
         </view>

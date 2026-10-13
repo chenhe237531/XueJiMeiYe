@@ -18,9 +18,15 @@ export function toast(title: string) {
   uni.showToast({ title, icon: 'none', duration: 2200 })
 }
 
+/** 原生组件（switch / slider / 弹窗按钮）不支持 CSS 变量，按当前风格给十六进制色：默认柔金、乐龄墨绿 */
+export function themeHex() {
+  const elder = uni.getStorageSync('xj_elder') === 'on'
+  return elder ? { brand: '#3F6B4F', ink: '#2F5238' } : { brand: '#C9A063', ink: '#6B4E2E' }
+}
+
 export function confirm(title: string, content: string, confirmText = '确认'): Promise<boolean> {
   return new Promise((resolve) => {
-    uni.showModal({ title, content, confirmText, cancelText: '再想想', confirmColor: '#6B4E2E', success: r => resolve(!!r.confirm), fail: () => resolve(false) })
+    uni.showModal({ title, content, confirmText, cancelText: '再想想', confirmColor: themeHex().ink, success: r => resolve(!!r.confirm), fail: () => resolve(false) })
   })
 }
 
@@ -127,7 +133,7 @@ export const DIMS = [
 ]
 
 /** 六维雷达图 */
-export function radarSvg(scores: Record<string, number>, prev?: Record<string, number> | null, opts: { size?: number, dark?: boolean } = {}) {
+export function radarSvg(scores: Record<string, number>, prev?: Record<string, number> | null, opts: { size?: number, dark?: boolean, color?: string } = {}) {
   const size = opts.size || 200
   const c = size / 2
   const R = size * 0.42
@@ -139,8 +145,10 @@ export function radarSvg(scores: Record<string, number>, prev?: Record<string, n
   const poly = (s: Record<string, number>) => DIMS.map((d, i) => pt(i, R * Math.max(0.06, (s?.[d.code] ?? 0) / 100))).join(' ')
   const line = opts.dark ? '#3A3237' : '#E6E6E6'
   const fill = opts.dark ? '#211C20' : '#F7F7F7'
-  const stroke = opts.dark ? '#D2B47A' : '#C9A063'
-  const area = opts.dark ? 'rgba(210,180,122,0.18)' : 'rgba(201,160,99,0.3)'
+  // 主色跟随当前风格（默认柔金 / 乐龄墨绿）；SVG 走 data URI，不能用 CSS 变量
+  const stroke = opts.dark ? '#D2B47A' : (opts.color || '#C9A063')
+  const [cr, cg, cb] = [1, 3, 5].map(i => Number.parseInt(stroke.slice(i, i + 2), 16))
+  const area = opts.dark ? 'rgba(210,180,122,0.18)' : `rgba(${cr},${cg},${cb},0.3)`
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`
   svg += `<polygon points="${ring(1)}" fill="${fill}" stroke="${line}"/>`
   svg += `<polygon points="${ring(0.66)}" fill="none" stroke="${line}"/><polygon points="${ring(0.33)}" fill="none" stroke="${line}"/>`

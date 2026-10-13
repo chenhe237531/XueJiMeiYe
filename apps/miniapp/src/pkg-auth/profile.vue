@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { go, toast } from '@/xj/utils'
+import { go, themeHex, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '基础资料' } })
 
@@ -22,7 +22,7 @@ async function save(skip = false) {
   const res: any = skip ? {} : await http.patch('/app/me', { salutation: salutation.value, birthYear: years[yearIdx.value], gender: gender.value }, { loading: '保存中' })
   await xj.loadMe()
   if (res.elderAuto) {
-    await new Promise(r => uni.showModal({ title: '已为您开启乐龄模式', content: '字更大、颜色更柔和。可以在"我的 - 设置"里随时切换。', showCancel: false, confirmText: '好的', confirmColor: '#6B4E2E', complete: r }))
+    await new Promise(r => uni.showModal({ title: '已为您开启乐龄模式', content: '字更大、颜色更柔和。可以在"我的 - 设置"里随时切换。', showCancel: false, confirmText: '好的', confirmColor: themeHex().ink, complete: r }))
   }
   go('/pages/index/index')
 }

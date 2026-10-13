@@ -47,18 +47,19 @@ async function demoFill() {
     <view v-if="a" class="stack" style="padding-top: 12px">
       <view class="col gap8">
         <view class="row-between">
-          <text class="t-xl">已完成 {{ a.doneCount }} / 6 关</text>
+          <text class="t-xl">已完成 {{ a.doneCount }} / {{ a.totalLevels }} 关</text>
           <text class="t-sm c2">{{ allDone ? '可以查看结果了' : `还需约 ${a.remainingMinutes} 分钟` }}</text>
         </view>
-        <view class="progress"><view :style="{ width: `${(a.doneCount / 6) * 100}%` }" /></view>
-        <text class="t-sm c2">每完成一关 +10 积分，已得 {{ a.doneCount * 10 + (safety?.done ? 10 : 0) }} 积分</text>
+        <view class="progress"><view :style="{ width: `${(a.doneCount / a.totalLevels) * 100}%` }" /></view>
+        <text class="t-sm c2">每完成一关 +10 积分，已得 {{ a.earnedPoints }} 积分</text>
         <view v-if="a.assistCode" class="tag care" style="align-self: flex-start">顾问陪填码 {{ a.assistCode }}</view>
       </view>
 
       <view class="card dots">
         <view v-for="(l, i) in [safety, ...dims]" :key="l.code" class="dot-item" @click="openLevel(l)">
           <view class="dot" :class="{ done: l.done, safety: l.code === 'safety', cur: next && next.code === l.code }">
-            <XIcon v-if="l.done" name="check" :size="16" color="var(--on-brand)" />
+            <XIcon v-if="l.done" name="check" :size="16" :color="l.code === 'safety' ? '#fff' : 'var(--on-brand)'" />
+            <XIcon v-else-if="l.code === 'safety'" name="shield-check" :size="16" />
             <text v-else>{{ i }}</text>
           </view>
           <text class="t-xs" :class="{ semi: l.done }">{{ l.short }}</text>

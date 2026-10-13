@@ -8,6 +8,8 @@
  */
 export interface QOption {
   label: string
+  /** 选项补充说明（无配图时帮助判断，如站姿、肤质） */
+  desc?: string
   value: string
   score?: number | null
   tags?: string[]
@@ -32,7 +34,7 @@ export interface QDef {
 }
 
 export const LEVELS = [
-  { code: 'safety', name: '健康安全关', short: '安全', scored: false, desc: '6 题，必答，保障门店项目安全' },
+  { code: 'safety', name: '健康安全关', short: '安全', scored: false, desc: '必答，保障门店项目安全' },
   { code: 'skin', name: '肌肤', short: '肌肤', scored: true, desc: '皮肤状态与护理习惯' },
   { code: 'shape', name: '体型', short: '体型', scored: true, desc: '身高体重、腰围与变化' },
   { code: 'contour', name: '轮廓', short: '轮廓', scored: true, desc: '面部轮廓与变化' },
@@ -96,7 +98,7 @@ export const QUESTIONS: QDef[] = [
   {
     code: 'H03', level: 'safety', type: 'multi', required: true,
     title: '以下情况有没有？',
-    intro: '和门店项目安全有关，可以选多个。',
+    intro: '和门店项目安全有关，请如实选择。',
     options: [
       { label: '心脏起搏器或体内有金属植入', value: 'pacemaker', tags: ['pacemaker_implant'] },
       { label: '正在吃抗凝药（如华法林、阿司匹林）', value: 'anticoagulant', tags: ['anticoagulant'] },
@@ -128,17 +130,17 @@ export const QUESTIONS: QDef[] = [
     code: 'S01', level: 'skin', type: 'image_choice',
     title: '您觉得自己的皮肤更接近哪种？',
     options: [
-      { label: '干性', value: 'dry', score: null, tags: ['skin_type_dry'] },
-      { label: '油性', value: 'oily', score: null, tags: ['skin_type_oily'] },
-      { label: '混合', value: 'combo', score: null, tags: ['skin_type_combo'] },
-      { label: '敏感', value: 'sensitive', score: null, tags: ['skin_type_sensitive'] },
+      { label: '干性', desc: '洗脸后发紧，容易起皮', value: 'dry', score: null, tags: ['skin_type_dry'] },
+      { label: '油性', desc: '全脸容易出油，毛孔明显', value: 'oily', score: null, tags: ['skin_type_oily'] },
+      { label: '混合', desc: '额头鼻子油，两颊偏干', value: 'combo', score: null, tags: ['skin_type_combo'] },
+      { label: '敏感', desc: '容易泛红、发痒或刺痛', value: 'sensitive', score: null, tags: ['skin_type_sensitive'] },
       { label: '说不清', value: 'unsure', score: null },
     ],
   },
   {
     code: 'S02', level: 'skin', type: 'multi',
     title: '最困扰您的皮肤问题？',
-    intro: '最多选 3 个',
+    intro: '挑最在意的就好',
     config: { max: 3, scoring: 'multiCount', map: { 0: 4, 1: 3, 2: 2, 3: 1 } },
     options: [
       { label: '皱纹细纹', value: 'wrinkle', tags: ['skin_aging'] }, { label: '松弛', value: 'sagging', tags: ['skin_aging'] },
@@ -259,12 +261,12 @@ export const QUESTIONS: QDef[] = [
 
   // ── C.7 体态
   {
-    code: 'P01', level: 'posture', type: 'image_choice', title: '哪张图最像您平时的站姿？',
+    code: 'P01', level: 'posture', type: 'image_choice', title: '哪种最像您平时的站姿？',
     options: [
-      { label: '挺直', value: 'straight', score: 4 },
-      { label: '头往前伸', value: 'forward_head', score: 2 },
-      { label: '圆肩驼背', value: 'round', score: 2 },
-      { label: '腰往前挺', value: 'sway', score: 2 },
+      { label: '挺直', desc: '侧面看耳朵、肩膀、胯大致在一条线上', value: 'straight', score: 4 },
+      { label: '头往前伸', desc: '侧面看耳朵在肩膀前面', value: 'forward_head', score: 2 },
+      { label: '圆肩驼背', desc: '肩膀往前收，后背拱起', value: 'round', score: 2 },
+      { label: '腰往前挺', desc: '小肚子往前顶，腰往里凹得明显', value: 'sway', score: 2 },
       { label: '说不清', value: 'unsure', score: null },
     ],
   },

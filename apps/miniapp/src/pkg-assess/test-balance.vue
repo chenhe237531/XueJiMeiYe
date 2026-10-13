@@ -76,7 +76,7 @@ async function skip() {
     <view class="footer-bar">
       <view v-if="!done" class="btn big-btn" @click="toggle">{{ running ? '脚落地了，结束' : '站稳了，开始' }}</view>
       <view v-else class="btn" @click="back()">记录好了，返回</view>
-      <text class="t-body" style="text-align: center; color: #3b3337" @click="skip">跳过，到店再测</text>
+      <text v-if="!done" class="t-body" style="text-align: center; color: #3b3337" @click="skip">跳过，到店再测</text>
     </view>
   </view>
 </template>

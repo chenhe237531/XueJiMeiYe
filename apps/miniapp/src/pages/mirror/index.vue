@@ -95,8 +95,15 @@ async function memoryConsent(ok: boolean) {
   toast(ok ? '好的，小镜会记住您说过的事' : '好的，小镜不会记住对话内容')
 }
 
+let sessionOwner = ''
 onShow(() => {
-  if (!session.value) start()
+  // 换账号后（小程序 tab 页不销毁）重新开会话，不沿用上一位用户的对话
+  if (!session.value || sessionOwner !== xj.token) {
+    sessionOwner = xj.token
+    msgs.value = []
+    session.value = null
+    start()
+  }
 })
 </script>
 

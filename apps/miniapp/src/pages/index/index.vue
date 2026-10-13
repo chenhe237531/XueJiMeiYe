@@ -10,15 +10,20 @@ defineOptions({ name: 'Home' })
 definePage({ type: 'home', style: { navigationStyle: 'custom', navigationBarTitleText: '首页' } })
 
 const xj = useXj()
-const data = ref<any>(uni.getStorageSync('xj_home_cache') || null)
+// 首页缓存标记属于哪个登录态，换账号 / 退出后不会先闪出上一位用户的首页
+const cached = uni.getStorageSync('xj_home_cache')
+const data = ref<any>(cached && cached.owner === xj.token ? cached.data : null)
 const offline = ref(false)
 const night = computed(() => data.value?.tier === 'A')
 
 async function load() {
+  const owner = xj.token
   try {
-    data.value = await http.get('/app/home', undefined, { silent: true })
+    const res = await http.get('/app/home', undefined, { silent: true })
+    if (owner !== xj.token) return // 请求期间换了账号，丢弃旧结果
+    data.value = res
     offline.value = false
-    uni.setStorageSync('xj_home_cache', data.value)
+    uni.setStorageSync('xj_home_cache', { owner, data: res })
   }
   catch (e: any) {
     if (e?.code === 40001) { xj.logout(); return load() }

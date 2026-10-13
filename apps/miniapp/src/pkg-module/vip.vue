@@ -4,7 +4,7 @@ import XIcon from '@/components/XIcon.vue'
 import XNav from '@/components/XNav.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { back, toast } from '@/xj/utils'
+import { back, themeHex, toast } from '@/xj/utils'
 
 definePage({ style: { navigationStyle: 'custom', navigationBarTitleText: '海外 VIP 通道', navigationBarTextStyle: 'white' } })
 
@@ -23,7 +23,7 @@ const translator = ref('不需要')
 async function submit() {
   if (xj.me?.tier !== 'A') return toast('海外 VIP 通道为臻享会员权益，可以咨询您的顾问')
   const res: any = await http.post('/app/leads', { moduleCode: 'vip_overseas', form: { destination: dest.value, need: need.value, translator: translator.value } }, { loading: '提交中' })
-  await new Promise(r => uni.showModal({ title: '已提交', content: `专属顾问会在 ${res.slaHours} 小时内联系您。`, showCancel: false, confirmText: '好的', confirmColor: '#6B4E2E', complete: r }))
+  await new Promise(r => uni.showModal({ title: '已提交', content: `专属顾问会在 ${res.slaHours} 小时内联系您。`, showCancel: false, confirmText: '好的', confirmColor: themeHex().ink, complete: r }))
   back()
 }
 </script>

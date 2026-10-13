@@ -151,12 +151,12 @@ const moduleOpts = computed(() => modules.value.filter(m => (m.visibleTiers || [
 .layout-item.on { background: #f4e7ed; }
 .comp { display: flex; align-items: center; padding: 8px 10px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 6px; cursor: pointer; }
 .comp.on { border-color: #8c2b56; background: #fbf4f7; }
-.phone { width: 340px; min-height: 640px; border-radius: 36px; border: 10px solid #1e191c; background: #f4f2f3; padding: 14px; box-sizing: border-box; font-size: 13px; position: relative; }
+.phone { width: 340px; min-height: 640px; border-radius: 36px; border: 10px solid #1e191c; background: #faf7f2; padding: 14px; box-sizing: border-box; font-size: 13px; position: relative; }
 .phone.night { background: #131013; color: #f2ece8; }
 .phone.elder { font-size: 16px; }
 .phone-title { font-size: 11px; color: #999; text-align: center; margin-bottom: 8px; }
 .p-greet { font-size: 1.6em; font-weight: 700; margin: 6px 0 10px; }
-.p-tag { font-size: 11px; background: #f4e7ed; color: #8c2b56; padding: 2px 6px; border-radius: 6px; margin-left: 8px; vertical-align: middle; }
+.p-tag { font-size: 11px; background: #f7ede0; color: #6b4e2e; padding: 2px 6px; border-radius: 6px; margin-left: 8px; vertical-align: middle; }
 .p-card { background: #fff; border-radius: 14px; padding: 10px; margin-bottom: 8px; }
 .night .p-card { background: #1e191d; }
 .p-card.tier { background: #f7ede0; color: #6b4e2e; border: 1px solid #e3cdb0; }
@@ -166,11 +166,11 @@ const moduleOpts = computed(() => modules.value.filter(m => (m.visibleTiers || [
 .p-card.hint { background: #faf1de; }
 .p-card.elder-today { background: #edf3ea; color: #2f5238; }
 .p-card.row { display: flex; gap: 8px; align-items: center; }
-.p-ph { width: 44px; height: 44px; border-radius: 10px; background: #eae5e8; flex-shrink: 0; display: inline-block; }
+.p-ph { width: 44px; height: 44px; border-radius: 10px; background: #f0ebe3; flex-shrink: 0; display: inline-block; }
 .p-small { font-size: 11px; color: #888; }
 .p-grid { display: grid; gap: 6px; margin-bottom: 8px; }
 .p-cell { background: #fff; border-radius: 12px; padding: 12px 4px; text-align: center; font-size: 0.85em; }
 .night .p-cell { background: #1e191d; }
 .p-div { font-weight: 700; margin: 10px 0 6px; }
-.p-fab { position: absolute; right: 14px; bottom: 20px; background: #8c2b56; color: #fff; border-radius: 20px; padding: 6px 12px; font-weight: 700; }
+.p-fab { position: absolute; right: 14px; bottom: 20px; background: #c9a063; color: #2b2622; border-radius: 20px; padding: 6px 12px; font-weight: 700; }
 </style>

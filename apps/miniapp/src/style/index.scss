@@ -154,6 +154,8 @@ page {
 .t-title { font-size: var(--fs-title); font-weight: 700; line-height: 1.25; font-family: var(--font-title); letter-spacing: 0.5px; }
 .t-xl { font-size: var(--fs-xl); font-weight: 700; line-height: 1.3; font-family: var(--font-title); letter-spacing: 0.5px; }
 .t-lg { font-size: var(--fs-lg); font-weight: 700; }
+/* 标题折行时两行均衡，避免"团""聊"这类单字孤行（乐龄大字号下常见） */
+.t-hero, .t-title, .t-xl, .t-lg { text-wrap: balance; }
 .t-md { font-size: var(--fs-md); font-weight: 600; }
 .t-body { font-size: var(--fs-body); }
 .t-sm { font-size: var(--fs-sm); }
@@ -246,11 +248,13 @@ page {
   background: var(--brand-soft);
   color: var(--brand-ink);
   white-space: nowrap;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .tag.care { background: var(--care-soft); color: var(--care); }
 .tag.gray { background: var(--line); color: var(--ink-2); }
 .tag.line { background: transparent; color: var(--ink-2); border: 1px solid var(--line-2); font-weight: 500; }
-.tag.promo { background: var(--price-soft); color: var(--price-ink); border: 1px solid var(--price-line); font-weight: 500; }
+.tag.promo { background: var(--price-soft); color: var(--price-ink); border: 1px solid var(--price-line); font-weight: 500; white-space: normal; } /* 优惠文案较长，乐龄字号下允许折行 */
 .tag.alert { background: var(--alert-soft); color: var(--alert); }
 .tag.warn { background: var(--hint); color: var(--warn-ink); }
 .tag.gold { background: rgba(210, 180, 122, 0.16); color: var(--brand-ink); }
@@ -394,6 +398,7 @@ page {
   color: var(--brand-ink);
 }
 .icon-box.care { background: var(--care-soft); color: var(--care); }
+.night .icon-box.care { background: rgba(110, 127, 92, 0.22); color: #a9c09a; }
 .icon-box.gray { background: var(--line); color: var(--ink-2); }
 .icon-box.green { background: var(--aux-green-soft); color: var(--aux-green); }
 .icon-box.terra { background: var(--aux-terra-soft); color: var(--aux-terra); }

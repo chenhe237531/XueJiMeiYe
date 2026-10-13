@@ -82,11 +82,11 @@ function readAll() {
       </view>
 
       <view v-if="r.medical.length" class="card care stack">
-        <text class="t-md bold" style="color: #57664a">{{ paused ? '请先就医，门店项目暂停' : '就医建议，请优先安排' }}</text>
+        <text class="t-md bold" style="color: var(--care-dark)">{{ paused ? '请先就医，门店项目暂停' : '就医建议，请优先安排' }}</text>
         <view v-for="m in r.medical" :key="m.code" class="row gap12">
           <view class="col flex1">
             <text class="t-lg">{{ m.name }}</text>
-            <text class="t-sm" style="color: #31524e">{{ m.reason }}</text>
+            <text class="t-sm" style="color: #4d5a3f">{{ m.reason }}</text>
           </view>
           <text class="t-sm semi c-care">顾问可代约</text>
         </view>

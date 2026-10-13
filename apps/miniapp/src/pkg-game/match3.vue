@@ -104,7 +104,7 @@ const adjacent = (a: number, b: number, c: any) => {
 
 /** 两次 tap 选中交换（乐龄友好，不依赖滑动） */
 function tap(i: number) {
-  if (busy.value || won.value) return
+  if (busy.value || won.value || finishSent.value) return // 达标后等待结算，棋盘不再响应
   if (sel.value === null) { sel.value = i; return }
   if (sel.value === i) { sel.value = null; return }
   if (!adjacent(sel.value, i, cfg.value)) { sel.value = i; return }

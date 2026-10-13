@@ -8,7 +8,7 @@ import XIcon from '@/components/XIcon.vue'
 import XRadar from '@/components/XRadar.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { go, toast, absUrl } from '@/xj/utils'
+import { absUrl, go, themeHex, toast } from '@/xj/utils'
 
 const props = defineProps<{ components: any[], night?: boolean }>()
 const xj = useXj()
@@ -143,7 +143,7 @@ const DIMS = [
       <view v-else-if="c.type === 'elderToday'" class="card elder-today">
         <view class="row-between gap8">
           <view class="col gap6 flex1">
-            <text class="t-hero">{{ c.props.text }}</text>
+            <text class="t-title">{{ c.props.text }}</text>
             <view class="row gap8">
               <text class="tag">{{ c.props.isGuest ? '访客' : c.props.tierName }}</text>
               <text v-if="c.props.isGuest" class="t-sm c-brand semi" @click="go('/pkg-auth/login')">登录 / 注册</text>
@@ -201,7 +201,7 @@ const DIMS = [
             </view>
           </view>
           <view v-for="it in featuredFirst(c.props.items, c.props.featured).rest" :key="it.code" class="tile" @click="open(it, 'entryGrid')">
-            <XIcon :name="it.icon" :size="30" :color="it.code === 'checkup_coupon' ? '#6E7F5C' : (night ? '#D2B47A' : 'var(--brand-ink)')" />
+            <XIcon :name="it.icon" :size="30" :color="it.code === 'checkup_coupon' ? 'var(--care)' : (night ? '#D2B47A' : 'var(--brand-ink)')" />
             <text class="tile-name">{{ it.name }}</text>
           </view>
         </view>
@@ -214,7 +214,7 @@ const DIMS = [
       </view>
 
       <!-- 轮播（乐龄模式停用自动轮播） -->
-      <swiper v-else-if="c.type === 'banner'" class="banner" :autoplay="c.props.autoplay" circular :indicator-dots="c.props.items.length > 1" indicator-color="rgba(60, 50, 42, 0.14)" indicator-active-color="#C9A063">
+      <swiper v-else-if="c.type === 'banner'" class="banner" :autoplay="c.props.autoplay" circular :indicator-dots="c.props.items.length > 1" indicator-color="rgba(60, 50, 42, 0.14)" :indicator-active-color="themeHex().brand">
         <swiper-item v-for="it in c.props.items" :key="it.code">
           <view class="card row gap12 banner-card" @click="open(it, 'banner')">
             <view class="photo-slot" style="width: 84px; height: 84px">
@@ -303,6 +303,7 @@ const DIMS = [
 .tier-line { height: 1px; background: currentColor; opacity: 0.2; }
 .benefit { padding: 3px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.35); align-items: center; }
 .tier-C .benefit { background: #fff; }
+.tier-A .benefit { background: rgba(210, 180, 122, 0.14); color: #e6d3ad; }
 .tier-up { color: var(--on-brand); opacity: 0.9; }
 .tier-B .tier-up { opacity: 0.85; }
 
@@ -322,12 +323,12 @@ const DIMS = [
 
 .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .tile { height: 100px; border-radius: 20px; background: var(--surface); padding: 14px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 8px 18px -14px rgba(34, 24, 40, 0.28); }
-.elder .tile { height: 108px; }
-.tile-name { font-size: var(--fs-md); font-weight: 600; line-height: 1.3; }
+.elder .tile { height: 108px; padding: 12px 10px; }
+.tile-name { font-size: var(--fs-md); font-weight: 600; line-height: 1.3; text-wrap: balance; }
 .tile.featured { grid-column: span 2; background: var(--brand); color: var(--on-brand); height: 112px; box-shadow: 0 10px 22px -12px rgba(168, 130, 77, 0.5); }
 .night .tile.featured { color: #1c1712; }
 .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 4px; }
-.g4 { align-items: center; text-align: center; }
+.g4 { align-items: center; text-align: center; text-wrap: balance; }
 
 .banner { height: 120px; }
 .banner-card { height: 116px; }
