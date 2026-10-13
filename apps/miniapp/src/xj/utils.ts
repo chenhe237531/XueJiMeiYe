@@ -42,9 +42,9 @@ export function absUrl(u?: string | null): string {
   if (!u || !u.startsWith('/')) return u || ''
   // #ifdef MP-WEIXIN
   const base = (import.meta.env.VITE_MP_SERVER_BASEURL || import.meta.env.VITE_SERVER_BASEURL || '') as string
-  if (/^https?:\/\//.test(base)) {
-    try { return new URL(base).origin + u } catch { /* 非法地址时回退相对路径 */ }
-  }
+  // 小程序运行时没有全局 URL，用正则取 origin
+  const origin = base.match(/^https?:\/\/[^/]+/)?.[0]
+  if (origin) return origin + u
   // #endif
   return u
 }
