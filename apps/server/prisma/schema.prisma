@@ -662,6 +662,7 @@ model GameProgress {
   customerId Int
   game       String
   state      Json
+  version    Int      @default(0) // 乐观锁：并发写只有一个成功
   updatedAt  DateTime @updatedAt
   createdAt  DateTime @default(now())
 
