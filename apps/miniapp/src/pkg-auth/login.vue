@@ -15,10 +15,10 @@ const showC1 = ref(false)
 
 /** 卖点卡（issue #2）：一眼看懂登录后能得到什么，icon-box 辅助色区分 */
 const SELLS = [
-  { icon: 'hexagon', tone: '', title: '免费六维测评', sub: '约 8 分钟了解自己' },
-  { icon: 'stethoscope', tone: 'care', title: '免费基础体检', sub: '完成测评即可领取' },
+  { icon: 'hexagon', tone: '', title: '免费六维测评', sub: '约 8 分钟完成' },
+  { icon: 'stethoscope', tone: 'care', title: '免费基础体检', sub: '测完即可领取' },
   { icon: 'clipboard-heart', tone: 'terra', title: '健康档案', sub: '记录每一次变化' },
-  { icon: 'sparkles', tone: 'rose', title: 'AI 陪伴', sub: '小镜读报告、聊家常' },
+  { icon: 'sparkles', tone: 'rose', title: 'AI 陪伴', sub: '读报告、陪聊天' },
 ]
 
 onLoad(async () => {

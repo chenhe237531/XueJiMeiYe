@@ -58,17 +58,25 @@ export class GameController {
 
   // ───────── 种健康树 ─────────
 
+  /** 今天答过几道健康问答（答对答错都算，每题 1 滴水） */
+  private async quizAnsweredCount(customerId: number) {
+    const evs = await this.prisma.eventLog.findMany({ where: { customerId, event: 'quiz_answer', createdAt: { gte: dayStart() } } })
+    return new Set(evs.map(e => (e.props as any)?.id).filter(Boolean)).size
+  }
+
   @Get('tree')
   async tree(@CurrentUser() u: CustomerUser) {
     let { s } = await this.state<TreeState>(u.id, 'tree', { drops: 0, stage: 0, watered: 0, date: today(), checkinClaimed: false, quizClaimed: 0 })
     if (s.date !== today()) s = { ...s, date: today(), checkinClaimed: false, quizClaimed: 0 }
     const checkedToday = await this.prisma.checkin.count({ where: { customerId: u.id, date: today() } })
-    const quizDone = await this.prisma.pointsLedger.count({ where: { customerId: u.id, reasonCode: 'quiz', createdAt: { gte: dayStart() } } })
+    const quizDone = await this.quizAnsweredCount(u.id)
     return {
       drops: s.drops, stage: s.stage, watered: s.watered,
       stageDrops: TREE_STAGE_DROPS, redeemPoints: TREE_REDEEM_POINTS,
       stageNames: ['种子', '发芽', '幼苗', '小树', '长成'],
       canClaim: { checkin: !!checkedToday && !s.checkinClaimed, quizCount: Math.max(0, Math.min(quizDone, 3) - s.quizClaimed) },
+      // 前端区分"可领 / 已领 / 还没做任务"三种状态
+      claimed: { checkin: s.checkinClaimed, quizAll: s.quizClaimed >= 3 },
     }
   }
 
@@ -85,7 +93,7 @@ export class GameController {
       s.drops += 2
     }
     else {
-      const quizDone = await this.prisma.pointsLedger.count({ where: { customerId: u.id, reasonCode: 'quiz', createdAt: { gte: dayStart() } } })
+      const quizDone = await this.quizAnsweredCount(u.id)
       if (s.quizClaimed >= Math.min(quizDone, 3)) throw Err.bad(quizDone ? '今天的答题水滴已经领完啦' : '先去答今天的健康问答，再来领水滴')
       s.quizClaimed += 1
       s.drops += 1

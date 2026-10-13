@@ -96,6 +96,9 @@ export class MirrorService {
 
   async send(customerId: number, sessionId: number, text: string, inputMethod = 'text') {
     if (!text?.trim()) throw Err.bad('说点什么吧')
+    // 会话必须属于当前用户：换账号后旧页面可能还拿着上一位用户的会话 id
+    const owned = await this.prisma.mirrorSession.findFirst({ where: { id: sessionId, customerId } })
+    if (!owned) throw Err.notFound('会话已失效，请重新进入魔镜')
     const persona = await this.persona()
     const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0)
     const todayTurns = await this.prisma.mirrorMessage.count({ where: { customerId, role: 'user', createdAt: { gte: startOfDay } } })

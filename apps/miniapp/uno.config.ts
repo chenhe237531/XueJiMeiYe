@@ -13,6 +13,9 @@ import {
 } from 'unocss'
 
 export default defineConfig({
+  // 这些类名在 style/index.scss 里按设计令牌定义（gap8 = 8px、c-care = var(--care)）；
+  // 不屏蔽的话 UnoCSS 会生成同名规则（gap8 = 2rem、c-care = 写死的旧绿色）覆盖掉全局样式
+  blocklist: [/^gap\d+$/, /^m[tblrxy]?\d+$/, 'c-care', 'c-brand', 'center'],
   presets: [
     presetUni({
       attributify: false,

@@ -45,16 +45,16 @@ function read() {
       <view v-if="d.paused" class="card hint row gap8"><XIcon name="alert-triangle" /><text class="t-md">门店项目暂停中，等医生确认后再安排。</text></view>
 
       <view v-if="c.medicalItems?.length" class="card care stack">
-        <text class="t-sm bold" style="color: #57664a">第一步，先就医</text>
-        <text v-if="c.medicalIntro" class="t-sm" style="color: #23403d">{{ c.medicalIntro }}</text>
+        <text class="t-sm bold" style="color: var(--care-dark)">第一步，先就医</text>
+        <text v-if="c.medicalIntro" class="t-sm" style="color: #3f4a35">{{ c.medicalIntro }}</text>
         <view v-for="m in c.medicalItems" :key="m.service" class="row gap12">
-          <view class="col flex1"><text class="t-md">{{ m.name }}</text><text class="t-sm" style="color: #31524e">{{ m.why }}</text></view>
+          <view class="col flex1"><text class="t-md">{{ m.name }}</text><text class="t-sm" style="color: #4d5a3f">{{ m.why }}</text></view>
           <text class="t-sm semi c-care">顾问代约</text>
         </view>
       </view>
 
       <view v-if="sk.doctorAdvice" class="card stack" style="border: 1px solid var(--care-line)">
-        <view class="row gap8"><XIcon name="building-hospital" color="#6E7F5C" /><text class="t-md">医生建议（{{ sk.doctorAdvice.doctor }}）</text></view>
+        <view class="row gap8"><XIcon name="building-hospital" color="var(--care)" /><text class="t-md">医生建议（{{ sk.doctorAdvice.doctor }}）</text></view>
         <text class="t-body">{{ sk.doctorAdvice.advice }}</text>
         <text v-if="sk.doctorAdvice.recheckDate" class="t-sm c-care semi">复查日期：{{ sk.doctorAdvice.recheckDate }}</text>
       </view>

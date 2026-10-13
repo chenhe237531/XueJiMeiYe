@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { toast } from '@/xj/utils'
+import { confirm, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '积分转盘' } })
 
@@ -29,6 +29,7 @@ onLoad(load)
 
 async function spin(usePoints: boolean) {
   if (spinning.value) return
+  if (usePoints && !(await confirm('积分抽奖', `这次抽奖会用掉 ${d.value.paidCost} 积分（当前 ${d.value.balance} 积分），确定抽吗？`, '抽一次'))) return
   spinning.value = true
   result.value = null
   try {

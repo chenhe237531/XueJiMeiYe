@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { createRecognizer, go, speak, stopSpeak, toast } from '@/xj/utils'
+import { createRecognizer, go, speak, stopSpeak, themeHex, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '答题' } })
 
@@ -18,6 +18,8 @@ const listening = ref(false)
 const numInput = ref('')
 
 const q = computed(() => questions.value[idx.value])
+/** 关卡标题：维度名补"关"字（健康安全关、女性健康进阶关本身已带） */
+const levelTitle = computed(() => { const n = levelInfo.value?.name || ''; return n.endsWith('关') ? n : `${n}关` })
 const cur = computed(() => answers.value[q.value?.code] || {})
 const selected = computed<string[]>(() => cur.value.values || (cur.value.value !== undefined ? [cur.value.value] : []))
 const sliderVal = ref(0)
@@ -27,7 +29,7 @@ async function load(keepCode?: string) {
   levelInfo.value = r.level
   questions.value = r.questions
   answers.value = r.answers || {}
-  uni.setNavigationBarTitle({ title: `${r.level?.name}${level.value === 'safety' ? '' : '关'}` })
+  uni.setNavigationBarTitle({ title: levelTitle.value })
   if (keepCode) {
     const i = questions.value.findIndex(x => x.code === keepCode)
     idx.value = i >= 0 ? i : idx.value
@@ -47,6 +49,8 @@ onUnload(() => stopSpeak())
 
 watch(q, (nq) => {
   if (!nq) return
+  // 换题回到顶部：上一题选项多、页面滚下去后，下一题的题号和进度条会被挡住
+  uni.pageScrollTo({ scrollTop: 0, duration: 0 })
   if (nq.type === 'slider') sliderVal.value = answers.value[nq.code]?.value ?? nq.config?.default ?? nq.config?.min ?? 0
   if (nq.type === 'number') numInput.value = answers.value[nq.code]?.value !== undefined ? String(answers.value[nq.code].value) : ''
   if (xj.elderMode && xj.me?.autoRead !== false) setTimeout(() => speak(nq.voiceText || nq.title), 300)
@@ -117,19 +121,27 @@ function prev() {
   if (idx.value > 0) idx.value--
 }
 
+let finishing = false
 async function finishLevel() {
   const missing = questions.value.filter(x => x.required && !answers.value[x.code])
   if (missing.length) {
     idx.value = questions.value.indexOf(missing[0])
     return toast('还有必答题没有完成')
   }
-  const r: any = await http.post(`/app/assessments/${id.value}/levels/${level.value}/complete`)
+  // 连点最后一题会重复提交、叠出多个弹窗，只处理第一次
+  if (finishing) return
+  finishing = true
+  const r: any = await http.post(`/app/assessments/${id.value}/levels/${level.value}/complete`).catch(() => null)
+  if (!r) {
+    finishing = false
+    return
+  }
   await new Promise(res => uni.showModal({
-    title: `${levelInfo.value?.name || ''}已完成${r.points ? `，+${r.points} 积分` : ''}`,
+    title: `${levelTitle.value}已完成${r.points ? `，+${r.points} 积分` : ''}`,
     content: r.tip || '谢谢您的配合',
     showCancel: false,
     confirmText: '回到关卡地图',
-    confirmColor: '#6B4E2E',
+    confirmColor: themeHex().ink,
     complete: res,
   }))
   uni.navigateBack()
@@ -174,7 +186,10 @@ function voice() {
         <text v-if="q.type === 'multi'" class="t-sm c2">可以选多个{{ q.config?.max ? `，最多 ${q.config.max} 个` : '' }}</text>
         <view v-for="o in q.options" :key="o.value" class="option" :class="{ on: selected.includes(o.value) }" @click="pick(o)">
           <view class="dot" :class="{ sq: q.type === 'multi' }" />
-          <text class="flex1">{{ o.label }}</text>
+          <view class="col flex1">
+            <text>{{ o.label }}</text>
+            <text v-if="o.desc" class="t-sm c2" style="font-weight: 400">{{ o.desc }}</text>
+          </view>
         </view>
       </view>
 
@@ -185,7 +200,7 @@ function voice() {
         </view>
         <view class="row gap16" style="width: 100%">
           <view class="step" @click="sliderVal = Math.max(q.config.min, sliderVal - 1)"><XIcon name="minus" :size="24" /></view>
-          <slider class="flex1" :min="q.config.min" :max="q.config.max" :step="q.config.step || 1" :value="sliderVal" active-color="#C9A063" block-size="28" @changing="(e) => (sliderVal = e.detail.value)" @change="(e) => (sliderVal = e.detail.value)" />
+          <slider class="flex1" :min="q.config.min" :max="q.config.max" :step="q.config.step || 1" :value="sliderVal" :active-color="themeHex().brand" block-size="28" @changing="(e) => (sliderVal = e.detail.value)" @change="(e) => (sliderVal = e.detail.value)" />
           <view class="step" @click="sliderVal = Math.min(q.config.max, sliderVal + 1)"><XIcon name="plus" :size="24" /></view>
         </view>
       </view>
@@ -215,7 +230,7 @@ function voice() {
       <view v-else-if="answers[q.code] && idx === questions.length - 1" class="btn" :class="{ ghost: xj.elderMode }" @click="finishLevel">完成本关</view>
       <view class="row-between t-body" style="padding: 4px 8px; color: #3b3337">
         <text :style="{ opacity: idx > 0 ? 1 : 0.3 }" @click="prev">上一题</text>
-        <text v-if="answers[q.code] && idx < questions.length - 1 && !['multi', 'slider', 'number'].includes(q.type)" @click="idx++">下一题</text>
+        <text v-if="answers[q.code] && idx < questions.length - 1 && !['multi', 'slider', 'number', 'counter', 'timer'].includes(q.type)" @click="idx++">下一题</text>
         <text v-if="!q.required" @click="skip">跳过</text>
       </view>
     </view>

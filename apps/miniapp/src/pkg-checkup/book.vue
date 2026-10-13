@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { toast } from '@/xj/utils'
+import { themeHex, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '体检预约' } })
 
@@ -39,7 +39,7 @@ async function submit() {
   if (mode.value === 'coupon') Object.assign(body, { couponId: coupon.value.id, date: date.value })
   else Object.assign(body, { services: result.value?.medical?.map((m: any) => m.code) || [] })
   await http.post('/app/checkup/bookings', body, { loading: '提交中' })
-  await new Promise(r => uni.showModal({ title: '已提交', content: mode.value === 'coupon' ? `您预约了 ${dateText.value} 的体检，医院确认后会通知您。体检前一晚 10 点后请不要进食。` : '合作医院会尽快联系您安排就诊，顾问也会协助您。', showCancel: false, confirmText: '好的', confirmColor: '#6B4E2E', complete: r }))
+  await new Promise(r => uni.showModal({ title: '已提交', content: mode.value === 'coupon' ? `您预约了 ${dateText.value} 的体检，医院确认后会通知您。体检前一晚 10 点后请不要进食。` : '合作医院会尽快联系您安排就诊，顾问也会协助您。', showCancel: false, confirmText: '好的', confirmColor: themeHex().ink, complete: r }))
   uni.navigateBack()
 }
 </script>
@@ -53,7 +53,7 @@ async function submit() {
       </view>
       <view v-if="mode === 'referral'" class="card care stack">
         <text class="t-lg">转介到{{ hospitalName }}</text>
-        <view v-for="m in result?.medical || []" :key="m.code" class="col"><text class="t-md">{{ m.name }}</text><text class="t-sm" style="color: #31524e">{{ m.reason }}</text></view>
+        <view v-for="m in result?.medical || []" :key="m.code" class="col"><text class="t-md">{{ m.name }}</text><text class="t-sm" style="color: #4d5a3f">{{ m.reason }}</text></view>
         <textarea v-model="note" class="textarea" placeholder="想补充给医生的情况（可不填）" />
       </view>
 
@@ -71,18 +71,18 @@ async function submit() {
       <view class="card stack">
         <view class="row gap12">
           <view class="col flex1">
-            <view class="row gap6"><text class="t-md">向{{ hospitalName }}提供预约信息</text><text class="t-xs c-brand semi">必需</text></view>
+            <view class="row gap6" style="align-items: flex-start"><text class="t-md">向{{ hospitalName }}提供预约信息</text><text class="t-xs c-brand semi need">必需</text></view>
             <text class="t-sm c2">称呼、性别、年龄、手机号、推荐的检查项目、相关测评要点</text>
           </view>
-          <switch :checked="c3" color="#C9A063" @change="(e) => (c3 = e.detail.value)" />
+          <switch :checked="c3" :color="themeHex().brand" @change="(e) => (c3 = e.detail.value)" />
         </view>
         <view class="divider" />
         <view class="row gap12">
           <view class="col flex1">
-            <view class="row gap6"><text class="t-md">允许医院把结果回传给顾问</text><text class="t-xs c2">可选</text></view>
+            <view class="row gap6" style="align-items: flex-start"><text class="t-md">允许医院把结果回传给顾问</text><text class="t-xs c2 need">可选</text></view>
             <text class="t-sm c2">让顾问按医生意见调整您的门店方案；不影响就诊</text>
           </view>
-          <switch :checked="c4" color="#C9A063" @change="(e) => (c4 = e.detail.value)" />
+          <switch :checked="c4" :color="themeHex().brand" @change="(e) => (c4 = e.detail.value)" />
         </view>
         <view class="divider" />
         <view class="row gap12" @click="transport = !transport">
@@ -101,9 +101,11 @@ async function submit() {
 
 <style scoped>
 .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
-.day { height: 74px; border-radius: 14px; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.day { min-height: 74px; padding: 6px 0; box-sizing: border-box; border-radius: 14px; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .day.on { background: var(--brand); color: var(--on-brand); }
 .day.full { background: #ece8ea; color: #786e74; }
+.elder .day .t-lg { font-size: 20px; }
+.need { flex-shrink: 0; white-space: nowrap; margin-top: 3px; }
 .check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #c9bec4; display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0; }
 .check.on { background: var(--brand); border-color: var(--brand); }
 </style>

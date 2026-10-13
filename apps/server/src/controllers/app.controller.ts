@@ -206,9 +206,14 @@ export class AppController {
     const c = await this.prisma.customer.findUnique({ where: { id: u.id } })
     const lc: any = m.leadConfig || {}
     const sla = lc.sla_hours || 24
+    // 手机号类字段留空时用账号绑定手机，顾问回访不用再查
+    const form = { ...(body.form || {}) }
+    for (const f of ((m.entryConfig as any)?.fields || [])) {
+      if (f.type === 'phone' && !form[f.key] && c?.phone) form[f.key] = c.phone
+    }
     const lead = await this.prisma.lead.create({
       data: {
-        leadNo: genNo('LD'), customerId: u.id, moduleId: m.id, moduleCode: m.code, moduleName: m.name, type: lc.type || 'other', formData: body.form || {},
+        leadNo: genNo('LD'), customerId: u.id, moduleId: m.id, moduleCode: m.code, moduleName: m.name, type: lc.type || 'other', formData: form,
         healthNotices: (body.ackNotices || []).map(id => ({ id, ackAt: new Date().toISOString() })), assigneeId: c?.advisorId, partnerId: m.partnerId, slaDueAt: addHours(sla),
       },
     })
@@ -414,7 +419,15 @@ export class AppController {
     }
     if (perms.includes('receive_reminder')) {
       const card = await this.home.healthCard(elder, 5)
-      out.reminders = card.todos
+      // 待办原文是写给本人的（"查看我的养护方案"），家人视角改成第三人称
+      const name = elder?.salutation || '家人'
+      const famText: Record<string, (t: any) => string> = {
+        alert: () => `顾问会尽快联系${name}`,
+        assessment: () => `${name}的六维测评还没做完`,
+        plan: () => `${name}的养护方案`,
+        checkup: t => t.text.startsWith('体检券') ? `${name}的${t.text}` : t.text,
+      }
+      out.reminders = card.todos.map((t: any) => ({ ...t, text: famText[t.kind]?.(t) ?? t.text, sub: t.kind === 'alert' ? '门店项目先暂停，身体最要紧' : t.sub }))
     }
     return out
   }
@@ -507,14 +520,30 @@ export class AppController {
     return { ok: true, points: pts }
   }
 
+  /** 今天已答过的问答题：题目 id → 当时的作答结果（每题每天只算一次，答错不能重答刷分） */
+  private async quizAnsweredToday(customerId: number) {
+    const evs = await this.prisma.eventLog.findMany({ where: { customerId, event: 'quiz_answer', createdAt: { gte: dayjs().startOf('day').toDate() } } })
+    const map: Record<number, { answer: number, correct: boolean }> = {}
+    evs.forEach((e) => {
+      const p: any = e.props || {}
+      if (p.id && !map[p.id]) map[p.id] = { answer: p.answer, correct: !!p.correct }
+    })
+    return map
+  }
+
   @Get('quiz/today')
   @Aud('app')
   async quiz(@CurrentUser() u: CustomerUser) {
     const all = await this.prisma.quizQuestion.findMany({ where: { status: 'active' }, orderBy: { id: 'asc' } })
     const seed = Number(dayjs().format('YYYYMMDD'))
     const qs = [0, 1, 2].map(i => all[(seed + i * 7) % all.length]).filter((q, i, arr) => arr.findIndex(x => x.id === q.id) === i)
-    const done = await this.prisma.pointsLedger.count({ where: { customerId: u.id, reasonCode: 'quiz', createdAt: { gte: dayjs().startOf('day').toDate() } } })
-    return { questions: qs.map(q => ({ id: q.id, title: q.title, options: q.options })), answeredToday: done }
+    const answered = await this.quizAnsweredToday(u.id)
+    const pts = await this.prisma.pointsLedger.aggregate({ _sum: { change: true }, where: { customerId: u.id, reasonCode: 'quiz', createdAt: { gte: dayjs().startOf('day').toDate() } } })
+    return {
+      questions: qs.map(q => ({ id: q.id, title: q.title, options: q.options, answered: answered[q.id] ? { ...answered[q.id], rightAnswer: q.answer, knowledge: q.knowledge } : null })),
+      answeredToday: qs.filter(q => answered[q.id]).length,
+      pointsToday: pts._sum.change || 0,
+    }
   }
 
   @Post('quiz/answers')
@@ -522,11 +551,13 @@ export class AppController {
   async quizAnswer(@CurrentUser() u: CustomerUser, @Body() body: { id: number, answer: number }) {
     const q = await this.prisma.quizQuestion.findUnique({ where: { id: body.id } })
     if (!q) throw Err.notFound()
+    const prev = (await this.quizAnsweredToday(u.id))[q.id]
+    if (prev) return { correct: prev.correct, answer: q.answer, knowledge: q.knowledge, points: 0, repeat: true }
     const correct = q.answer === Number(body.answer)
     let points = 0
     const done = await this.prisma.pointsLedger.count({ where: { customerId: u.id, reasonCode: 'quiz', createdAt: { gte: dayjs().startOf('day').toDate() } } })
     if (correct && done < 3) { points = 5; await this.wf.addPoints(u.id, 5, 'quiz', '每日健康问答') }
-    await this.wf.event(u.id, 'quiz_answer', { correct })
+    await this.wf.event(u.id, 'quiz_answer', { id: q.id, answer: Number(body.answer), correct })
     return { correct, answer: q.answer, knowledge: q.knowledge, points }
   }
 

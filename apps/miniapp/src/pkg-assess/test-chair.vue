@@ -85,8 +85,8 @@ async function skip() {
     <view class="footer-bar">
       <view v-if="!done" class="btn big-btn" @click="tap">{{ running ? '站起一次，点一下' : '开始 30 秒计时' }}</view>
       <view v-else class="btn" @click="back()">记录好了，返回</view>
-      <text class="t-sm c2" style="text-align: center">陪同的人帮您点也可以，30 秒后自动记录</text>
-      <text class="t-body" style="text-align: center; color: #3b3337" @click="skip">跳过，到店再测</text>
+      <text v-if="!done" class="t-sm c2" style="text-align: center">陪同的人帮您点也可以，30 秒后自动记录</text>
+      <text v-if="!done" class="t-body" style="text-align: center; color: #3b3337" @click="skip">跳过，到店再测</text>
     </view>
   </view>
 </template>

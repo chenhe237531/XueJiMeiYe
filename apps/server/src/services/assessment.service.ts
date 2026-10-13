@@ -56,12 +56,15 @@ export class AssessmentService {
       const done = qs.filter(q => answered.has(q.code)).length
       return { ...l, total: qs.length, answered: done, done: progress[l.code] === 'done', minutes: Math.max(1, Math.round(qs.length * 0.3)) }
     })
-    const doneCount = levels.filter(l => l.done && DIMENSIONS.includes(l.code)).length
+    // 必答关 = 健康安全关 + 六个维度（共 7 关）；女性健康进阶关可选，不计入进度和剩余时间
+    const required = levels.filter(l => SCORED_LEVELS.includes(l.code))
+    const doneCount = required.filter(l => l.done).length
     const { scores } = scoreDimensions(questions, facts)
     return {
       id: a.id, mode: a.mode, assistCode: a.assistCode, status: a.status, startedAt: a.startedAt,
-      levels, doneCount, totalDims: 6, safetyDone: progress.safety === 'done', dims: scores,
-      remainingMinutes: levels.filter(l => !l.done).reduce((s, l) => s + l.minutes, 0),
+      levels, doneCount, totalLevels: required.length, totalDims: 6, safetyDone: progress.safety === 'done', dims: scores,
+      earnedPoints: levels.filter(l => l.done).length * 10,
+      remainingMinutes: required.filter(l => !l.done).reduce((s, l) => s + l.minutes, 0),
     }
   }
 
@@ -80,7 +83,7 @@ export class AssessmentService {
     if (q.config?.scoring === 'chairStand') config.ref = chairStandRef(facts.age)
     return {
       code: q.code, level: q.level, type: q.type, title: q.title, voiceText: q.voiceText || q.title, intro: q.intro,
-      options: (q.options || []).map(o => ({ label: o.label, value: o.value, exclusive: !!o.exclusive })),
+      options: (q.options || []).map(o => ({ label: o.label, desc: o.desc, value: o.value, exclusive: !!o.exclusive })),
       config, required: !!q.required, skippable: !q.required,
     }
   }
@@ -116,7 +119,7 @@ export class AssessmentService {
         saved: true, urgent: true, visibleCodes: visible,
         urgentPage: {
           title: '您提到的情况需要尽快就医',
-          body: `${rule.customerText} 您的顾问会在 1 小时内给您打电话。门店项目先暂停，身体最要紧。`,
+          body: rule.customerText, // 顾问回电、门店暂停两条在页面下方单独列出，这里不再重复
           hotline: rule.code === 'RF09' || !!(rule.action as any)?.hotline,
           actions: ['call_120', 'contact_advisor'],
           ruleCode: rule.code,

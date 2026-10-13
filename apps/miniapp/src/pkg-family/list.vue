@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { confirm, go, toast } from '@/xj/utils'
+import { confirm, go, themeHex, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '我的家人' } })
 
@@ -81,7 +81,7 @@ onShareAppMessage(() => ({ title: `${xj.me?.salutation || ''}邀请您成为她�
         <text class="t-sm c2 semi">{{ l.name }}可以看到什么</text>
         <view v-for="p in PERMS" :key="p.k" class="row gap12">
           <view class="col flex1"><text class="t-md">{{ p.n }}</text><text class="t-sm c2">{{ p.d }}</text></view>
-          <switch :checked="l.permissions.includes(p.k)" color="#C9A063" @change="togglePerm(l, p.k)" />
+          <switch :checked="l.permissions.includes(p.k)" :color="themeHex().brand" @change="togglePerm(l, p.k)" />
         </view>
         <text class="t-sm c2" @click="unlink(l)">不想继续分享时，可以<text class="link" style="color: #5c5358; text-decoration: underline">解除绑定</text></text>
       </view>

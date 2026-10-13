@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { http, TOKEN_KEY } from './request'
 
+/** 与当前登录用户绑定的本地缓存键 */
+const USER_CACHE_KEYS = ['xj_home_cache', 'xj_ack', 'xj_lead_prefill', 'xj_urgent', 'xj_elder', 'xj_tier']
+
 /** 客户端全局状态：登录态、个人资料、乐龄模式 */
 export const useXj = defineStore('xj', () => {
   const token = ref<string>(uni.getStorageSync(TOKEN_KEY) || '')
@@ -14,7 +17,16 @@ export const useXj = defineStore('xj', () => {
   /** 登录 / 资料填写 / 授权流程固定标准样式（issue #3）：不读乐龄模式，避免新用户被预设为大字号 */
   const stdPageClass = computed(() => ['xj', 'std'])
 
+  /** 切换 / 退出账号时清掉上一位用户留在本机的数据（首页缓存、已读健康提示、表单预填等），避免串号 */
+  function clearUserCache() {
+    USER_CACHE_KEYS.forEach(k => uni.removeStorageSync(k))
+    me.value = null
+    elderMode.value = false
+    tier.value = 'C'
+  }
+
   function setToken(t: string) {
+    if (t !== token.value) clearUserCache()
     token.value = t
     uni.setStorageSync(TOKEN_KEY, t)
   }
@@ -47,8 +59,8 @@ export const useXj = defineStore('xj', () => {
   }
 
   function logout() {
+    clearUserCache()
     token.value = ''
-    me.value = null
     uni.removeStorageSync(TOKEN_KEY)
   }
 
