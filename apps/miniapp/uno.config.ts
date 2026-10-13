@@ -176,6 +176,8 @@ export default defineConfig({
     'i-tabler-messages',
     'i-tabler-notes',
     'i-tabler-wifi-off',
+    'i-tabler-plant',
+    'i-tabler-grid-dots',
   ],
   rules: [
     [

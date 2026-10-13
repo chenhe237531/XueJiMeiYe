@@ -656,6 +656,18 @@ model PointsLedger {
   createdAt    DateTime @default(now())
 }
 
+/** 互动游戏进度（issue #7）：tree / wheel / match3 共用，state 存各游戏状态 JSON */
+model GameProgress {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  game       String
+  state      Json
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+
+  @@unique([customerId, game])
+}
+
 model Checkin {
   id         Int      @id @default(autoincrement())
   customerId Int
