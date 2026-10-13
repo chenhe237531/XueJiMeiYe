@@ -3,7 +3,7 @@
  * 首页配置驱动渲染（设计文档 5.6）：greeting / tierCard / healthCard / entryGrid / banner / moduleList / activityCard / notice / mirrorFab / divider
  * 不认识的组件类型直接跳过，保证老版本兼容。
  */
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import XRadar from '@/components/XRadar.vue'
 import { http } from '@/xj/request'
@@ -24,6 +24,9 @@ function open(item: any, component: string) {
   }
   go(item.link)
 }
+
+/** 封面图加载失败回退占位（issue #6）：按模块 code 记录 */
+const imgErr = ref(new Set<string>())
 
 const featuredFirst = (items: any[], featured?: string) => {
   if (!featured) return { feature: null, rest: items }
@@ -197,7 +200,10 @@ const DIMS = [
       <swiper v-else-if="c.type === 'banner'" class="banner" :autoplay="c.props.autoplay" circular :indicator-dots="c.props.items.length > 1" indicator-color="rgba(60, 50, 42, 0.14)" indicator-active-color="#C9A063">
         <swiper-item v-for="it in c.props.items" :key="it.code">
           <view class="card row gap12 banner-card" @click="open(it, 'banner')">
-            <view class="photo-slot" style="width: 84px; height: 84px"><XIcon :name="it.icon" :size="24" /><text>实拍位</text></view>
+            <view class="photo-slot" style="width: 84px; height: 84px">
+              <image v-if="it.cover && !imgErr.has(it.code)" class="ph-img" :src="it.cover" mode="aspectFill" @error="imgErr.add(it.code)" />
+              <template v-else><XIcon :name="it.icon" :size="24" /><text>实拍位</text></template>
+            </view>
             <view class="col gap4 flex1">
               <text class="t-xs semi" :class="`tone-${it.tone || 'care'}`">{{ it.name }}</text>
               <text class="t-lg">{{ it.summary }}</text>
@@ -218,8 +224,8 @@ const DIMS = [
         <template v-if="c.props.style === 'card'">
           <view v-for="it in c.props.items" :key="it.code" class="card row gap12 mcard" @click="open(it, 'moduleList')">
             <view class="photo-slot" :style="{ width: elder ? '92px' : '84px', height: elder ? '92px' : '84px' }">
-              <XIcon :name="it.icon" :size="22" />
-              <text>实拍位</text>
+              <image v-if="it.cover && !imgErr.has(it.code)" class="ph-img" :src="it.cover" mode="aspectFill" @error="imgErr.add(it.code)" />
+              <template v-else><XIcon :name="it.icon" :size="22" /><text>实拍位</text></template>
             </view>
             <view class="col gap4 flex1">
               <text class="t-lg" style="line-height: 1.35">{{ it.name }}</text>
@@ -309,6 +315,8 @@ const DIMS = [
 .banner { height: 120px; }
 .banner-card { height: 116px; }
 .mcard { padding: 12px; }
+.photo-slot { position: relative; overflow: hidden; }
+.ph-img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 
 .fab { position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 60; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--brand); color: var(--on-brand); display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; box-shadow: 0 8px 24px -8px rgba(168, 130, 77, 0.5); }
 .fab.elder { height: 58px; padding: 0 20px; font-size: 18px; bottom: calc(88px + env(safe-area-inset-bottom)); }

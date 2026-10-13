@@ -41,6 +41,14 @@ async function act(row: any, action: string, body: any = {}) {
   message("已更新", { type: "success" });
   load();
 }
+/** 封面上传（issue #6）：multer 存服务端 uploads/，返回 /uploads/xx 路径 */
+async function uploadCover(opt: any) {
+  const fd = new FormData();
+  fd.append("file", opt.file);
+  const r: any = await post("/admin/upload", fd);
+  form.value.cover = r.url;
+  message("封面上传成功", { type: "success" });
+}
 </script>
 
 <template>
@@ -83,6 +91,15 @@ async function act(row: any, action: string, body: any = {}) {
           <el-col :span="12"><el-form-item label="图标"><el-input v-model="form.icon" placeholder="Tabler 图标名，如 beach" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="排序"><el-input-number v-model="form.sort" /></el-form-item></el-col>
           <el-col :span="24"><el-form-item label="摘要"><el-input v-model="form.summary" /></el-form-item></el-col>
+          <el-col :span="24">
+            <el-form-item label="封面图">
+              <div class="flex gap-2 w-full items-center flex-wrap">
+                <el-input v-model="form.cover" placeholder="图片 URL，或点右侧上传（5MB 内图片，存服务端可随时替换为门店实拍）" style="flex: 1; min-width: 240px" />
+                <el-upload :show-file-list="false" :http-request="uploadCover" accept="image/*"><el-button>上传封面</el-button></el-upload>
+                <img v-if="form.cover" :src="form.cover" class="cover-preview" />
+              </div>
+            </el-form-item>
+          </el-col>
           <el-col :span="12"><el-form-item label="可见等级"><el-checkbox-group v-model="form.visibleTiers"><el-checkbox value="A">臻享</el-checkbox><el-checkbox value="B">尊享</el-checkbox><el-checkbox value="C">悦享</el-checkbox></el-checkbox-group></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="乐龄可见"><el-switch v-model="form.elderOk" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="详情 detail"><el-input v-model="json.detail" type="textarea" :rows="8" class="mono" /></el-form-item></el-col>
@@ -98,4 +115,5 @@ async function act(row: any, action: string, body: any = {}) {
 
 <style scoped>
 .mono :deep(textarea) { font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+.cover-preview { width: 84px; height: 84px; border-radius: 10px; object-fit: cover; border: 1px solid #eee; }
 </style>

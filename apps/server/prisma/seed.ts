@@ -104,7 +104,7 @@ async function main() {
   for (const t of CONSENT_TEXTS) await prisma.consentText.create({ data: { type: t.type, version: '2026.10.1', title: t.title, summary: t.summary, content: `${t.title}\n\n${t.summary.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\n（全文由法务出具，待法务确认）`, required: t.required } })
   for (const m of MODULES) {
     await prisma.module.create({ data: {
-      code: m.code, name: m.name, category: m.category, entryType: m.entryType, icon: m.icon, summary: m.summary, visibleTiers: m.tiers, sort: m.sort, version: m.version || 'V1.0',
+      code: m.code, name: m.name, category: m.category, entryType: m.entryType, icon: m.icon, cover: m.cover || null, summary: m.summary, visibleTiers: m.tiers, sort: m.sort, version: m.version || 'V1.0',
       detail: m.detail || {}, entryConfig: m.entryConfig || undefined, healthRules: m.healthRules || [], leadConfig: m.lead ? { ...m.lead, assign: 'advisor' } : undefined,
       partnerId: m.partner !== undefined ? partners[m.partner].id : undefined, elderOk: true, complianceStatus: 'approved', status: 'online',
     } })
