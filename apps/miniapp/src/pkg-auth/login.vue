@@ -13,6 +13,14 @@ const agreed = ref(false)
 const personas = ref<any[]>([])
 const showC1 = ref(false)
 
+/** 卖点卡（issue #2）：一眼看懂登录后能得到什么，icon-box 辅助色区分 */
+const SELLS = [
+  { icon: 'hexagon', tone: '', title: '免费六维测评', sub: '约 8 分钟了解自己' },
+  { icon: 'stethoscope', tone: 'care', title: '免费基础体检', sub: '完成测评即可领取' },
+  { icon: 'clipboard-heart', tone: 'terra', title: '健康档案', sub: '记录每一次变化' },
+  { icon: 'sparkles', tone: 'rose', title: 'AI 陪伴', sub: '小镜读报告、聊家常' },
+]
+
 onLoad(async () => {
   personas.value = await http.get('/app/auth/demo-personas', undefined, { silent: true }).catch(() => [])
 })
@@ -48,12 +56,27 @@ async function demo(p: any) {
 
 <template>
   <view :class="xj.stdPageClass">
-    <view class="col gap8" style="padding: 28px 4px 20px">
-      <text class="t-hero">雪姬美业 · 六维健康</text>
-      <text class="c2">六维测评、免费体检、健康档案与 AI 陪伴</text>
+    <!-- 品牌头区（issue #2）：衬线品牌名 + 柔金渐变标识 -->
+    <view class="brand-hero">
+      <view class="brand-mark">雪</view>
+      <view class="col gap4 flex1">
+        <text class="brand-name">雪姬美业</text>
+        <text class="t-sm c2">科技护美 · 一对一健康养护</text>
+      </view>
     </view>
 
-    <view class="card stack">
+    <!-- 卖点卡（issue #2） -->
+    <view class="sell-grid">
+      <view v-for="s in SELLS" :key="s.title" class="card sell">
+        <view class="icon-box" :class="s.tone"><XIcon :name="s.icon" :size="20" /></view>
+        <view class="col gap4 flex1">
+          <text class="t-sm semi">{{ s.title }}</text>
+          <text class="t-xs c3">{{ s.sub }}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card stack mt12">
       <text class="t-lg">手机号快速验证</text>
       <input v-model="phone" class="input" type="number" maxlength="11" placeholder="请输入手机号">
       <text class="t-xs c3">演示环境：输入任意手机号即可登录。老客户按手机号匹配，继承原有等级、门店和顾问。</text>
@@ -65,24 +88,39 @@ async function demo(p: any) {
       <view class="btn" @click="phoneLogin">登录</view>
     </view>
 
-    <view class="section-title mt24"><text>演示账号</text><text class="t-xs c3">黑客松演示用</text></view>
-    <view class="group mt8">
-      <view v-for="p in personas" :key="p.id" class="cell" @click="demo(p)">
-        <view class="avatar" :class="`t${p.tier}`">{{ p.salutation.slice(0, 1) }}</view>
-        <view class="col flex1">
-          <text class="t-md">{{ p.salutation }}</text>
-          <text class="t-sm c2">{{ p.title }}</text>
+    <!-- 演示账号区（issue #2）：虚线金边与正式登录区分 -->
+    <view class="demo-zone">
+      <view class="row-between">
+        <view class="row gap8"><text class="t-md semi">演示账号</text><text class="tag">演示</text></view>
+        <text class="t-xs c3">黑客松演示用</text>
+      </view>
+      <view class="group mt8">
+        <view v-for="p in personas" :key="p.id" class="cell" @click="demo(p)">
+          <view class="avatar" :class="`t${p.tier}`">{{ p.salutation.slice(0, 1) }}</view>
+          <view class="col flex1">
+            <text class="t-md">{{ p.salutation }}</text>
+            <text class="t-sm c2">{{ p.title }}</text>
+          </view>
+          <XIcon name="chevron-right" :size="20" color="#786E74" />
         </view>
-        <XIcon name="chevron-right" :size="20" color="#786E74" />
       </view>
     </view>
   </view>
 </template>
 
 <style scoped lang="scss">
+.brand-hero { display: flex; align-items: center; gap: 14px; padding: 22px 4px 16px; }
+.brand-mark { width: 54px; height: 54px; border-radius: 18px; background: linear-gradient(135deg, #e3cdb0 0%, #c9a063 55%, #a8824d 100%); color: #fff; font-family: var(--font-title); font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 22px -12px rgba(168, 130, 77, 0.55); flex-shrink: 0; }
+.brand-name { font-family: var(--font-title); font-size: 30px; font-weight: 700; color: var(--ink); letter-spacing: 1px; line-height: 1.2; }
+
+.sell-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.sell { display: flex; flex-direction: row; align-items: center; gap: 10px; padding: 11px 12px; }
+
+.demo-zone { margin-top: 24px; border: 1.5px dashed var(--brand-line); border-radius: var(--r-card); padding: 14px; background: rgba(201, 160, 99, 0.05); }
+
 .check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #c9bec4; display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0; }
 .check.on { background: var(--brand); border-color: var(--brand); }
 .avatar { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; background: var(--brand-soft); color: var(--brand-ink); }
-.avatar.tA { background: #1e191d; color: #d2b47a; }
+.avatar.tA { background: #1c1712; color: #d2b47a; }
 .avatar.tB { background: var(--brand); color: var(--on-brand); }
 </style>

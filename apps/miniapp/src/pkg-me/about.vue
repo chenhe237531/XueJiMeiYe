@@ -14,7 +14,7 @@ onLoad(async () => { d.value = await http.get('/app/about') })
   <view :class="xj.pageClass">
     <view class="stack" style="padding-top: 12px">
       <view class="card stack">
-        <text class="t-lg">雪姬美业 · 六维健康</text>
+        <text class="t-lg">雪姬美业</text>
         <text class="t-sm c2">雪姬 AI 智能健康美容体验馆以"科技护美"为理念：用 AI 帮助了解肌肤与身体状态，结合专业顾问的一对一服务，制定个性化的养护方案。门店承诺：无推销办卡、无隐形消费、不满意重做、保证正品、一对一服务、一次性用品。</text>
         <text class="t-sm c2">雪姬美业是生活美容与健康管理连锁机构，不是医疗机构。平台提供六维测评、免费体检转介、健康档案、门店养护方案和 AI 陪伴；诊断与医疗方案由合作医院医生出具。</text>
       </view>

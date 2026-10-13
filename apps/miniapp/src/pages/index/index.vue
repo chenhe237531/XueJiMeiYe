@@ -47,6 +47,6 @@ onPullDownRefresh(async () => { await load(); uni.stopPullDownRefresh() })
       <view class="card skeleton" style="height: 220px" />
     </view>
     <HomeRender v-else :components="data.components" :night="night" />
-    <view class="t-xs c3" style="text-align: center; margin-top: 24px">雪姬美业 · 六维健康 | 价格与权益按公开会员规则</view>
+    <view class="t-xs c3" style="text-align: center; margin-top: 24px">雪姬美业 | 价格与权益按公开会员规则</view>
   </view>
 </template>
