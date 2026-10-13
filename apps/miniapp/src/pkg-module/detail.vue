@@ -28,7 +28,7 @@ function submit() {
   if (m.value.entryType === 'miniprogram') {
     // #ifdef MP-WEIXIN
     const cfg = m.value.entryConfig || {}
-    uni.showModal({ title: '提示', content: cfg.tip || '即将前往商城', confirmColor: '#8A5A00', success: (r) => { if (r.confirm) uni.navigateToMiniProgram({ appId: cfg.appId, path: cfg.path, fail: () => toast('商城小程序待配置') }) } })
+    uni.showModal({ title: '提示', content: cfg.tip || '即将前往商城', confirmColor: '#6B4E2E', success: (r) => { if (r.confirm) uni.navigateToMiniProgram({ appId: cfg.appId, path: cfg.path, fail: () => toast('商城小程序待配置') }) } })
     // #endif
     // #ifndef MP-WEIXIN
     toast(`${m.value.entryConfig?.tip || '即将前往商城'}（小程序内可跳转）`)

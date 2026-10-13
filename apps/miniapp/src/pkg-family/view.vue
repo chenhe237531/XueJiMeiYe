@@ -33,7 +33,7 @@ onLoad(async (q: any) => {
       <view v-if="d.reminders" class="group">
         <view class="cell"><text class="t-md">需要提醒的事</text></view>
         <view v-for="t in d.reminders" :key="t.text" class="cell">
-          <XIcon :name="t.icon" color="#1F6E68" />
+          <XIcon :name="t.icon" color="#6E7F5C" />
           <view class="col flex1"><text class="t-md">{{ t.text }}</text><text class="t-sm c2">{{ t.sub }}</text></view>
         </view>
         <view v-if="!d.reminders.length" class="cell"><text class="c2">暂无待办</text></view>

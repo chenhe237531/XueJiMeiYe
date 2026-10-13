@@ -131,11 +131,11 @@ export class AppController {
       if (y > new Date().getFullYear() - 18) throw Err.bad('本平台面向 18 岁以上用户')
       data.birthYear = y
       const c = await this.prisma.customer.findUnique({ where: { id: u.id } })
-      // 4.2：≥ 60 岁首次填写时自动开启乐龄模式
-      if (!c?.birthYear && ageOf(y) >= 60) data.elderMode = true
+      // issue #8：首次填写出生年份、年龄 > 55 岁自动开启乐龄模式；≤ 55 岁保持默认风格（可在设置手动切换）
+      if (!c?.birthYear && ageOf(y) > 55) data.elderMode = true
     }
     const c = await this.prisma.customer.update({ where: { id: u.id }, data })
-    return { ok: true, elderMode: c.elderMode, elderAuto: !!data.elderMode, askElder: !!data.birthYear && ageOf(data.birthYear) >= 50 && ageOf(data.birthYear) < 60 }
+    return { ok: true, elderMode: c.elderMode, elderAuto: !!data.elderMode }
   }
 
   @Patch('me/settings')

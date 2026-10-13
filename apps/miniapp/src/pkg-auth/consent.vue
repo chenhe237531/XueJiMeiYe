@@ -29,15 +29,15 @@ async function decide(granted: boolean) {
   <view :class="[...xj.pageClass, 'has-footer']">
     <view v-if="text" class="stack" style="padding-top: 16px">
       <view class="row gap8">
-        <XIcon name="shield-check" :size="28" color="#1F6E68" />
+        <XIcon name="shield-check" :size="28" color="#6E7F5C" />
         <text class="t-title">{{ text.title }}</text>
       </view>
       <view class="card care stack">
         <view v-for="s in text.summary" :key="s" class="row gap8" style="align-items: flex-start">
-          <XIcon name="check" :size="18" color="#1F6E68" style="margin-top: 4px" />
-          <text class="t-body" style="color: #23403d">{{ s }}</text>
+          <XIcon name="check" :size="18" color="#6E7F5C" style="margin-top: 4px" />
+          <text class="t-body" style="color: #3f4a35">{{ s }}</text>
         </view>
-        <text class="link t-sm" style="color: #1F6E68" @click="full = !full">{{ full ? '收起' : '查看完整说明' }}</text>
+        <text class="link t-sm" style="color: #6E7F5C" @click="full = !full">{{ full ? '收起' : '查看完整说明' }}</text>
       </view>
       <view v-if="full" class="card t-sm c2" style="white-space: pre-wrap">{{ text.content }}</view>
       <text class="t-xs c3">文本版本 {{ text.version }}。本授权为单独同意，不会默认勾选；授权行为不发放积分。</text>

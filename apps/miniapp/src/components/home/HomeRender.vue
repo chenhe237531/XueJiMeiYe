@@ -13,7 +13,7 @@ import { go } from '@/xj/utils'
 const props = defineProps<{ components: any[], night?: boolean }>()
 const xj = useXj()
 const elder = computed(() => xj.elderMode)
-const KNOWN = ['greeting', 'tierCard', 'healthCard', 'entryGrid', 'banner', 'moduleList', 'activityCard', 'notice', 'mirrorFab', 'divider']
+const KNOWN = ['greeting', 'tierCard', 'healthCard', 'elderToday', 'entryGrid', 'banner', 'moduleList', 'activityCard', 'notice', 'mirrorFab', 'divider']
 const list = computed(() => (props.components || []).filter(c => KNOWN.includes(c.type)))
 
 function open(item: any, component: string) {
@@ -93,6 +93,57 @@ const featuredFirst = (items: any[], featured?: string) => {
         </view>
       </view>
 
+      <!-- 乐龄 · 今日健康（issue #8）：问候 + 健康概览 + 今日养护 + 家人大入口 -->
+      <view v-else-if="c.type === 'elderToday'" class="card elder-today">
+        <view class="row-between gap8">
+          <view class="col gap6 flex1">
+            <text class="t-hero">{{ c.props.text }}</text>
+            <view class="row gap8">
+              <text class="tag">{{ c.props.isGuest ? '访客' : c.props.tierName }}</text>
+              <text v-if="c.props.isGuest" class="t-sm c-brand semi" @click="go('/pkg-auth/login')">登录 / 注册</text>
+            </view>
+          </view>
+          <view v-if="c.props.showElderToggle" class="col gap4" style="align-items: flex-end" @click="xj.toggleElder()">
+            <text class="t-sm c2">乐龄模式</text>
+            <view class="toggle" :class="{ on: elder }"><view class="knob" /></view>
+          </view>
+        </view>
+        <template v-if="c.props.health.hasAssessment">
+          <view class="row-between et-index" @click="go('/pages/archive/index')">
+            <view class="col gap4">
+              <text class="t-body c2">六维年轻化指数</text>
+              <view class="row gap8" style="align-items: baseline">
+                <text class="num bold" style="font-size: 60px; line-height: 1.05">{{ c.props.health.index }}</text>
+                <text v-if="c.props.health.delta" class="semi" :class="c.props.health.delta > 0 ? 'c-care' : 'c-warn'">比上次 {{ c.props.health.delta > 0 ? '+' : '' }}{{ c.props.health.delta }}</text>
+              </view>
+              <text class="t-sm c3">上次测评 {{ c.props.health.lastAssessedAt }}</text>
+            </view>
+            <XRadar :scores="c.props.health.dims" :size="104" :dark="night" />
+          </view>
+        </template>
+        <view v-else class="col gap8 et-cta" @click="go(xj.loggedIn ? '/pkg-assess/intro' : '/pkg-auth/login')">
+          <text class="t-lg">了解自己的六个维度</text>
+          <text class="c2">完成测评可以领取免费体检券。</text>
+          <view class="btn">{{ c.props.health.cta || '开始六维测评，约 8 分钟' }}</view>
+        </view>
+        <view v-for="t in c.props.health.todos" :key="t.text" class="todo row gap12" @click="go(t.link)">
+          <view class="icon-box" :class="t.tone === 'care' ? 'care' : ''"><XIcon :name="t.icon" /></view>
+          <view class="col flex1">
+            <text class="t-md">{{ t.text }}</text>
+            <text v-if="t.sub" class="t-sm c2">{{ t.sub }}</text>
+          </view>
+          <XIcon name="chevron-right" :size="22" color="#786E74" />
+        </view>
+        <view class="et-family row gap12" @click="go('/pkg-family/list')">
+          <view class="icon-box family-ic"><XIcon name="users" :size="26" /></view>
+          <view class="col flex1">
+            <text class="et-family-t">家人</text>
+            <text class="t-sm" style="opacity: 0.92">让子女随时了解您的健康情况，更放心</text>
+          </view>
+          <XIcon name="chevron-right" :size="22" color="rgba(255,255,255,0.9)" />
+        </view>
+      </view>
+
       <!-- 入口宫格 -->
       <view v-else-if="c.type === 'entryGrid'">
         <view v-if="elder || c.props.columns === 3" class="grid3">
@@ -104,7 +155,7 @@ const featuredFirst = (items: any[], featured?: string) => {
             </view>
           </view>
           <view v-for="it in featuredFirst(c.props.items, c.props.featured).rest" :key="it.code" class="tile" @click="open(it, 'entryGrid')">
-            <XIcon :name="it.icon" :size="30" :color="it.code === 'checkup_coupon' ? '#1F6E68' : (night ? '#D2B47A' : 'var(--brand-ink)')" />
+            <XIcon :name="it.icon" :size="30" :color="it.code === 'checkup_coupon' ? '#6E7F5C' : (night ? '#D2B47A' : 'var(--brand-ink)')" />
             <text class="tile-name">{{ it.name }}</text>
           </view>
         </view>
@@ -117,7 +168,7 @@ const featuredFirst = (items: any[], featured?: string) => {
       </view>
 
       <!-- 轮播（乐龄模式停用自动轮播） -->
-      <swiper v-else-if="c.type === 'banner'" class="banner" :autoplay="c.props.autoplay" circular :indicator-dots="c.props.items.length > 1" indicator-color="rgba(34, 24, 40, 0.14)" indicator-active-color="#f5be00">
+      <swiper v-else-if="c.type === 'banner'" class="banner" :autoplay="c.props.autoplay" circular :indicator-dots="c.props.items.length > 1" indicator-color="rgba(60, 50, 42, 0.14)" indicator-active-color="#C9A063">
         <swiper-item v-for="it in c.props.items" :key="it.code">
           <view class="card row gap12 banner-card" @click="open(it, 'banner')">
             <view class="photo-slot" style="width: 84px; height: 84px"><XIcon :name="it.icon" :size="24" /><text>实拍位</text></view>
@@ -194,7 +245,7 @@ const featuredFirst = (items: any[], featured?: string) => {
 .tier-card { border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 10px 24px -16px rgba(34, 24, 40, 0.35); }
 .tier-C { background: var(--brand-soft); color: var(--brand-ink); }
 .tier-B { background: var(--brand); color: var(--on-brand); }
-.tier-A { background: #1e191d; color: #f2ece8; border: 1px solid rgba(210, 180, 122, 0.3); }
+.tier-A { background: #1c1712; color: #f2ece8; border: 1px solid rgba(210, 180, 122, 0.3); }
 .tier-A .t-lg { color: #d2b47a; }
 .tier-line { height: 1px; background: currentColor; opacity: 0.2; }
 .benefit { padding: 2px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.28); }
@@ -207,8 +258,8 @@ const featuredFirst = (items: any[], featured?: string) => {
 .tile { height: 100px; border-radius: 20px; background: var(--surface); padding: 14px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 8px 18px -14px rgba(34, 24, 40, 0.28); }
 .elder .tile { height: 108px; }
 .tile-name { font-size: var(--fs-md); font-weight: 600; line-height: 1.3; }
-.tile.featured { grid-column: span 2; background: var(--brand); color: var(--on-brand); height: 112px; box-shadow: 0 10px 22px -12px rgba(204, 150, 0, 0.55); }
-.night .tile.featured { color: #131013; }
+.tile.featured { grid-column: span 2; background: var(--brand); color: var(--on-brand); height: 112px; box-shadow: 0 10px 22px -12px rgba(168, 130, 77, 0.5); }
+.night .tile.featured { color: #1c1712; }
 .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 4px; }
 .g4 { align-items: center; text-align: center; }
 
@@ -216,7 +267,14 @@ const featuredFirst = (items: any[], featured?: string) => {
 .banner-card { height: 116px; }
 .mcard { padding: 12px; }
 
-.fab { position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 60; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--brand); color: var(--on-brand); display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; box-shadow: 0 8px 24px -8px rgba(204, 150, 0, 0.55); }
+.fab { position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 60; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--brand); color: var(--on-brand); display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; box-shadow: 0 8px 24px -8px rgba(168, 130, 77, 0.5); }
 .fab.elder { height: 58px; padding: 0 20px; font-size: 18px; bottom: calc(88px + env(safe-area-inset-bottom)); }
-.fab.night { color: #131013; }
+.fab.night { color: #1c1712; }
+
+.elder-today { padding: 18px 16px 8px; }
+.et-index { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 14px; }
+.et-cta { margin-top: 14px; }
+.et-family { margin: 14px 0 10px; border-radius: var(--r-inner); background: var(--care); color: #fff; padding: 16px 14px; min-height: 64px; }
+.et-family .icon-box.family-ic { background: rgba(255, 255, 255, 0.2); color: #fff; }
+.et-family-t { font-size: var(--fs-lg); font-weight: 700; line-height: 1.3; }
 </style>

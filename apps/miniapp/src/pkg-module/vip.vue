@@ -23,7 +23,7 @@ const translator = ref('不需要')
 async function submit() {
   if (xj.me?.tier !== 'A') return toast('海外 VIP 通道为臻享会员权益，可以咨询您的顾问')
   const res: any = await http.post('/app/leads', { moduleCode: 'vip_overseas', form: { destination: dest.value, need: need.value, translator: translator.value } }, { loading: '提交中' })
-  await new Promise(r => uni.showModal({ title: '已提交', content: `专属顾问会在 ${res.slaHours} 小时内联系您。`, showCancel: false, confirmText: '好的', confirmColor: '#8A5A00', complete: r }))
+  await new Promise(r => uni.showModal({ title: '已提交', content: `专属顾问会在 ${res.slaHours} 小时内联系您。`, showCancel: false, confirmText: '好的', confirmColor: '#6B4E2E', complete: r }))
   back()
 }
 </script>
@@ -68,6 +68,6 @@ async function submit() {
 .dest:first-child { border-top: 0; }
 .ph { width: 52px; height: 52px; border-radius: 14px; background: #2a2328; display: flex; align-items: center; justify-content: center; }
 .chip { height: 40px; padding: 0 16px; border-radius: 20px; background: #2a2328; color: #e2d9d3; display: flex; align-items: center; font-size: var(--fs-sm); }
-.chip.on { background: #d2b47a; color: #131013; font-weight: 700; }
+.chip.on { background: #d2b47a; color: #1c1712; font-weight: 700; }
 .num-c { width: 22px; height: 22px; border-radius: 11px; border: 1px solid rgba(210, 180, 122, 0.5); color: #d2b47a; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 </style>

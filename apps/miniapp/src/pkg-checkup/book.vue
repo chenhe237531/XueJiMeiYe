@@ -39,7 +39,7 @@ async function submit() {
   if (mode.value === 'coupon') Object.assign(body, { couponId: coupon.value.id, date: date.value })
   else Object.assign(body, { services: result.value?.medical?.map((m: any) => m.code) || [] })
   await http.post('/app/checkup/bookings', body, { loading: '提交中' })
-  await new Promise(r => uni.showModal({ title: '已提交', content: mode.value === 'coupon' ? `您预约了 ${dateText.value} 的体检，医院确认后会通知您。体检前一晚 10 点后请不要进食。` : '合作医院会尽快联系您安排就诊，顾问也会协助您。', showCancel: false, confirmText: '好的', confirmColor: '#8A5A00', complete: r }))
+  await new Promise(r => uni.showModal({ title: '已提交', content: mode.value === 'coupon' ? `您预约了 ${dateText.value} 的体检，医院确认后会通知您。体检前一晚 10 点后请不要进食。` : '合作医院会尽快联系您安排就诊，顾问也会协助您。', showCancel: false, confirmText: '好的', confirmColor: '#6B4E2E', complete: r }))
   uni.navigateBack()
 }
 </script>
@@ -74,7 +74,7 @@ async function submit() {
             <view class="row gap6"><text class="t-md">向{{ hospitalName }}提供预约信息</text><text class="t-xs c-brand semi">必需</text></view>
             <text class="t-sm c2">称呼、性别、年龄、手机号、推荐的检查项目、相关测评要点</text>
           </view>
-          <switch :checked="c3" color="#F5BE00" @change="(e) => (c3 = e.detail.value)" />
+          <switch :checked="c3" color="#C9A063" @change="(e) => (c3 = e.detail.value)" />
         </view>
         <view class="divider" />
         <view class="row gap12">
@@ -82,7 +82,7 @@ async function submit() {
             <view class="row gap6"><text class="t-md">允许医院把结果回传给顾问</text><text class="t-xs c2">可选</text></view>
             <text class="t-sm c2">让顾问按医生意见调整您的门店方案；不影响就诊</text>
           </view>
-          <switch :checked="c4" color="#F5BE00" @change="(e) => (c4 = e.detail.value)" />
+          <switch :checked="c4" color="#C9A063" @change="(e) => (c4 = e.detail.value)" />
         </view>
         <view class="divider" />
         <view class="row gap12" @click="transport = !transport">

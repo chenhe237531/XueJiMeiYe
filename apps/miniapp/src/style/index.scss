@@ -1,49 +1,62 @@
 /**
- * 雪姬美业 · 设计令牌（小程序页面总图 v2 精修版；版式向美团门店页靠拢，见 GitHub issue #1）
- * 品牌黄 #FFD100（参考美团，按钮上用深色字 --on-brand）用于主操作与选中态；品牌文字 / 图标用深琥珀 --brand-ink；医疗青 #1F6E68 只用于就医与安全；提示黄只用于健康提示；警示红只用于紧急；
- * 价格橙红只用于门店项目价格与优惠标签，健康相关页面不使用。
- * 中性灰背景 + 白卡片；圆角：容器 12、内部元素 8、标签 4、按钮全圆角。
- * 标准模式紧凑排版；乐龄模式放大字号、间距与触控区域（设计文档 5.4），正文对比度不低于 4.5:1。
+ * 雪姬美业 · 设计令牌（双风格体系，见 GitHub issue #8）
+ * 默认风格「柔金轻奢」（docs/04，面向 30-40 岁女性）：暖米白底 + 香槟金主色 + 深棕墨文字 + 衬线标题；
+ * 金底统一配白字 --on-brand；品牌文字 / 图标用深金棕 --brand-ink。
+ * 鼠尾草绿 #6E7F5C 只用于健康语义（就医、安全、报告正常态）；警示红只用于紧急；价格玫瑰红只用于门店项目价格。
+ * 乐龄风格（.xj.elder，docs/03「养生绿」）：墨绿主色 + 原木暖白底，正文 ≥19px、热区 ≥60px、对比度 ≥4.5:1。
+ * 臻享皮肤（.xj.night）：暖黑 #1C1712 + 金 #D2B47A。
  */
 
 page {
-  --brand: #ffd100;
-  --brand-dark: #f5be00;
-  --brand-soft: #fff8dc;
-  --brand-line: #ffe58a;
-  --brand-ink: #8a5a00;
-  --on-brand: #222222;
-  --care: #1f6e68;
-  --care-dark: #164f4a;
-  --care-soft: #e6f1ef;
-  --care-line: #c3ddd9;
+  --brand: #c9a063;
+  --brand-dark: #a8824d;
+  --brand-soft: #f7ede0;
+  --brand-line: #e3cdb0;
+  --brand-ink: #6b4e2e;
+  --on-brand: #ffffff;
+  --care: #6e7f5c;
+  --care-dark: #57664a;
+  --care-soft: #e9eee2;
+  --care-line: #c8d4bc;
   --hint: #faf1de;
   --hint-line: #ead3a2;
   --hint-ink: #4a3105;
   --warn-ink: #7a4a08;
   --alert: #b3261e;
   --alert-soft: #fcebe9;
-  --price: #f2481b;
-  --price-ink: #d9380b;
-  --price-soft: #fff3ee;
-  --price-line: #f7c2ae;
-  --star: #ffa31a;
-  --bg: #f5f5f5;
+  --price: #b95c6a;
+  --price-ink: #a34b58;
+  --price-soft: #f9eef0;
+  --price-line: #e3c3c9;
+  --star: #d99a2b;
+  --bg: #faf7f2;
   --surface: #ffffff;
-  --ink: #222222;
-  --ink-2: #555555;
-  --ink-3: #767676;
-  --line: #eeeeee;
-  --line-2: #e6e6e6;
-  --placeholder: #ebebeb;
-  --r-card: 12px;
-  --r-inner: 8px;
+  --ink: #2b2622;
+  --ink-2: #5c544d;
+  --ink-3: #8d8479;
+  --line: #eee9e1;
+  --line-2: #e5ddd2;
+  --placeholder: #f0ebe3;
+  --r-card: 16px;
+  --r-inner: 10px;
   --r-tag: 4px;
   --gold: #d2b47a;
-  --night: #131013;
-  --night-2: #1e191d;
-  background: #f5f5f5;
-  color: #222222;
+  --night: #1c1712;
+  --night-2: #262019;
+  --font-title: 'Songti SC', 'Noto Serif SC', 'Source Han Serif SC', 'PingFang SC', serif;
+  /* 辅助色（模块色彩识别，issue #4）：green 健康 / terra 出游 / rose 活动 / sky 互动 / plum 会员权益 */
+  --aux-green: #6e7f5c;
+  --aux-green-soft: #e9eee2;
+  --aux-terra: #b08968;
+  --aux-terra-soft: #f3e9df;
+  --aux-rose: #c88a94;
+  --aux-rose-soft: #f9eef0;
+  --aux-sky: #7a93ac;
+  --aux-sky-soft: #e9eff4;
+  --aux-plum: #8c7aa6;
+  --aux-plum-soft: #efecf5;
+  background: #faf7f2;
+  color: #2b2622;
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 }
 
@@ -69,15 +82,31 @@ page {
   line-height: 1.6;
 }
 
+/* 乐龄风格「养生绿」：墨绿主色 + 原木暖白，同步切换色板与字号（issue #8） */
 .xj.elder {
-  --fs-xs: 13px;
-  --fs-sm: 15px;
-  --fs-body: 17px;
-  --fs-md: 18px;
-  --fs-lg: 20px;
-  --fs-xl: 24px;
-  --fs-title: 28px;
-  --fs-hero: 34px;
+  --brand: #3f6b4f;
+  --brand-dark: #345a41;
+  --brand-soft: #edf3ea;
+  --brand-line: #c9dcc9;
+  --brand-ink: #2f5238;
+  --on-brand: #ffffff;
+  --care: #5c7a52;
+  --care-soft: #ebf1e6;
+  --care-line: #cdddc4;
+  --bg: #f7f4ee;
+  --ink: #33302b;
+  --ink-2: #5c574e;
+  --ink-3: #726b60;
+  --line: #e8e3d8;
+  --line-2: #ddd6c8;
+  --fs-xs: 15px;
+  --fs-sm: 17px;
+  --fs-body: 19px;
+  --fs-md: 20px;
+  --fs-lg: 22px;
+  --fs-xl: 25px;
+  --fs-title: 30px;
+  --fs-hero: 36px;
   --btn-h: 60px;
   --gap: 16px;
   --pad: 16px;
@@ -93,25 +122,26 @@ page {
   padding-bottom: calc(120px + env(safe-area-inset-bottom));
 }
 
+/* 臻享皮肤「夜色金」：暖黑 + 金（issue #8，与默认风格统一为金×暖黑） */
 .xj.night {
-  --bg: #131013;
-  --surface: #1e191d;
+  --bg: #1c1712;
+  --surface: #262019;
   --ink: #f2ece8;
   --ink-2: #b3a8a2;
   --ink-3: #9d928d;
   --line: rgba(255, 255, 255, 0.08);
   --line-2: rgba(255, 255, 255, 0.12);
-  --placeholder: #2a2328;
+  --placeholder: #332a22;
   --brand: #d2b47a;
   --brand-dark: #b99a5e;
   --brand-soft: rgba(210, 180, 122, 0.14);
   --brand-line: rgba(210, 180, 122, 0.4);
   --brand-ink: #d2b47a;
-  --on-brand: #131013;
-  --price: #ff7a45;
-  --price-ink: #ff8f61;
-  --price-soft: rgba(255, 122, 69, 0.1);
-  --price-line: rgba(255, 122, 69, 0.45);
+  --on-brand: #1c1712;
+  --price: #e08a94;
+  --price-ink: #e8a0a9;
+  --price-soft: rgba(224, 138, 148, 0.1);
+  --price-line: rgba(224, 138, 148, 0.4);
 }
 
 .num {
@@ -119,10 +149,10 @@ page {
   letter-spacing: -0.02em;
 }
 
-/* ───── 文本 ───── */
-.t-hero { font-size: var(--fs-hero); font-weight: 700; line-height: 1.2; }
-.t-title { font-size: var(--fs-title); font-weight: 700; line-height: 1.25; }
-.t-xl { font-size: var(--fs-xl); font-weight: 700; line-height: 1.3; }
+/* ───── 文本（标题衬线：柔金轻奢高端感，issue #8） ───── */
+.t-hero { font-size: var(--fs-hero); font-weight: 700; line-height: 1.2; font-family: var(--font-title); letter-spacing: 0.5px; }
+.t-title { font-size: var(--fs-title); font-weight: 700; line-height: 1.25; font-family: var(--font-title); letter-spacing: 0.5px; }
+.t-xl { font-size: var(--fs-xl); font-weight: 700; line-height: 1.3; font-family: var(--font-title); letter-spacing: 0.5px; }
 .t-lg { font-size: var(--fs-lg); font-weight: 700; }
 .t-md { font-size: var(--fs-md); font-weight: 600; }
 .t-body { font-size: var(--fs-body); }
@@ -218,12 +248,17 @@ page {
   white-space: nowrap;
 }
 .tag.care { background: var(--care-soft); color: var(--care); }
-.tag.gray { background: #f2f2f2; color: #555555; }
+.tag.gray { background: var(--line); color: var(--ink-2); }
 .tag.line { background: transparent; color: var(--ink-2); border: 1px solid var(--line-2); font-weight: 500; }
 .tag.promo { background: var(--price-soft); color: var(--price-ink); border: 1px solid var(--price-line); font-weight: 500; }
 .tag.alert { background: var(--alert-soft); color: var(--alert); }
 .tag.warn { background: var(--hint); color: var(--warn-ink); }
-.tag.gold { background: rgba(210, 180, 122, 0.16); color: #a9823a; }
+.tag.gold { background: rgba(210, 180, 122, 0.16); color: var(--brand-ink); }
+.tag.green { background: var(--aux-green-soft); color: var(--aux-green); }
+.tag.terra { background: var(--aux-terra-soft); color: var(--aux-terra); }
+.tag.rose { background: var(--aux-rose-soft); color: var(--aux-rose); }
+.tag.sky { background: var(--aux-sky-soft); color: var(--aux-sky); }
+.tag.plum { background: var(--aux-plum-soft); color: var(--aux-plum); }
 
 /* ───── 按钮（全圆角） ───── */
 .btn {
@@ -241,14 +276,14 @@ page {
   font-weight: 700;
   box-sizing: border-box;
   text-align: center;
-  box-shadow: 0 6px 16px -8px rgba(204, 150, 0, 0.5);
+  box-shadow: 0 6px 16px -8px rgba(168, 130, 77, 0.4);
 }
 .btn:active { opacity: 0.85; }
 .btn.ghost { background: var(--surface); color: var(--brand-ink); border: 1.5px solid var(--brand-dark); box-shadow: none; }
 .btn.plain { background: var(--surface); color: #3b3337; border: 1px solid #e0d8dc; font-weight: 600; box-shadow: none; }
-.btn.care { background: var(--care); box-shadow: 0 6px 16px -8px rgba(31, 110, 104, 0.5); }
-.btn.alert { background: var(--alert); box-shadow: 0 6px 16px -8px rgba(179, 38, 30, 0.45); }
-.btn.gold { background: var(--gold); color: #131013; box-shadow: 0 6px 16px -8px rgba(160, 124, 64, 0.5); }
+.btn.care { background: var(--care); color: #fff; box-shadow: 0 6px 16px -8px rgba(110, 127, 92, 0.5); }
+.btn.alert { background: var(--alert); color: #fff; box-shadow: 0 6px 16px -8px rgba(179, 38, 30, 0.45); }
+.btn.gold { background: var(--gold); color: var(--night); box-shadow: 0 6px 16px -8px rgba(160, 124, 64, 0.5); }
 .btn.small { height: 40px; font-size: var(--fs-sm); padding: 0 16px; }
 .elder .btn.small { height: 46px; font-size: var(--fs-body); }
 .btn.disabled { background: #e0e0e0; color: #8c8c8c; border: 0; box-shadow: none; }
@@ -284,7 +319,7 @@ page {
   align-items: stretch;
   gap: 6px;
 }
-.night .footer-bar { background: rgba(19, 16, 19, 0.96); }
+.night .footer-bar { background: rgba(28, 23, 18, 0.96); }
 
 /* ───── 选项卡片（答题） ───── */
 .option {
@@ -360,6 +395,11 @@ page {
 }
 .icon-box.care { background: var(--care-soft); color: var(--care); }
 .icon-box.gray { background: var(--line); color: var(--ink-2); }
+.icon-box.green { background: var(--aux-green-soft); color: var(--aux-green); }
+.icon-box.terra { background: var(--aux-terra-soft); color: var(--aux-terra); }
+.icon-box.rose { background: var(--aux-rose-soft); color: var(--aux-rose); }
+.icon-box.sky { background: var(--aux-sky-soft); color: var(--aux-sky); }
+.icon-box.plum { background: var(--aux-plum-soft); color: var(--aux-plum); }
 
 .ai-note { font-size: var(--fs-xs); color: var(--ink-3); }
 .empty { padding: 48px 16px; text-align: center; color: var(--ink-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }

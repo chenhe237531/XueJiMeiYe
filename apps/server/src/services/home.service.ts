@@ -86,6 +86,12 @@ export class HomeService {
         case 'healthCard':
           out.push({ type: 'healthCard', props: await this.healthCard(customer, p.maxTodos || 3) })
           break
+        /** issue #8：乐龄首页"今日健康"——问候 + 健康概览 + 家人入口，替代乐龄布局的 greeting + healthCard */
+        case 'elderToday': {
+          const health = await this.healthCard(customer, p.maxTodos || 2)
+          out.push({ type: 'elderToday', props: { text: `${greetingWord()}，${customer?.salutation || '您好'}`, showElderToggle: p.showElderToggle !== false, tier, tierName: TIER_NAMES[tier], isGuest: !customer, health } })
+          break
+        }
         case 'entryGrid': {
           const max = elderMode ? 6 : 8
           const items = pick(p.modules).slice(0, max)

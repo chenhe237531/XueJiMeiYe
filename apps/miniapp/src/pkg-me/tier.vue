@@ -42,7 +42,7 @@ onLoad(async () => { d.value = await http.get('/app/tier') })
 .tcard { border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 8px; }
 .tC { background: var(--brand-soft); color: var(--brand-ink); }
 .tB { background: var(--brand); color: var(--on-brand); }
-.tA { background: #1e191d; color: #d2b47a; }
+.tA { background: #262019; color: #d2b47a; }
 .b { padding: 2px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.18); }
 .tC .b { background: #fff; }
 .trow { display: flex; align-items: center; gap: 4px; padding: 10px 0; border-top: 1px solid var(--line); }

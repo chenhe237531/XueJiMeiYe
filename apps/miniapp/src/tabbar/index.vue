@@ -57,6 +57,6 @@ onLoad(() => {
 .tabbar.elder .item .label { font-size: 14px; }
 .item.on { color: #222222; }
 .item.on .label { font-weight: 700; }
-.item.on::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 18px; height: 3px; border-radius: 2px; background: #ffd100; }
+.item.on::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 18px; height: 3px; border-radius: 2px; background: #c9a063; }
 .safe { padding-bottom: env(safe-area-inset-bottom); }
 </style>
