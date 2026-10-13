@@ -1,4 +1,8 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { existsSync, mkdirSync } from 'node:fs'
+import { extname, join } from 'node:path'
+import { diskStorage } from 'multer'
 import dayjs from 'dayjs'
 import { Aud, CurrentUser, requireRole, ROLE_NAMES, type StaffUser } from '../common/auth'
 import { PrismaService } from '../common/prisma.service'
@@ -126,6 +130,27 @@ export class AdminConfigController {
   }
 
   // ───────── 首页配置 ─────────
+
+  /** 模块封面上传（issue #6）：存 uploads/（main.ts 静态托管），5MB 限图片，门店实拍图可直接替换 */
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: (_req, _file, cb) => {
+        const dir = join(process.cwd(), 'uploads')
+        if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
+        cb(null, dir)
+      },
+      filename: (_req, file, cb) => cb(null, `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${extname(file.originalname)}`),
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => { if (!/^image\//.test(file.mimetype)) return cb(Err.bad('仅支持图片文件'), false); cb(null, true) },
+  }))
+  async upload(@CurrentUser() u: StaffUser, @UploadedFile() file: Express.Multer.File) {
+    requireRole(u, ['ops'])
+    if (!file) throw Err.bad('缺少文件')
+    await this.wf.audit({ type: 'staff', id: u.id, name: u.name }, 'file.upload', undefined, { file: file.filename, size: file.size })
+    return { url: `/uploads/${file.filename}`, size: file.size }
+  }
 
   @Get('home-layouts')
   async layouts() {

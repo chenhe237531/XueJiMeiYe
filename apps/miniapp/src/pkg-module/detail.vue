@@ -11,6 +11,7 @@ definePage({ style: { navigationStyle: 'custom', navigationBarTitleText: '详情
 const xj = useXj()
 const m = ref<any>(null)
 const acked = ref<string[]>([])
+const heroErr = ref(false)
 const d = computed(() => m.value?.detail || {})
 const needAck = computed(() => (m.value?.healthNotices || []).filter((n: any) => n.requireAck))
 const allAcked = computed(() => needAck.value.every((n: any) => acked.value.includes(n.id)))
@@ -44,9 +45,12 @@ function submit() {
 <template>
   <view v-if="m" :class="[...xj.pageClass, 'has-footer']" style="padding: 0">
     <view class="hero photo-slot">
-      <XIcon :name="m.icon" :size="40" />
-      <text class="t-sm semi">实拍：{{ m.name }}</text>
-      <text class="t-xs">建议尺寸 1170 x 900</text>
+      <image v-if="m.cover && !heroErr" class="hero-img" :src="m.cover" mode="aspectFill" @error="heroErr = true" />
+      <template v-else>
+        <XIcon :name="m.icon" :size="40" />
+        <text class="t-sm semi">实拍：{{ m.name }}</text>
+        <text class="t-xs">建议尺寸 1170 x 900</text>
+      </template>
     </view>
     <view class="nav-float"><XNav show-back transparent /></view>
     <view class="sheet stack">
@@ -89,7 +93,8 @@ function submit() {
 </template>
 
 <style scoped>
-.hero { height: 280px; border-radius: 0; background: #e4dee1; }
+.hero { height: 280px; border-radius: 0; background: #e4dee1; position: relative; overflow: hidden; }
+.hero-img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 .nav-float { position: absolute; top: 0; left: 16px; right: 16px; }
 .sheet { background: #fff; border-radius: 24px 24px 0 0; margin-top: -24px; position: relative; padding: 20px 18px 24px; min-height: 60vh; }
 .hl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }

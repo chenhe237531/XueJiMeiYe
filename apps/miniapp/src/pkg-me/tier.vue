@@ -17,7 +17,7 @@ onLoad(async () => { d.value = await http.get('/app/tier') })
       <view class="tcard" :class="`t${d.tier}`">
         <text class="t-sm" style="opacity: 0.8">当前等级</text>
         <text class="t-hero">{{ d.tierName }}</text>
-        <view class="row gap8 wrap"><text v-for="b in d.benefits" :key="b" class="b t-sm">{{ b }}</text></view>
+        <view class="row gap8 wrap"><view v-for="b in d.benefits" :key="b.text" class="b row gap4"><XIcon :name="b.icon" :size="14" /><text class="t-sm">{{ b.text }}</text></view></view>
         <text v-if="d.keepUntil" class="t-sm">保级期至 {{ d.keepUntil }}</text>
       </view>
       <view class="card">
