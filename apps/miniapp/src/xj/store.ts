@@ -11,6 +11,8 @@ export const useXj = defineStore('xj', () => {
 
   const loggedIn = computed(() => !!token.value)
   const pageClass = computed(() => ['xj', elderMode.value ? 'elder' : 'std'])
+  /** 登录 / 资料填写 / 授权流程固定标准样式（issue #3）：不读乐龄模式，避免新用户被预设为大字号 */
+  const stdPageClass = computed(() => ['xj', 'std'])
 
   function setToken(t: string) {
     token.value = t
@@ -50,5 +52,5 @@ export const useXj = defineStore('xj', () => {
     uni.removeStorageSync(TOKEN_KEY)
   }
 
-  return { token, me, elderMode, tier, loggedIn, pageClass, setToken, setElder, loadMe, toggleElder, logout }
+  return { token, me, elderMode, tier, loggedIn, pageClass, stdPageClass, setToken, setElder, loadMe, toggleElder, logout }
 })

@@ -26,7 +26,7 @@ async function decide(granted: boolean) {
 </script>
 
 <template>
-  <view :class="[...xj.pageClass, 'has-footer']">
+  <view :class="[...xj.stdPageClass, 'has-footer']">
     <view v-if="text" class="stack" style="padding-top: 16px">
       <view class="row gap8">
         <XIcon name="shield-check" :size="28" color="#6E7F5C" />
