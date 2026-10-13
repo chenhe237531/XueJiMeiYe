@@ -47,7 +47,7 @@ async function demo(p: any) {
 </script>
 
 <template>
-  <view :class="xj.pageClass">
+  <view :class="xj.stdPageClass">
     <view class="col gap8" style="padding: 28px 4px 20px">
       <text class="t-hero">雪姬美业 · 六维健康</text>
       <text class="c2">六维测评、免费体检、健康档案与 AI 陪伴</text>

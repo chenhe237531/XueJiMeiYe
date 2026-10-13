@@ -18,7 +18,7 @@ onLoad(() => {
 })
 
 async function save(skip = false) {
-  if (!skip && !salutation.value) return toast('请填写您希望的称呼，如"王阿姨"')
+  if (!skip && !salutation.value) return toast('请填写您希望的称呼，如"王女士"')
   const res: any = skip ? {} : await http.patch('/app/me', { salutation: salutation.value, birthYear: years[yearIdx.value], gender: gender.value }, { loading: '保存中' })
   await xj.loadMe()
   if (res.elderAuto) {
@@ -29,14 +29,14 @@ async function save(skip = false) {
 </script>
 
 <template>
-  <view :class="xj.pageClass">
+  <view :class="xj.stdPageClass">
     <view class="col gap6" style="padding: 20px 4px">
       <text class="t-title">怎么称呼您？</text>
       <text class="c2">只用于问候和顾问联系，可以跳过</text>
     </view>
     <view class="card stack">
       <text class="t-md">称呼</text>
-      <input v-model="salutation" class="input" placeholder="如：王阿姨、李女士" maxlength="16">
+      <input v-model="salutation" class="input" placeholder="如：王女士、小李、Anna" maxlength="16">
       <text class="t-md">出生年份</text>
       <picker mode="selector" :range="years" :value="yearIdx" @change="(e) => (yearIdx = Number(e.detail.value))">
         <view class="input row-between"><text>{{ years[yearIdx] }} 年</text><text class="c3">选择</text></view>
