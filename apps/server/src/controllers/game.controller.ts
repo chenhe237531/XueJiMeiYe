@@ -179,15 +179,20 @@ export class GameController {
     return { levels: MATCH3_LEVELS, maxLevel: s.maxLevel, dailyCap: MATCH3_DAILY_CAP, pointsLeftToday: Math.max(0, MATCH3_DAILY_CAP - await this.match3EarnedToday(u.id)) }
   }
 
-  /** 通关：校验关卡顺序与最少步数；积分当日封顶 15 分（每次通关 +5，上限内发完为止） */
+  /** 通关：校验关卡顺序与单步均分合理性；积分当日封顶 15 分（每次通关 +5，上限内发完为止） */
   @Post('match3/complete')
-  async match3Complete(@CurrentUser() u: CustomerUser, @Body() body: { level: number, moves: number, seconds?: number }) {
+  async match3Complete(@CurrentUser() u: CustomerUser, @Body() body: { level: number, moves: number, score?: number, seconds?: number }) {
     const s = await this.state<Match3State>(u.id, 'match3', { maxLevel: 0 })
     const lv = Number(body.level)
     const cfg = MATCH3_LEVELS.find(l => l.level === lv)
     if (!cfg) throw Err.bad('关卡不存在')
     if (lv > s.maxLevel + 1) throw Err.bad('请先通过前面的关卡')
-    if (!Number(body.moves) || Number(body.moves) < cfg.minMoves) throw Err.bad('本局数据异常，请正常游玩')
+    const moves = Number(body.moves) || 0
+    const score = Number(body.score) || 0
+    // 评审修复：不再按下界步数校验（连锁消除下正常玩家步数普遍更少，会误伤）；
+    // 改为宽松的"单步均分"上限——每步超过 200 分（单步连锁消 20 块以上）才视为异常。
+    // 防刷兜底仍是每日 15 分封顶。
+    if (moves < 1 || score < cfg.targetScore || score > moves * 200) throw Err.bad('本局数据异常，请正常游玩')
     let points = 0
     const earned = await this.match3EarnedToday(u.id)
     if (earned < MATCH3_DAILY_CAP) {
@@ -196,7 +201,7 @@ export class GameController {
     }
     const maxLevel = Math.max(s.maxLevel, lv)
     if (maxLevel !== s.maxLevel) await this.saveState(u.id, 'match3', { maxLevel })
-    await this.wf.event(u.id, 'game_play', { game: 'match3', action: 'complete', level: lv, moves: body.moves, seconds: body.seconds, points })
+    await this.wf.event(u.id, 'game_play', { game: 'match3', action: 'complete', level: lv, moves: body.moves, score: body.score, seconds: body.seconds, points })
     return { points, maxLevel, capped: points === 0 }
   }
 }

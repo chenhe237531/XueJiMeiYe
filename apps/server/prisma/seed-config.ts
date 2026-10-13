@@ -160,14 +160,14 @@ export const WHEEL_PRIZES = [
   { type: 'none', value: 0, weight: 20, label: '谢谢参与' },
 ]
 
-/** 消消乐关卡（issue #7）：前两关小盘 3 色（乐龄友好），后面逐级加色加格；minMoves 为合法最少步数下界 */
+/** 消消乐关卡（issue #7）：前两关小盘 3 色（乐龄友好），后面逐级加色加格；防刷不设下界步数，靠每日积分封顶 + 单步均分上限 */
 export const MATCH3_LEVELS = [
-  { level: 1, rows: 5, cols: 5, tileTypes: 3, targetScore: 300, minMoves: 7 },
-  { level: 2, rows: 5, cols: 5, tileTypes: 3, targetScore: 500, minMoves: 12 },
-  { level: 3, rows: 7, cols: 7, tileTypes: 4, targetScore: 800, minMoves: 18 },
-  { level: 4, rows: 7, cols: 7, tileTypes: 4, targetScore: 1200, minMoves: 27 },
-  { level: 5, rows: 7, cols: 7, tileTypes: 5, targetScore: 1600, minMoves: 36 },
-  { level: 6, rows: 7, cols: 7, tileTypes: 5, targetScore: 2000, minMoves: 45 },
+  { level: 1, rows: 5, cols: 5, tileTypes: 3, targetScore: 300 },
+  { level: 2, rows: 5, cols: 5, tileTypes: 3, targetScore: 500 },
+  { level: 3, rows: 7, cols: 7, tileTypes: 4, targetScore: 800 },
+  { level: 4, rows: 7, cols: 7, tileTypes: 4, targetScore: 1200 },
+  { level: 5, rows: 7, cols: 7, tileTypes: 5, targetScore: 1600 },
+  { level: 6, rows: 7, cols: 7, tileTypes: 5, targetScore: 2000 },
 ]
 
 export const PERSONA = {

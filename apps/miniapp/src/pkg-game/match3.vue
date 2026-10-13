@@ -20,6 +20,7 @@ const moves = ref(0)
 const busy = ref(false)
 const won = ref<any>(null) // 通关弹层 { points, capped, next }
 const startedAt = ref(0)
+const finishSent = ref(false) // 通关上报只发一次（评审修复：失败时不重复请求）
 
 const cfg = computed(() => d.value?.levels?.find((l: any) => l.level === lv.value) || null)
 const progress = computed(() => cfg.value ? Math.min(100, Math.round(score.value / cfg.value.targetScore * 100)) : 0)
@@ -54,6 +55,7 @@ function start(level: number) {
   score.value = 0
   moves.value = 0
   won.value = null
+  finishSent.value = false
   startedAt.value = Date.now()
 }
 
@@ -114,8 +116,7 @@ function tap(i: number) {
   ;[g[a], g[b]] = [g[b], g[a]]
   const m = findMatches(g, cfg.value)
   if (!m.size) {
-    // 无匹配回弹
-    grid.value = g
+    // 无匹配：保持原棋盘不变，仅回弹抖动提示（评审修复：此前误把交换后的棋盘写回，且不计步数可随意摆盘）
     shakeIdx.value = [a, b]
     setTimeout(() => { shakeIdx.value = []; busy.value = false }, 350)
     return
@@ -129,9 +130,18 @@ function tap(i: number) {
 }
 
 async function finish() {
-  const res: any = await http.post('/app/games/match3/complete', { level: lv.value, moves: moves.value, seconds: Math.round((Date.now() - startedAt.value) / 1000) }, { silent: true })
-  won.value = { ...res, next: (lv.value || 1) < d.value.levels.length ? lv.value! + 1 : null }
-  load()
+  if (finishSent.value) return
+  finishSent.value = true
+  try {
+    const res: any = await http.post('/app/games/match3/complete', { level: lv.value, moves: moves.value, score: score.value, seconds: Math.round((Date.now() - startedAt.value) / 1000) }, { silent: true })
+    won.value = { ...res, next: (lv.value || 1) < d.value.levels.length ? lv.value! + 1 : null }
+    load()
+  }
+  catch (e: any) {
+    // 评审修复：上报失败给明确提示并回选关，避免对局卡在"每走一步重复请求"的状态
+    toast(e?.message || '结果提交失败，稍后再试')
+    lv.value = null
+  }
 }
 
 function nextLevel() {
