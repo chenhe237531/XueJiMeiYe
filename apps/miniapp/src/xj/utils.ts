@@ -33,6 +33,22 @@ export function call(phone: string) {
   // #endif
 }
 
+/**
+ * 服务端相对路径（如 /uploads/xx）转完整 URL（issue #16）：
+ * mp-weixin 会把 "/" 开头的 image src 按包内路径解析导致加载失败，需拼服务端 origin；
+ * H5 与服务端同源，相对路径直接可用。
+ */
+export function absUrl(u?: string | null): string {
+  if (!u || !u.startsWith('/')) return u || ''
+  // #ifdef MP-WEIXIN
+  const base = (import.meta.env.VITE_MP_SERVER_BASEURL || import.meta.env.VITE_SERVER_BASEURL || '') as string
+  if (/^https?:\/\//.test(base)) {
+    try { return new URL(base).origin + u } catch { /* 非法地址时回退相对路径 */ }
+  }
+  // #endif
+  return u
+}
+
 /** 朗读：H5 使用浏览器语音合成；小程序需接入"微信同声传译"插件或云端 TTS（V1.2） */
 export function speak(text: string) {
   // #ifdef H5

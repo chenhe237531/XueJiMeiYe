@@ -6,6 +6,7 @@ import type { NestExpressApplication } from '@nestjs/platform-express'
 import express from 'express'
 import { AppModule } from './app.module'
 import { AllExceptionsFilter, ResponseInterceptor } from './common/response'
+import { UPLOAD_DIR } from './common/upload-dir'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true })
@@ -18,7 +19,7 @@ async function bootstrap() {
   const root = process.env.WEB_ROOT || join(__dirname, '..', '..')
   const h5 = join(root, 'miniapp', 'dist', 'build', 'h5')
   const admin = join(root, 'admin', 'dist')
-  const uploads = join(__dirname, '..', 'uploads')
+  const uploads = UPLOAD_DIR // issue #16：与上传接口共用同一目录，Docker 里设为持久卷（UPLOAD_DIR）
   const server = app.getHttpAdapter().getInstance()
   server.use('/uploads', express.static(uploads))
   if (existsSync(h5)) {

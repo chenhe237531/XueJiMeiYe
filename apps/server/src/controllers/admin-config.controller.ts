@@ -8,6 +8,7 @@ import { Aud, CurrentUser, requireRole, ROLE_NAMES, type StaffUser } from '../co
 import { PrismaService } from '../common/prisma.service'
 import { Err } from '../common/response'
 import { fmt, TIER_NAMES } from '../common/util'
+import { UPLOAD_DIR } from '../common/upload-dir'
 import { evaluateRedFlags, evaluateRiskSignals, buildFacts, riskLevelOf } from '../engine'
 import { LEVELS } from '../engine/question-bank'
 import { findBannedWords, PROJECT_ATTRS, TAG_NAMES } from '../engine/rules-data'
@@ -131,19 +132,23 @@ export class AdminConfigController {
 
   // ───────── 首页配置 ─────────
 
-  /** 模块封面上传（issue #6）：存 uploads/（main.ts 静态托管），5MB 限图片，门店实拍图可直接替换 */
+  /** 模块封面上传（issue #6/#16）：存 UPLOAD_DIR（部署环境指到持久卷），5MB 限 jpg/png/webp（扩展名白名单，拒绝 svg 防 XSS），写审计日志 */
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: (_req, _file, cb) => {
-        const dir = join(process.cwd(), 'uploads')
-        if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
-        cb(null, dir)
+        if (!existsSync(UPLOAD_DIR)) mkdirSync(UPLOAD_DIR, { recursive: true })
+        cb(null, UPLOAD_DIR)
       },
-      filename: (_req, file, cb) => cb(null, `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${extname(file.originalname)}`),
+      filename: (_req, file, cb) => cb(null, `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${extname(file.originalname).toLowerCase()}`),
     }),
     limits: { fileSize: 5 * 1024 * 1024 },
-    fileFilter: (_req, file, cb) => { if (!/^image\//.test(file.mimetype)) return cb(Err.bad('仅支持图片文件'), false); cb(null, true) },
+    fileFilter: (_req, file, cb) => {
+      // 双重校验（issue #16）：mimetype 仅作初筛，扩展名白名单兜底——否则可上传 image/svg+xml 或伪装成图片的 html
+      const okExt = ['.jpg', '.jpeg', '.png', '.webp'].includes(extname(file.originalname).toLowerCase())
+      if (!/^image\//.test(file.mimetype) || !okExt) return cb(Err.bad('仅支持 jpg / png / webp 图片'), false)
+      cb(null, true)
+    },
   }))
   async upload(@CurrentUser() u: StaffUser, @UploadedFile() file: Express.Multer.File) {
     requireRole(u, ['ops'])
