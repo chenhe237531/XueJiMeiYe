@@ -110,7 +110,7 @@ async function demo(p: any) {
 
 <style scoped lang="scss">
 .brand-hero { display: flex; align-items: center; gap: 14px; padding: 22px 4px 16px; }
-.brand-mark { width: 54px; height: 54px; border-radius: 18px; background: linear-gradient(135deg, #e3cdb0 0%, #c9a063 55%, #a8824d 100%); color: #fff; font-family: var(--font-title); font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 22px -12px rgba(168, 130, 77, 0.55); flex-shrink: 0; }
+.brand-mark { width: 54px; height: 54px; border-radius: 18px; background: linear-gradient(135deg, #e3cdb0 0%, #c9a063 55%, #a8824d 100%); color: var(--on-brand); font-family: var(--font-title); font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 22px -12px rgba(168, 130, 77, 0.55); flex-shrink: 0; }
 .brand-name { font-family: var(--font-title); font-size: 30px; font-weight: 700; color: var(--ink); letter-spacing: 1px; line-height: 1.2; }
 
 .sell-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }

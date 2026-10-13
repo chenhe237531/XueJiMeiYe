@@ -301,10 +301,10 @@ const DIMS = [
 .tier-A { background: linear-gradient(150deg, #262019 0%, #1c1712 70%); color: #f2ece8; border: 1px solid rgba(210, 180, 122, 0.35); }
 .tier-A .tier-name { color: #d2b47a; font-family: var(--font-title); }
 .tier-line { height: 1px; background: currentColor; opacity: 0.2; }
-.benefit { padding: 3px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.28); align-items: center; }
+.benefit { padding: 3px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.35); align-items: center; }
 .tier-C .benefit { background: #fff; }
-.tier-up { color: var(--brand-ink); opacity: 0.9; }
-.tier-B .tier-up { color: #fff; }
+.tier-up { color: var(--on-brand); opacity: 0.9; }
+.tier-B .tier-up { opacity: 0.85; }
 
 .dim-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .dim { align-items: center; text-align: center; padding: 12px 4px 10px; border-radius: var(--r-inner); background: var(--placeholder); }
