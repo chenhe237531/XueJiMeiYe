@@ -8,7 +8,7 @@ import XIcon from '@/components/XIcon.vue'
 import XRadar from '@/components/XRadar.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { go } from '@/xj/utils'
+import { go, toast } from '@/xj/utils'
 
 const props = defineProps<{ components: any[], night?: boolean }>()
 const xj = useXj()
@@ -20,6 +20,23 @@ function open(item: any, component: string) {
   if (item?.code) http.post('/app/events', { event: 'home_component_click', props: { component, moduleCode: item.code } }, { silent: true }).catch(() => {})
   if (!xj.loggedIn && item?.link && !item.link.startsWith('/pkg-module/detail') && !item.link.startsWith('/pages/')) {
     go('/pkg-auth/login')
+    return
+  }
+  /** issue #5：商城类模块一步直达——微信端 navigateToMiniProgram（失败回退详情页），H5 走 h5Url 降级 */
+  if (item?.entryType === 'miniprogram') {
+    const cfg = item.entryConfig || {}
+    // #ifdef MP-WEIXIN
+    uni.navigateToMiniProgram({
+      appId: cfg.appId,
+      path: cfg.path,
+      fail: () => go(item.link),
+    })
+    return
+    // #endif
+    // #ifdef H5
+    if (cfg.h5Url) { window.location.href = cfg.h5Url; return }
+    // #endif
+    toast(cfg.tip || '商城请在微信小程序内访问')
     return
   }
   go(item.link)

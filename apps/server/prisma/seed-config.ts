@@ -41,7 +41,7 @@ export const MODULES: any[] = [
   { code: 'buddy_group', name: '结伴拼团', category: 'interactive', entryType: 'builtin', icon: 'users-group', summary: '约上老姐妹一起来', tiers: ['B', 'C'], sort: 10, version: 'V1.2' },
   { code: 'mall_organic', name: '有机好物', category: 'mall', entryType: 'miniprogram', icon: 'leaf', summary: '雪姬美业有机商城', tiers: ['B', 'C'], sort: 20,
     cover: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=70&auto=format&fit=crop',
-    entryConfig: { type: 'miniprogram', appId: '[商城小程序 AppID]', path: 'pages/index/index', tip: '即将前往雪姬美业有机商城' }, detail: { priceText: '会员专享价' } },
+    entryConfig: { type: 'miniprogram', appId: '[商城小程序 AppID]', path: 'pages/index/index', tip: '即将前往雪姬美业有机商城', h5Url: '' }, detail: { priceText: '会员专享价' } },
   { code: 'gift_private', name: '私享礼盒', category: 'mall', entryType: 'form', icon: 'gift', summary: '节令私享礼盒，专人配送', tiers: ['A'], sort: 21, lead: { type: 'gift', sla_hours: 24 },
     cover: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&q=70&auto=format&fit=crop',
     detail: { priceText: '臻享会员权益', highlights: ['节令养生食材', '专人上门配送', '可附手写祝福卡'], content: ['每季度一份私享礼盒，按您的口味偏好挑选。', '提交意向后，专属顾问会与您确认收货时间和地址。'] },
