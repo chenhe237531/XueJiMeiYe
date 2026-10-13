@@ -1,7 +1,7 @@
 /**
  * 雪姬美业 · 设计令牌（双风格体系，见 GitHub issue #8）
  * 默认风格「柔金轻奢」（docs/04，面向 30-40 岁女性）：暖米白底 + 香槟金主色 + 深棕墨文字 + 衬线标题；
- * 金底统一配白字 --on-brand；品牌文字 / 图标用深金棕 --brand-ink。
+ * 金底统一配深棕墨字 --on-brand（issue #17：白字对比仅 2.4:1 不达 WCAG，深棕约 6:1；乐龄墨绿底保持白字）；品牌文字 / 图标用深金棕 --brand-ink。
  * 鼠尾草绿 #6E7F5C 只用于健康语义（就医、安全、报告正常态）；警示红只用于紧急；价格玫瑰红只用于门店项目价格。
  * 乐龄风格（.xj.elder，docs/03「养生绿」）：墨绿主色 + 原木暖白底，正文 ≥19px、热区 ≥60px、对比度 ≥4.5:1。
  * 臻享皮肤（.xj.night）：暖黑 #1C1712 + 金 #D2B47A。
@@ -13,8 +13,8 @@ page {
   --brand-soft: #f7ede0;
   --brand-line: #e3cdb0;
   --brand-ink: #6b4e2e;
-  --on-brand: #ffffff;
-  --care: #6e7f5c;
+  --on-brand: #2b2622;
+  --care: #66784e;
   --care-dark: #57664a;
   --care-soft: #e9eee2;
   --care-line: #c8d4bc;
@@ -281,7 +281,7 @@ page {
 .btn:active { opacity: 0.85; }
 .btn.ghost { background: var(--surface); color: var(--brand-ink); border: 1.5px solid var(--brand-dark); box-shadow: none; }
 .btn.plain { background: var(--surface); color: #3b3337; border: 1px solid #e0d8dc; font-weight: 600; box-shadow: none; }
-.btn.care { background: var(--care); color: #fff; box-shadow: 0 6px 16px -8px rgba(110, 127, 92, 0.5); }
+.btn.care { background: var(--care); color: #fff; box-shadow: 0 6px 16px -8px rgba(102, 120, 78, 0.5); }
 .btn.alert { background: var(--alert); color: #fff; box-shadow: 0 6px 16px -8px rgba(179, 38, 30, 0.45); }
 .btn.gold { background: var(--gold); color: var(--night); box-shadow: 0 6px 16px -8px rgba(160, 124, 64, 0.5); }
 .btn.small { height: 40px; font-size: var(--fs-sm); padding: 0 16px; }
