@@ -191,9 +191,9 @@ export default defineConfig({
   theme: {
     colors: {
       /** 主题色，用法如: text-primary */
-      primary: '#FFD100',
+      primary: '#C9A063',
       brand: 'var(--brand-ink)', // 文字 / 图标用的品牌色（随乐龄 / 臻享皮肤变化）；黄色底用 var(--brand)
-      care: '#1F6E68',
+      care: '#6E7F5C',
       ink: '#222222',
       gold: '#D2B47A',
     },

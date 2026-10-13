@@ -144,7 +144,7 @@ export class AdminConfigController {
 
   private async validateLayout(tier: string, elderMode: boolean, components: any[]) {
     const errors: string[] = []
-    if (!components.some(c => c.type === 'healthCard')) errors.push('每套布局必须包含健康卡 healthCard')
+    if (!components.some(c => c.type === 'healthCard' || c.type === 'elderToday')) errors.push('每套布局必须包含健康卡 healthCard（乐龄布局可用 elderToday）')
     const modules = await this.prisma.module.findMany()
     for (const c of components) {
       const codes: string[] = [...(c.props?.modules || []), ...(c.props?.module ? [c.props.module] : [])]

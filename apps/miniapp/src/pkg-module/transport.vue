@@ -13,7 +13,7 @@ const form = ref<any>({ date: '', time: '09:30', from: '', to: '门店', people:
 async function submit() {
   if (!form.value.date || !form.value.from) return toast('请填写日期和上车地点')
   const res: any = await http.post('/app/transport/requests', form.value, { loading: '提交中' })
-  await new Promise(r => uni.showModal({ title: '已提交', content: `门店会确认车辆和司机后通知您（单号 ${res.leadNo}）。`, showCancel: false, confirmText: '好的', confirmColor: '#8A5A00', complete: r }))
+  await new Promise(r => uni.showModal({ title: '已提交', content: `门店会确认车辆和司机后通知您（单号 ${res.leadNo}）。`, showCancel: false, confirmText: '好的', confirmColor: '#6B4E2E', complete: r }))
   back()
 }
 </script>

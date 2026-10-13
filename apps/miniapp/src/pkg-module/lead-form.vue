@@ -31,7 +31,7 @@ async function submit() {
     if (f.required && (form.value[f.key] === undefined || form.value[f.key] === '')) return toast(`请填写：${f.label}`)
   }
   const res: any = await http.post('/app/leads', { moduleCode: m.value.code, form: form.value, ackNotices: uni.getStorageSync('xj_ack') || [] }, { loading: '提交中' })
-  await new Promise(r => uni.showModal({ title: '已提交', content: `顾问会在 ${res.slaHours} 小时内联系您。`, showCancel: false, confirmText: '好的', confirmColor: '#8A5A00', complete: r }))
+  await new Promise(r => uni.showModal({ title: '已提交', content: `顾问会在 ${res.slaHours} 小时内联系您。`, showCancel: false, confirmText: '好的', confirmColor: '#6B4E2E', complete: r }))
   back()
 }
 </script>

@@ -80,8 +80,7 @@ export const MODULES: any[] = [
 
 export const LAYOUTS: { tier: string, elderMode: boolean, components: any[] }[] = [
   { tier: 'C', elderMode: true, components: [
-    { type: 'greeting', props: { showElderToggle: true } },
-    { type: 'healthCard', props: { showTodos: true, maxTodos: 2 } },
+    { type: 'elderToday', props: { showTodos: true, maxTodos: 2 } },
     { type: 'entryGrid', props: { columns: 3, modules: ['assessment', 'checkup_coupon', 'mirror', 'buddy_group', 'checkin', 'family'] } },
     { type: 'divider', props: { title: '康养出游' } },
     { type: 'moduleList', props: { modules: ['trip_qingyuan_value'], style: 'card' } },
@@ -110,8 +109,7 @@ export const LAYOUTS: { tier: string, elderMode: boolean, components: any[] }[] 
     { type: 'mirrorFab', props: { label: '小镜' } },
   ] },
   { tier: 'B', elderMode: true, components: [
-    { type: 'greeting', props: { showElderToggle: true } },
-    { type: 'healthCard', props: { showTodos: true, maxTodos: 2 } },
+    { type: 'elderToday', props: { showTodos: true, maxTodos: 2 } },
     { type: 'entryGrid', props: { columns: 3, modules: ['assessment', 'checkup_coupon', 'my_plan', 'mirror', 'lecture', 'family'] } },
     { type: 'divider', props: { title: '康养精选' } },
     { type: 'moduleList', props: { modules: ['trip_qingyuan_boutique', 'trip_hainan_sojourn'], style: 'card' } },
@@ -129,9 +127,7 @@ export const LAYOUTS: { tier: string, elderMode: boolean, components: any[] }[] 
     { type: 'mirrorFab', props: { label: '小镜' } },
   ] },
   { tier: 'A', elderMode: true, components: [
-    { type: 'greeting', props: { showElderToggle: true } },
-    { type: 'tierCard', props: { showBenefits: true } },
-    { type: 'healthCard', props: { showTodos: true, maxTodos: 2 } },
+    { type: 'elderToday', props: { showTodos: true, maxTodos: 2 } },
     { type: 'entryGrid', props: { columns: 3, modules: ['vip_advisor', 'assessment', 'vip_overseas', 'vip_transport', 'my_plan', 'family'] } },
     { type: 'divider', props: { title: '私享' } },
     { type: 'moduleList', props: { modules: ['private_events', 'trip_maoming_agarwood', 'gift_private'], style: 'card' } },

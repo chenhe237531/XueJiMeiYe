@@ -19,7 +19,7 @@ onShow(async () => {
   <view :class="xj.pageClass">
     <view class="stack" style="padding-top: 12px">
       <view v-if="!list.length" class="card empty stack">
-        <XIcon name="ticket" :size="48" color="#1F6E68" />
+        <XIcon name="ticket" :size="48" color="#6E7F5C" />
         <text class="t-md">完成健康安全关和六关测评，就可以领取免费基础体检券</text>
         <view class="btn care" @click="go('/pkg-assess/intro')">去测评</view>
       </view>
@@ -37,7 +37,7 @@ onShow(async () => {
             <text class="t-xs num semi">{{ c.couponNo }}</text>
           </view>
         </view>
-        <text class="t-sm" style="color: #164f4a">{{ c.promise }}</text>
+        <text class="t-sm" style="color: #57664a">{{ c.promise }}</text>
         <view v-if="open === c.id || c.status === 'claimed'" class="card stack">
           <text class="t-md">{{ c.package?.name }}</text>
           <view class="row gap6 wrap"><text v-for="it in c.package?.items" :key="it" class="tag gray">{{ it }}</text></view>
@@ -57,6 +57,6 @@ onShow(async () => {
 <style scoped>
 .ticket { display: flex; height: 150px; position: relative; }
 .ticket .left { flex: 1; background: var(--care); color: #fff; border-radius: 20px 0 0 20px; padding: 16px; justify-content: center; }
-.ticket .right { width: 112px; background: #fff; border-radius: 0 20px 20px 0; align-items: center; justify-content: center; border-left: 2px dashed #c3ddd9; }
+.ticket .right { width: 112px; background: #fff; border-radius: 0 20px 20px 0; align-items: center; justify-content: center; border-left: 2px dashed #c8d4bc; }
 .ticket.dim { opacity: 0.55; }
 </style>

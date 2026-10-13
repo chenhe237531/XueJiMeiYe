@@ -59,5 +59,5 @@ onLoad(async (q: any) => {
 .seg { flex: 1; height: 40px; border-radius: 20px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); }
 .seg.on { background: var(--brand-soft); color: var(--brand-ink); font-weight: 700; }
 .lgd { width: 10px; height: 10px; border-radius: 6px; border: 2.5px solid; background: #fff; }
-.lgd.ref { border: 0; border-radius: 2px; background: #e6f1ef; }
+.lgd.ref { border: 0; border-radius: 2px; background: #e9eee2; }
 </style>

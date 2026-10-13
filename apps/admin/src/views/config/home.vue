@@ -14,6 +14,7 @@ const LIB = [
   { type: "greeting", name: "问候栏", props: { showElderToggle: true } },
   { type: "tierCard", name: "等级卡", props: { showBenefits: true } },
   { type: "healthCard", name: "健康卡", props: { showTodos: true, maxTodos: 3 } },
+  { type: "elderToday", name: "乐龄今日健康", props: { showTodos: true, maxTodos: 2 } },
   { type: "entryGrid", name: "入口宫格", props: { columns: 4, modules: ["assessment", "checkup_coupon", "my_plan", "mirror"] } },
   { type: "banner", name: "轮播", props: { modules: [], autoplay: true } },
   { type: "divider", name: "分组标题", props: { title: "康养精选" } },
@@ -131,6 +132,7 @@ const moduleOpts = computed(() => modules.value.filter(m => (m.visibleTiers || [
         <div v-if="c.type === 'greeting'" class="p-greet">{{ c.props.text }}<span class="p-tag">{{ c.props.tierName }}</span></div>
         <div v-else-if="c.type === 'tierCard'" class="p-card tier">{{ c.props.tierName }} · {{ c.props.benefits.join(' / ') }}</div>
         <div v-else-if="c.type === 'healthCard'" class="p-card">六维年轻化指数 <b>—</b><div class="p-small">开始六维测评，约 8 分钟</div></div>
+        <div v-else-if="c.type === 'elderToday'" class="p-card elder-today">今日健康 · 六维年轻化指数 <b>—</b><div class="p-small">今日养护 · 家人入口（乐龄专属）</div></div>
         <div v-else-if="c.type === 'entryGrid'" class="p-grid" :style="{ gridTemplateColumns: `repeat(${c.props.columns}, 1fr)` }"><div v-for="it in c.props.items" :key="it.code" class="p-cell">{{ it.name }}</div></div>
         <div v-else-if="c.type === 'divider'" class="p-div">{{ c.props.title }}</div>
         <div v-else-if="c.type === 'moduleList'"><div v-for="it in c.props.items" :key="it.code" class="p-card row"><span class="p-ph" /> <span>{{ it.name }}<div class="p-small">{{ it.priceText || it.summary }}</div></span></div></div>
@@ -160,6 +162,7 @@ const moduleOpts = computed(() => modules.value.filter(m => (m.visibleTiers || [
 .p-card.tier { background: #f4e7ed; color: #8c2b56; }
 .night .p-card.tier { background: #1e191d; color: #d2b47a; border: 1px solid rgba(210,180,122,.3); }
 .p-card.hint { background: #faf1de; }
+.p-card.elder-today { background: #edf3ea; color: #2f5238; }
 .p-card.row { display: flex; gap: 8px; align-items: center; }
 .p-ph { width: 44px; height: 44px; border-radius: 10px; background: #eae5e8; flex-shrink: 0; display: inline-block; }
 .p-small { font-size: 11px; color: #888; }
