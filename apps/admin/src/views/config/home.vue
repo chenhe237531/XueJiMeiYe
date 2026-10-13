@@ -130,8 +130,8 @@ const moduleOpts = computed(() => modules.value.filter(m => (m.visibleTiers || [
       <div class="phone-title">手机预览（访客数据）</div>
       <template v-for="(c, i) in preview?.components || []" :key="i">
         <div v-if="c.type === 'greeting'" class="p-greet">{{ c.props.text }}<span class="p-tag">{{ c.props.tierName }}</span></div>
-        <div v-else-if="c.type === 'tierCard'" class="p-card tier">{{ c.props.tierName }} · {{ c.props.benefits.join(' / ') }}</div>
-        <div v-else-if="c.type === 'healthCard'" class="p-card">六维年轻化指数 <b>—</b><div class="p-small">开始六维测评，约 8 分钟</div></div>
+        <div v-else-if="c.type === 'tierCard'" class="p-card tier" :class="`tier-${c.props.tier}`">{{ c.props.tierName }} · {{ c.props.benefits.map((b: any) => b.text).join(' / ') }}</div>
+        <div v-else-if="c.type === 'healthCard'" class="p-card">六维年轻化指数 <b>—</b><div class="p-small">肌肤 · 体型 · 轮廓 · 体能 · 体态 · 心灵 · 测完领免费体检券</div></div>
         <div v-else-if="c.type === 'elderToday'" class="p-card elder-today">今日健康 · 六维年轻化指数 <b>—</b><div class="p-small">今日养护 · 家人入口（乐龄专属）</div></div>
         <div v-else-if="c.type === 'entryGrid'" class="p-grid" :style="{ gridTemplateColumns: `repeat(${c.props.columns}, 1fr)` }"><div v-for="it in c.props.items" :key="it.code" class="p-cell">{{ it.name }}</div></div>
         <div v-else-if="c.type === 'divider'" class="p-div">{{ c.props.title }}</div>
@@ -159,8 +159,10 @@ const moduleOpts = computed(() => modules.value.filter(m => (m.visibleTiers || [
 .p-tag { font-size: 11px; background: #f4e7ed; color: #8c2b56; padding: 2px 6px; border-radius: 6px; margin-left: 8px; vertical-align: middle; }
 .p-card { background: #fff; border-radius: 14px; padding: 10px; margin-bottom: 8px; }
 .night .p-card { background: #1e191d; }
-.p-card.tier { background: #f4e7ed; color: #8c2b56; }
-.night .p-card.tier { background: #1e191d; color: #d2b47a; border: 1px solid rgba(210,180,122,.3); }
+.p-card.tier { background: #f7ede0; color: #6b4e2e; border: 1px solid #e3cdb0; }
+.p-card.tier.tier-B { background: linear-gradient(135deg, #d9b984, #c9a063 55%, #a8824d); color: #fff; border: none; }
+.p-card.tier.tier-A { background: #1c1712; color: #d2b47a; border: 1px solid rgba(210, 180, 122, 0.35); }
+.night .p-card.tier { background: #1c1712; color: #d2b47a; border: 1px solid rgba(210,180,122,.3); }
 .p-card.hint { background: #faf1de; }
 .p-card.elder-today { background: #edf3ea; color: #2f5238; }
 .p-card.row { display: flex; gap: 8px; align-items: center; }

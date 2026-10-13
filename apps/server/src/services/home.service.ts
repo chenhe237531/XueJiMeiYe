@@ -22,11 +22,35 @@ export const BUILTIN_LINKS: Record<string, string> = {
   store_services: '/pkg-module/store',
 }
 
-export const TIER_BENEFITS: Record<string, string[]> = {
-  A: ['专属顾问 4 小时内响应', '海外 VIP 通道', '接送车', '高端体检与优先号源', '私享活动与礼盒', '年度个人健康报告'],
-  B: ['方案包与医生讲座名额', '康养文旅精选', '清远温泉精品小团', '有机商城', '结伴拼团'],
-  C: ['六维测评与免费基础体检', '健康档案与魔镜陪伴', '清远温泉特惠结伴团', '有机商城', '结伴拼团与小游戏'],
+/** 会员权益（issue #4 图标化）：icon 为 tabler 图标名 */
+export const TIER_BENEFITS: Record<string, { icon: string, text: string }[]> = {
+  A: [
+    { icon: 'headset', text: '专属顾问 4 小时内响应' },
+    { icon: 'plane', text: '海外 VIP 通道' },
+    { icon: 'car', text: '接送车' },
+    { icon: 'heart-rate-monitor', text: '高端体检与优先号源' },
+    { icon: 'gift', text: '私享活动与礼盒' },
+    { icon: 'report-medical', text: '年度个人健康报告' },
+  ],
+  B: [
+    { icon: 'clipboard-heart', text: '方案包与医生讲座名额' },
+    { icon: 'mountain', text: '康养文旅精选' },
+    { icon: 'beach', text: '清远温泉精品小团' },
+    { icon: 'leaf', text: '有机商城' },
+    { icon: 'users-group', text: '结伴拼团' },
+  ],
+  C: [
+    { icon: 'hexagon', text: '六维测评与免费基础体检' },
+    { icon: 'notebook', text: '健康档案与魔镜陪伴' },
+    { icon: 'beach', text: '清远温泉特惠结伴团' },
+    { icon: 'leaf', text: '有机商城' },
+    { icon: 'users-group', text: '结伴拼团与小游戏' },
+  ],
 }
+
+/** 健康服务类模块统一养生绿，保持克制（issue #4 模块色彩识别） */
+const CARE_CODES = ['assessment', 'checkup_coupon', 'my_plan', 'mirror', 'annual_report']
+const CATEGORY_TONES: Record<string, string> = { travel: 'terra', mall: 'green', activity: 'rose', interactive: 'sky', benefit: 'plum', medical: 'care' }
 
 /** 4.3 模块可见性 */
 export function moduleVisible(m: any, c: { tier: string, storeId?: number | null, elderMode: boolean }, nowT = Date.now()) {
@@ -49,9 +73,10 @@ export function moduleLink(m: any) {
 
 export function moduleCard(m: any) {
   const d: any = m.detail || {}
+  const tone = CARE_CODES.includes(m.code) ? 'care' : (CATEGORY_TONES[m.category] || '')
   return {
     code: m.code, name: m.name, icon: m.icon || 'circle', cover: m.cover || null, summary: m.summary,
-    priceText: d.priceText || null, days: d.days || null, link: moduleLink(m), category: m.category, entryType: m.entryType,
+    priceText: d.priceText || null, days: d.days || null, link: moduleLink(m), category: m.category, entryType: m.entryType, tone,
   }
 }
 

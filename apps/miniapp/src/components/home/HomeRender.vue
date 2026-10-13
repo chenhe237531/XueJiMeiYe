@@ -30,6 +30,16 @@ const featuredFirst = (items: any[], featured?: string) => {
   const f = items.find(i => i.code === featured)
   return { feature: f || null, rest: items.filter(i => i.code !== featured) }
 }
+
+/** 六维测评卖点宫格（issue #4）：XIcon 均在 uno safelist 内 */
+const DIMS = [
+  { icon: 'droplet', tone: '', name: '肌肤', sub: '水润与细腻' },
+  { icon: 'scale', tone: 'terra', name: '体型', sub: '紧致与匀称' },
+  { icon: 'flower', tone: 'rose', name: '轮廓', sub: '立体与流畅' },
+  { icon: 'heartbeat', tone: 'care', name: '体能', sub: '活力与耐力' },
+  { icon: 'user', tone: 'sky', name: '体态', sub: '挺拔与平衡' },
+  { icon: 'mood-smile', tone: 'plum', name: '心灵', sub: '松弛与愉悦' },
+]
 </script>
 
 <template>
@@ -50,17 +60,26 @@ const featuredFirst = (items: any[], featured?: string) => {
         </view>
       </view>
 
-      <!-- 等级卡 -->
+      <!-- 等级卡（issue #4 三档质感 + 权益图标化 + 水印字） -->
       <view v-else-if="c.type === 'tierCard'" class="tier-card" :class="`tier-${c.props.tier}`" @click="go('/pkg-me/tier')">
         <view class="row-between">
-          <text class="t-lg">{{ c.props.tierName }}</text>
-          <view class="row gap4 t-sm"><text>全部权益</text><XIcon name="chevron-right" :size="16" /></view>
+          <text class="t-lg tier-name">{{ c.props.tierName }}</text>
+          <view class="row gap4 t-sm tier-more"><text>全部权益</text><XIcon name="chevron-right" :size="16" /></view>
         </view>
         <view class="tier-line" />
         <view class="row wrap gap8">
-          <text v-for="b in c.props.benefits" :key="b" class="benefit t-sm">{{ b }}</text>
+          <view v-for="b in c.props.benefits" :key="b.text" class="benefit row gap4">
+            <XIcon :name="b.icon" :size="14" />
+            <text class="t-sm">{{ b.text }}</text>
+          </view>
         </view>
-        <text v-if="c.props.keepUntil" class="t-xs" style="opacity: 0.8">保级至 {{ c.props.keepUntil }}</text>
+        <view class="row-between">
+          <text v-if="c.props.keepUntil" class="t-xs" style="opacity: 0.8">保级至 {{ c.props.keepUntil }}</text>
+          <text v-else class="t-xs" style="opacity: 0" aria-hidden> </text>
+          <view v-if="c.props.tier !== 'A'" class="tier-up row gap4" @click.stop="go('/pkg-me/tier')">
+            <text class="t-sm semi">了解升级</text><XIcon name="chevron-right" :size="14" />
+          </view>
+        </view>
       </view>
 
       <!-- 健康卡 -->
@@ -80,8 +99,15 @@ const featuredFirst = (items: any[], featured?: string) => {
         </template>
         <view v-else class="col gap12" @click="go(xj.loggedIn ? '/pkg-assess/intro' : '/pkg-auth/login')">
           <text class="t-lg">了解自己的六个维度</text>
-          <text class="c2">肌肤、体型、轮廓、体能、体态、心灵。完成测评可以领取免费体检券。</text>
+          <view class="dim-grid">
+            <view v-for="dm in DIMS" :key="dm.name" class="dim col gap4">
+              <view class="icon-box sm" :class="dm.tone"><XIcon :name="dm.icon" :size="18" /></view>
+              <text class="t-sm semi">{{ dm.name }}</text>
+              <text class="t-xs c3">{{ dm.sub }}</text>
+            </view>
+          </view>
           <view class="btn">{{ c.props.cta || '开始六维测评，约 8 分钟' }}</view>
+          <text class="t-sm c-care semi" style="text-align: center">完成测评可以领取免费体检券</text>
         </view>
         <view v-for="t in c.props.todos" :key="t.text" class="todo row gap12" @click="go(t.link)">
           <view class="icon-box" :class="t.tone === 'care' ? 'care' : ''"><XIcon :name="t.icon" /></view>
@@ -173,7 +199,7 @@ const featuredFirst = (items: any[], featured?: string) => {
           <view class="card row gap12 banner-card" @click="open(it, 'banner')">
             <view class="photo-slot" style="width: 84px; height: 84px"><XIcon :name="it.icon" :size="24" /><text>实拍位</text></view>
             <view class="col gap4 flex1">
-              <text class="t-xs c-care semi">{{ it.name }}</text>
+              <text class="t-xs semi" :class="`tone-${it.tone || 'care'}`">{{ it.name }}</text>
               <text class="t-lg">{{ it.summary }}</text>
               <text class="t-sm c-brand semi">{{ it.priceText || '查看详情' }}</text>
             </view>
@@ -204,7 +230,7 @@ const featuredFirst = (items: any[], featured?: string) => {
         </template>
         <view v-else class="group">
           <view v-for="it in c.props.items" :key="it.code" class="cell" @click="open(it, 'moduleList')">
-            <view class="icon-box"><XIcon :name="it.icon" /></view>
+            <view class="icon-box" :class="it.tone || ''"><XIcon :name="it.icon" /></view>
             <view class="col flex1">
               <text class="t-md">{{ it.name }}</text>
               <text class="t-sm c2">{{ it.summary }}</text>
@@ -242,14 +268,31 @@ const featuredFirst = (items: any[], featured?: string) => {
 .toggle.on .knob { left: 23px; }
 .night .toggle.on { background: var(--gold); }
 
-.tier-card { border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 10px 24px -16px rgba(34, 24, 40, 0.35); }
-.tier-C { background: var(--brand-soft); color: var(--brand-ink); }
-.tier-B { background: var(--brand); color: var(--on-brand); }
-.tier-A { background: #1c1712; color: #f2ece8; border: 1px solid rgba(210, 180, 122, 0.3); }
-.tier-A .t-lg { color: #d2b47a; }
+.tier-card { position: relative; overflow: hidden; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 10px 24px -16px rgba(60, 48, 34, 0.35); }
+.tier-card::before { position: absolute; right: 10px; top: -8px; font-family: var(--font-title); font-size: 58px; font-weight: 700; opacity: 0.08; pointer-events: none; line-height: 1; }
+.tier-C::before { content: '悦'; }
+.tier-B::before { content: '悦'; }
+.tier-A::before { content: '臻'; }
+.tier-C { background: var(--brand-soft); color: var(--brand-ink); border: 1px solid var(--brand-line); }
+.tier-B { background: linear-gradient(135deg, #d9b984 0%, #c9a063 55%, #a8824d 100%); color: var(--on-brand); }
+.tier-A { background: linear-gradient(150deg, #262019 0%, #1c1712 70%); color: #f2ece8; border: 1px solid rgba(210, 180, 122, 0.35); }
+.tier-A .tier-name { color: #d2b47a; font-family: var(--font-title); }
 .tier-line { height: 1px; background: currentColor; opacity: 0.2; }
-.benefit { padding: 2px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.28); }
+.benefit { padding: 3px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.28); align-items: center; }
 .tier-C .benefit { background: #fff; }
+.tier-up { color: var(--brand-ink); opacity: 0.9; }
+.tier-B .tier-up { color: #fff; }
+
+.dim-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.dim { align-items: center; text-align: center; padding: 12px 4px 10px; border-radius: var(--r-inner); background: var(--placeholder); }
+.icon-box.sm { width: 34px; height: 34px; border-radius: 10px; }
+
+.tone-care { color: var(--care); }
+.tone-green { color: var(--aux-green); }
+.tone-terra { color: var(--aux-terra); }
+.tone-rose { color: var(--aux-rose); }
+.tone-sky { color: var(--aux-sky); }
+.tone-plum { color: var(--aux-plum); }
 
 .health { padding-bottom: 4px; }
 .todo { border-top: 1px solid var(--line); padding: 14px 0 12px; margin-top: 12px; }
