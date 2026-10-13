@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>美业小程序 UI 调研与参考模版 · 雪姬美业</title>
+<style>
+  :root {
+    --ink: #222; --ink2: #555; --ink3: #777;
+    --bg: #f6f6f4; --card: #fff; --line: #e8e6e0;
+    --brand: #d2b47a; --brand-soft: #faf6ec;
+    --care: #1f6e68; --care-soft: #e6f1ef;
+    --rose: #c4707f; --rose-soft: #f9eef0;
+    --night-ink: #131013;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.75; font-size: 15px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, #1f6e68 0%, #2a5f5a 60%, #3d4a44 100%);
+    color: #fff; border-radius: 20px; padding: 44px 40px; margin-bottom: 36px;
+  }
+  header.hero h1 { font-size: 28px; font-weight: 700; letter-spacing: 1px; }
+  header.hero p { margin-top: 12px; opacity: .88; font-size: 15px; max-width: 640px; }
+  header.hero .tags { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+  header.hero .tag {
+    background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.25);
+    padding: 4px 14px; border-radius: 999px; font-size: 13px;
+  }
+  h2 { font-size: 21px; margin: 48px 0 6px; display: flex; align-items: center; gap: 10px; }
+  h2 .num {
+    background: var(--care); color: #fff; width: 28px; height: 28px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 15px; flex: none;
+  }
+  .sub { color: var(--ink3); font-size: 14px; margin-bottom: 20px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 24px; margin-bottom: 16px;
+  }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 720px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+
+  /* competitor card */
+  .comp { border-radius: 16px; border: 1px solid var(--line); background: #fff; overflow: hidden; }
+  .comp .head { padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+  .comp .head .logo {
+    width: 40px; height: 40px; border-radius: 10px; flex: none;
+    display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; font-weight: 700;
+  }
+  .comp .head .name { font-weight: 700; font-size: 16px; }
+  .comp .head .cate { font-size: 12px; color: var(--ink3); }
+  .comp .body { padding: 0 20px 18px; font-size: 14px; color: var(--ink2); }
+  .comp .row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .comp .row b { flex: none; color: var(--ink); font-weight: 600; width: 74px; }
+  .swatches { display: flex; gap: 6px; margin: 10px 0 4px; }
+  .swatch { width: 26px; height: 26px; border-radius: 7px; border: 1px solid rgba(0,0,0,.08); }
+  .borrow {
+    margin-top: 10px; background: var(--care-soft); border-radius: 10px; padding: 10px 14px;
+    font-size: 13.5px; color: #164f4a;
+  }
+  .borrow b { color: #0e3b37; }
+
+  /* phone mockup */
+  .phones { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+  .phone { width: 230px; }
+  .phone .frame {
+    border: 8px solid #1d1b1e; border-radius: 30px; overflow: hidden; background: #f2f1ed;
+    box-shadow: 0 14px 34px rgba(0,0,0,.12);
+  }
+  .phone .caption { text-align: center; margin-top: 14px; }
+  .phone .caption .t { font-weight: 700; font-size: 15px; }
+  .phone .caption .d { font-size: 13px; color: var(--ink3); margin-top: 2px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: #fafaf8; font-weight: 600; color: var(--ink); white-space: nowrap; }
+  td.pg { font-weight: 600; white-space: nowrap; color: var(--ink); }
+  .ref { display: inline-block; background: var(--brand-soft); color: #8a6a2a; border: 1px solid #e6d5ae; font-size: 12.5px; border-radius: 6px; padding: 2px 9px; margin-bottom: 6px; }
+  .do { color: var(--ink2); font-size: 13.5px; }
+
+  .check li { list-style: none; padding: 9px 0 9px 32px; position: relative; border-bottom: 1px dashed var(--line); font-size: 14.5px; }
+  .check li::before {
+    content: "✓"; position: absolute; left: 6px; top: 9px; color: var(--care); font-weight: 700;
+  }
+  .check li b { color: var(--ink); }
+  .spec { color: var(--ink3); font-size: 13px; }
+  .footer-note { text-align: center; color: var(--ink3); font-size: 13px; margin-top: 60px; }
+  .pill { display:inline-block; font-size:12px; padding:2px 10px; border-radius:999px; margin-right:6px; }
+  .pill.a { background:#fff3d6; color:#8a5a00; }
+  .pill.b { background:var(--care-soft); color:#164f4a; }
+  .pill.c { background:#efe9f7; color:#5b4680; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>美业小程序 UI 调研与参考模版</h1>
+  <p>面向「雪姬美业 · 六维健康平台」的界面升级调研：盘点市面美业相关小程序的设计风格与页面结构，结合乐龄女性用户、健康测评 + 门店养护的产品定位，给出三套可参考的设计模版方向与逐页借鉴清单。</p>
+  <div class="tags">
+    <span class="tag">调研时间 2026-10</span>
+    <span class="tag">覆盖 4 类 · 10+ 产品</span>
+    <span class="tag">含适老化规范对照</span>
+  </div>
+</header>
+
+<!-- ============ 1 竞品总览 ============ -->
+<h2><span class="num">1</span>市面产品调研总览</h2>
+<p class="sub">美业相关小程序可分四类。雪姬横跨「健康管理」与「美业服务」两界，参考对象也按这个双定位选取。</p>
+
+<div class="grid2">
+  <!-- 美团丽人 -->
+  <div class="comp">
+    <div class="head">
+      <div class="logo" style="background:#ffd100;color:#222">美</div>
+      <div><div class="name">美团丽人</div><div class="cate">综合到店平台 · 行业事实标准</div></div>
+    </div>
+    <div class="body">
+      <div class="swatches">
+        <div class="swatch" style="background:#ffd100"></div>
+        <div class="swatch" style="background:#222"></div>
+        <div class="swatch" style="background:#f5f5f5"></div>
+        <div class="swatch" style="background:#f2481b"></div>
+      </div>
+      <div class="row"><b>设计风格</b><span>高饱和品牌黄 + 黑字，高对比、高信息密度；白卡片 + 灰底；价格用橙红锚点。</span></div>
+      <div class="row"><b>页面结构</b><span>门店页 = 头图 + 团购卡片流 + 评价信任区；金刚区分类入口；底部一键预约。</span></div>
+      <div class="borrow"><b>对雪姬的借鉴：</b>雪姬现有设计令牌本就向美团靠拢（品牌黄 #FFD100、圆角 12/8/4），方向正确——继续深化「门店项目卡片 + 价格锚点 + 评价信任」三件套，降低乐龄用户的认知成本（她们已在美团上见过这套语言）。</div>
+    </div>
+  </div>
+
+  <!-- 河狸家 -->
+  <div class="comp">
+    <div class="head">
+      <div class="logo" style="background:#e8628c">河</div>
+      <div><div class="name">河狸家</div><div class="cate">上门美业 O2O · 老牌标杆</div></div>
+    </div>
+    <div class="body">
+      <div class="swatches">
+        <div class="swatch" style="background:#e8628c"></div>
+        <div class="swatch" style="background:#fdeef3"></div>
+        <div class="swatch" style="background:#ffe58a"></div>
+      </div>
+      <div class="row"><b>设计风格</b><span>低饱和暖色系，柔粉为主；入口极简，图标+大字说明，饱和度压低。</span></div>
+      <div class="row"><b>页面结构</b><span>信息层级只有 2–3 层；「预约」按钮居中放大高亮；信任体系前置（审核标识、九大流程保障、监督电话）。</span></div>
+      <div class="borrow"><b>对雪姬的借鉴：</b>①「预约/测评」主行动按钮要在 tab 或页面固定位置放大，乐龄用户不会去找藏在角落的入口；② 陌生人服务 = 信任先行，医院转介、门店养护页应把资质、流程保障做成显眼的信任徽章区，而不是一行小字。</div>
+    </div>
+  </div>
+
+  <!-- 新氧 -->
+  <div class="comp">
+    <div class="head">
+      <div class="logo" style="background:#ff5c8a">氧</div>
+      <div><div class="name">新氧（新氧魔镜）</div><div class="cate">医美平台 · AI 测肤代表</div></div>
+    </div>
+    <div class="body">
+      <div class="swatches">
+        <div class="swatch" style="background:#ff5c8a"></div>
+        <div class="swatch" style="background:#fff0f4"></div>
+        <div class="swatch" style="background:#2b2b33"></div>
+      </div>
+      <div class="row"><b>设计风格</b><span>粉白轻医美风 + 社区日记流；魔镜 AI 报告用深色底 + 彩色数据，突出「科技感」。</span></div>
+      <div class="row"><b>魔镜功能</b><span>拍照 → AI 多维度分析（出油、毛孔、细纹、光滑度…）→ 生成评分报告 + 改善建议 + 项目推荐，形成「测评 → 方案 → 转化」闭环。</span></div>
+      <div class="borrow"><b>对雪姬的借鉴：</b>雪姬「魔镜」是最接近新氧魔镜的功能。可参考其「报告即转化」结构：六维测评结果页 = 雷达总览 + 维度打分卡 + 每维度一句人话解读 + 门店养护方案 CTA。报告要「好看到愿意给女儿看」，才有自传播。</div>
+    </div>
+  </div>
+
+  <!-- 美业SaaS模版 -->
+  <div class="comp">
+    <div class="head">
+      <div class="logo" style="background:#b58e5f">S</div>
+      <div><div class="name">美业 SaaS 模版类</div><div class="cate">卓旭 / 肌遇 / 码云数智等</div></div>
+    </div>
+    <div class="body">
+      <div class="swatches">
+        <div class="swatch" style="background:#f3d9d2"></div>
+        <div class="swatch" style="background:#d9b38c"></div>
+        <div class="swatch" style="background:#2c3a33"></div>
+      </div>
+      <div class="row"><b>风格定位</b><span>行业公认三档：轻美容 = 柔粉+香槟金+奶白；高端抗衰 = 黑金+米白轻奢；养生 SPA = 墨绿+原木自然。</span></div>
+      <div class="row"><b>标准页面架构</b><span>首页（Banner + 金刚区 + 热门瀑布流 + 客评）→ 服务列表（分类 Tab + 筛选 + 卡片）→ 详情（款式/技师/日历时段）→ 预约 5 步流 → 会员中心（等级徽章 + 权益 + 储值积分）。</span></div>
+      <div class="borrow"><b>对雪姬的借鉴：</b>雪姬的页面骨架已对齐这套标准（tab 4 页 + 分包）。真正的差距在「养生 SPA 档」的视觉质感：墨绿 + 原木 + 暖白最贴合「乐龄 + 健康养护」的心智，比继续抄美团黄更适合雪姬的健康主业。</div>
+    </div>
+  </div>
+
+  <!-- 健康管理 -->
+  <div class="comp">
+    <div class="head">
+      <div class="logo" style="background:#2f7fd6">健</div>
+      <div><div class="name">健康管理类</div><div class="cate">美年 / 平安好医生 / 健康评估原型</div></div>
+    </div>
+    <div class="body">
+      <div class="swatches">
+        <div class="swatch" style="background:#2f7fd6"></div>
+        <div class="swatch" style="background:#4caf50"></div>
+        <div class="swatch" style="background:#ff9800"></div>
+        <div class="swatch" style="background:#f44336"></div>
+      </div>
+      <div class="row"><b>设计风格</b><span>浅灰蓝底 + 白卡；状态色严格编码：绿=正常、橙=临界、红=异常；核心是数据可视化而非氛围。</span></div>
+      <div class="row"><b>报告可视化</b><span>雷达图（多维评分）、折线图（指标趋势）、仪表盘（偏离程度）、环形图（构成占比），配合通俗文案 + 行动建议。</span></div>
+      <div class="borrow"><b>对雪姬的借鉴：</b>六维测评结果、指标趋势页应完全采用这套「体检报告语言」：雷达图 + 绿橙红状态色 + 每个异常指标跟一句「这意味着什么 + 该做什么」。红色仅用于紧急就医（雪姬已有 --care/--alert 令牌，语义正确）。</div>
+    </div>
+  </div>
+
+  <!-- 适老化 -->
+  <div class="comp">
+    <div class="head">
+      <div class="logo" style="background:#8a5a00">龄</div>
+      <div><div class="name">适老化设计规范</div><div class="cate">工信部 WCA / 微信长辈就医指引</div></div>
+    </div>
+    <div class="body">
+      <div class="row"><b>核心硬指标</b><span>适老版正文字号 ≥ 18pt；行距 ≥ 1.3 倍；对比度 ≥ 4.5:1；可点击区域 ≥ 60×60pt；关闭按钮 ≥ 44×44pt；禁止广告与诱导按钮。</span></div>
+      <div class="row"><b>交互原则</b><span>首页零思考（只留核心功能）、流程无分支、图标必须带文字标签、关键节点语音播报、支持子女代管代收消息（雪姬已有 pkg-family，是天然优势）。</span></div>
+      <div class="borrow"><b>对雪姬的借鉴：</b>乐龄模式不能只是「字号放大」。对照规范自查：elder 模式正文字号 17px 是否提到 18pt 级别、按钮高度 48px 是否达到 60pt 热区、家属代办链路是否在适老版中优先露出。「家人帮我看」应成为一等公民入口。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 2 模版方向 ============ -->
+<h2><span class="num">2</span>三套可参考的设计模版方向</h2>
+<p class="sub">结合雪姬「健康为本、美业为用、乐龄为主」的定位，给出三套方向。均为首页示意，可与现有 CSS 变量体系平滑映射。</p>
+
+<div class="card">
+  <div class="phones">
+    <!-- 方向A -->
+    <div class="phone">
+      <div class="frame">
+        <svg viewBox="0 0 214 440" width="214" height="440" xmlns="http://www.w3.org/2000/svg">
+          <rect width="214" height="440" fill="#f5f5f5"/>
+          <!-- status bar -->
+          <rect x="0" y="0" width="214" height="30" fill="#ffd100"/>
+          <text x="107" y="20" font-size="11" fill="#222" text-anchor="middle" font-weight="600">雪姬美业</text>
+          <!-- banner -->
+          <rect x="10" y="40" width="194" height="84" rx="10" fill="#fff8dc"/>
+          <text x="24" y="76" font-size="14" fill="#8a5a00" font-weight="700">六维健康测评</text>
+          <text x="24" y="98" font-size="10" fill="#a07830">3 分钟了解身体状况 · 免费体检</text>
+          <rect x="146" y="86" width="48" height="22" rx="11" fill="#ffd100"/>
+          <text x="170" y="101" font-size="10" fill="#222" text-anchor="middle" font-weight="600">去测评</text>
+          <!-- kingkong -->
+          <rect x="10" y="134" width="194" height="76" rx="10" fill="#ffffff"/>
+          <g font-size="10" fill="#555" text-anchor="middle">
+            <circle cx="42" cy="158" r="14" fill="#fff3d6"/><text x="42" y="162" font-size="12" fill="#c99700">📋</text><text x="42" y="188">测评</text>
+            <circle cx="94" cy="158" r="14" fill="#e6f1ef"/><text x="94" y="162" font-size="12" fill="#1f6e68">🏥</text><text x="94" y="188">体检</text>
+            <circle cx="146" cy="158" r="14" fill="#f9eef0"/><text x="146" y="162" font-size="12" fill="#c4707f">💆</text><text x="146" y="188">养护</text>
+            <circle cx="196" cy="158" r="14" fill="#eee9f7"/>
+          </g>
+          <text x="196" y="162" font-size="12" text-anchor="end"></text>
+          <!-- price card -->
+          <rect x="10" y="220" width="194" height="64" rx="10" fill="#ffffff"/>
+          <rect x="20" y="230" width="44" height="44" rx="6" fill="#f0ece4"/>
+          <text x="74" y="245" font-size="11" fill="#222" font-weight="600">经络疏通养护 60min</text>
+          <text x="74" y="262" font-size="10" fill="#767676">⭐ 4.9 · 已服务 1200+ 人</text>
+          <text x="74" y="277" font-size="12" fill="#f2481b" font-weight="700">¥198</text>
+          <rect x="160" y="232" width="38" height="20" rx="10" fill="#ffd100"/>
+          <text x="179" y="246" font-size="9" fill="#222" text-anchor="middle" font-weight="600">预约</text>
+          <!-- 2nd card -->
+          <rect x="10" y="292" width="194" height="64" rx="10" fill="#ffffff"/>
+          <rect x="20" y="302" width="44" height="44" rx="6" fill="#e6f1ef"/>
+          <text x="74" y="317" font-size="11" fill="#222" font-weight="600">免费体检 · 合作医院</text>
+          <text x="74" y="334" font-size="10" fill="#767676">会员专享 · 大巴接送</text>
+          <text x="74" y="349" font-size="12" fill="#1f6e68" font-weight="700">¥0 起</text>
+          <rect x="150" y="304" width="48" height="20" rx="10" fill="#1f6e68"/>
+          <text x="174" y="318" font-size="9" fill="#fff" text-anchor="middle" font-weight="600">领体检券</text>
+          <!-- tabbar -->
+          <rect x="0" y="396" width="214" height="44" fill="#ffffff"/>
+          <rect x="0" y="396" width="214" height="1" fill="#eee"/>
+          <g font-size="9" fill="#999" text-anchor="middle">
+            <text x="27" y="418" font-size="13">🏠</text><text x="27" y="432" fill="#222" font-weight="600">首页</text>
+            <text x="80" y="418" font-size="13">📁</text><text x="80" y="432">档案</text>
+            <text x="134" y="418" font-size="13">🪞</text><text x="134" y="432">魔镜</text>
+            <text x="187" y="418" font-size="13">👤</text><text x="187" y="432">我的</text>
+          </g>
+        </svg>
+      </div>
+      <div class="caption">
+        <div class="t">方向 A · 效率黄 <span class="pill a">现有体系深化</span></div>
+        <div class="d">沿用 #FFD100 美团语言：高对比、大按钮、价格锚点。优点是乐龄用户对美团式界面有肌肉记忆、转化路径短；缺点是「外卖感」强，健康信任感弱。</div>
+      </div>
+    </div>
+
+    <!-- 方向B -->
+    <div class="phone">
+      <div class="frame">
+        <svg viewBox="0 0 214 440" width="214" height="440" xmlns="http://www.w3.org/2000/svg">
+          <rect width="214" height="440" fill="#f4f6f2"/>
+          <rect x="0" y="0" width="214" height="90" fill="#1f6e68"/>
+          <text x="16" y="26" font-size="13" fill="#fff" font-weight="700">雪姬健康</text>
+          <text x="16" y="44" font-size="9" fill="#c3ddd9">王阿姨，早上好 ☀️</text>
+          <!-- health score hero -->
+          <rect x="10" y="104" width="194" height="96" rx="12" fill="#ffffff"/>
+          <circle cx="58" cy="152" r="30" fill="none" stroke="#e6f1ef" stroke-width="7"/>
+          <circle cx="58" cy="152" r="30" fill="none" stroke="#2e9e93" stroke-width="7" stroke-dasharray="150 189" stroke-linecap="round" transform="rotate(-90 58 152)"/>
+          <text x="58" y="149" font-size="16" fill="#1f6e68" text-anchor="middle" font-weight="700">82</text>
+          <text x="58" y="163" font-size="8" fill="#999" text-anchor="middle">健康分</text>
+          <text x="104" y="130" font-size="10" fill="#222" font-weight="600">六维测评 · 上次 9 月 30 日</text>
+          <text x="104" y="148" font-size="9" fill="#767676">柔韧、平衡两项进步啦</text>
+          <rect x="104" y="160" width="92" height="24" rx="12" fill="#1f6e68"/>
+          <text x="150" y="176" font-size="10" fill="#fff" text-anchor="middle" font-weight="600">再测一次</text>
+          <!-- today plan -->
+          <rect x="10" y="212" width="194" height="70" rx="12" fill="#ffffff"/>
+          <text x="22" y="234" font-size="10" fill="#222" font-weight="700">今日养护安排</text>
+          <rect x="22" y="242" width="10" height="10" rx="5" fill="#d2b47a"/>
+          <text x="38" y="251" font-size="9" fill="#555">14:00 经络疏通 · 五月花店</text>
+          <rect x="22" y="260" width="10" height="10" rx="5" fill="#2e9e93"/>
+          <text x="38" y="269" font-size="9" fill="#555">晚饭后散步 20 分钟（魔镜提醒）</text>
+          <!-- store card -->
+          <rect x="10" y="294" width="194" height="66" rx="12" fill="#ffffff"/>
+          <rect x="20" y="304" width="46" height="46" rx="8" fill="#e8e2d4"/>
+          <text x="76" y="318" font-size="10" fill="#222" font-weight="600">AI智能健康美容体验馆</text>
+          <text x="76" y="333" font-size="9" fill="#767676">五月花店 · 1.2km · ⭐4.8</text>
+          <text x="76" y="350" font-size="9" fill="#1f6e68">会员可预约免费接送 →</text>
+          <!-- tabbar -->
+          <rect x="0" y="396" width="214" height="44" fill="#ffffff"/>
+          <rect x="0" y="396" width="214" height="1" fill="#eee"/>
+          <g font-size="9" fill="#999" text-anchor="middle">
+            <text x="27" y="418" font-size="13">🏠</text><text x="27" y="432" fill="#1f6e68" font-weight="600">首页</text>
+            <text x="80" y="418" font-size="13">📁</text><text x="80" y="432">档案</text>
+            <text x="134" y="418" font-size="13">🪞</text><text x="134" y="432">魔镜</text>
+            <text x="187" y="418" font-size="13">👤</text><text x="187" y="432">我的</text>
+          </g>
+        </svg>
+      </div>
+      <div class="caption">
+        <div class="t">方向 B · 养生绿 <span class="pill b">推荐 · 最贴定位</span></div>
+        <div class="d">美业 SaaS「养生 SPA 档」：墨绿 #1F6E68 主色（雪姬已有 --care 令牌）+ 原木暖白。首页从「卖项目」改为「今日健康」：健康分 + 今日安排 + 门店服务，健康信任感与乐龄友好度最高。</div>
+      </div>
+    </div>
+
+    <!-- 方向C -->
+    <div class="phone">
+      <div class="frame">
+        <svg viewBox="0 0 214 440" width="214" height="440" xmlns="http://www.w3.org/2000/svg">
+          <rect width="214" height="440" fill="#131013"/>
+          <rect x="0" y="0" width="214" height="110" fill="#1e191d"/>
+          <text x="16" y="30" font-size="13" fill="#f5e9d0" font-weight="700">雪姬 · 臻选会员</text>
+          <text x="16" y="48" font-size="9" fill="#9c8f80">王阿姨 · A 级会员 · 尊享通道</text>
+          <!-- gold member card -->
+          <rect x="10" y="62" width="194" height="66" rx="12" fill="#26201c" stroke="#d2b47a" stroke-width="1"/>
+          <text x="24" y="90" font-size="12" fill="#d2b47a" font-weight="700">A 级臻选卡</text>
+          <text x="24" y="110" font-size="9" fill="#b3a493">免费体检 · 专属顾问 · 海外 VIP 通道</text>
+          <text x="170" y="110" font-size="9" fill="#d2b47a">权益 →</text>
+          <!-- dark cards -->
+          <rect x="10" y="140" width="194" height="72" rx="12" fill="#1e191d"/>
+          <text x="24" y="166" font-size="10" fill="#f0e8dc" font-weight="600">🪞 魔镜小镜</text>
+          <text x="24" y="184" font-size="9" fill="#9c8f80">「今天气色不错，记得多喝水」</text>
+          <text x="24" y="200" font-size="9" fill="#d2b47a">和她聊聊 ›</text>
+          <rect x="10" y="222" width="194" height="72" rx="12" fill="#1e191d"/>
+          <text x="24" y="248" font-size="10" fill="#f0e8dc" font-weight="600">🌿 定制养护方案</text>
+          <text x="24" y="266" font-size="9" fill="#9c8f80">根据 10 月测评更新 · 柔韧提升 5 分</text>
+          <text x="24" y="282" font-size="9" fill="#d2b47a">查看我的方案 ›</text>
+          <rect x="10" y="304" width="194" height="72" rx="12" fill="#1e191d"/>
+          <text x="24" y="330" font-size="10" fill="#f0e8dc" font-weight="600">✨ 门店臻选项目</text>
+          <text x="24" y="348" font-size="9" fill="#9c8f80">艾灸温养 60min · 顾问 1 对 1</text>
+          <text x="24" y="364" font-size="10" fill="#d2b47a" font-weight="700">会员价 ¥268</text>
+          <!-- tabbar -->
+          <rect x="0" y="396" width="214" height="44" fill="#1a161a"/>
+          <g font-size="9" fill="#7a6f66" text-anchor="middle">
+            <text x="27" y="418" font-size="13">🏠</text><text x="27" y="432" fill="#d2b47a" font-weight="600">首页</text>
+            <text x="80" y="418" font-size="13">📁</text><text x="80" y="432">档案</text>
+            <text x="134" y="418" font-size="13">🪞</text><text x="134" y="432">魔镜</text>
+            <text x="187" y="418" font-size="13">👤</text><text x="187" y="432">我的</text>
+          </g>
+        </svg>
+      </div>
+ <div class="caption">
+        <div class="t">方向 C · 夜色金 <span class="pill c">差异化 · 已有雏形</span></div>
+        <div class="d">雪姬代码里已有 night（A 级会员夜版）逻辑。可发展为「高端会员专属皮肤」：深底 + 金 #D2B47A 尊贵感，把会员权益、魔镜陪伴、定制方案做成奢侈品化叙事。作为 A/B 混合方向而非全局替换。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px; background:var(--brand-soft); border-color:#e6d5ae;">
+    <b>推荐策略：</b>方向 B 为全局主风格（健康信任 + 乐龄友好），方向 A 的「美团式门店卡片」保留在门店项目 / 体检券等强转化页，方向 C 作为 A 级会员的专属夜版皮肤。三者共用同一套布局骨架与组件，只切换设计令牌——现有 CSS 变量架构（page 令牌 + .xj + .elder）完全支撑这种做法。
+  </div>
+</div>
+
+<!-- ============ 3 页面级借鉴清单 ============ -->
+<h2><span class="num">3</span>页面级参考模版清单</h2>
+<p class="sub">把调研结论落到雪姬的每一类页面上：参考谁、怎么改。</p>
+
+<div class="card" style="padding:12px;">
+<table>
+  <tr><th style="width:130px">雪姬页面</th><th>参考对象</th><th>具体做法</th></tr>
+  <tr>
+    <td class="pg">首页</td>
+    <td><span class="ref">方向 B 养生 SPA 档</span></td>
+    <td class="do">顶部问候 + 健康分大卡（环形进度）；金刚区只留 4 个大图标入口（测评 / 体检 / 养护 / 家人），图标必须配文字；今日安排卡承接「养护方案」落地感；门店卡片沿用美团式价格锚点做转化。Banner 减弱为一条活动横幅，不再占首屏。</td>
+  </tr>
+  <tr>
+    <td class="pg">六维测评（intro / question）</td>
+    <td><span class="ref">微信长辈就医 · 适老流程</span></td>
+    <td class="do">答题页一屏一题、大选项卡（热区 ≥ 60pt）、进度条粗体可视；避免分支和弹窗；「坐站小测」「单腿站立」用图示分步引导（≥3 步图），完成后语音/震动反馈。文案口语化：「测平衡」而非「静态平衡功能评估」。</td>
+  </tr>
+  <tr>
+    <td class="pg">测评结果 / 指标趋势</td>
+    <td><span class="ref">新氧魔镜报告 + 体检可视化研究</span></td>
+    <td class="do">雷达图总览 + 六张维度评分卡；绿 / 橙 / 红状态色与雪姬 --care / --hint / --alert 令牌对齐；每个维度三行结构：「得了几分 → 一句人话解读 → 建议做什么」；趋势页用粗折线 + 异常点标注；底部固定「生成我的养护方案」CTA，报告即转化。</td>
+  </tr>
+  <tr>
+    <td class="pg">魔镜（AI 陪伴）</td>
+    <td><span class="ref">新氧魔镜入口设计</span></td>
+    <td class="do">新氧把魔镜放在首页左上角一级入口，认知成本低。雪姬魔镜已占一个 tab，可在对话界面加「头像拟人 + 大字号气泡 + 常用问题按钮组」（免打字输入，适老化关键）；记忆卡片（小镜记得的事）用轻收藏卡样式。</td>
+  </tr>
+  <tr>
+    <td class="pg">门店项目 / 预约</td>
+    <td><span class="ref">美团丽人 + 河狸家信任区</span></td>
+    <td class="do">项目卡片 = 实拍图 + 名称 + 时长 + 星标评分 + 橙红价格（--price 令牌语义正确）；门店页头部加「信任徽章带」：卫生许可、技师资质、免费接送、到店保障（学河狸家把审核与保障前置）；时段选择用大格日历 + 余位提示「还剩 2 个时段」制造稀缺。</td>
+  </tr>
+  <tr>
+    <td class="pg">体检预约 / 体检券</td>
+    <td><span class="ref">SaaS 模版券包页 + 美团券样式</span></td>
+    <td class="do">券用左右撕票结构（左侧金额大字、右侧使用条件），临期券红标提醒（美业 SaaS 标配）；接送预约独立成一步而非表单里的一个字段；合作医院信息 = logo + 等级 + 距离 + 一句话，弱化销售感、强化转介的权威感。</td>
+  </tr>
+  <tr>
+    <td class="pg">健康档案 / 时间轴</td>
+    <td><span class="ref">健康管理类报告页</span></td>
+    <td class="do">时间轴节点 = 日期 + 类型徽章（测评 / 体检 / 门店养护）+ 关键指标摘要，学体检报告「记录归集与可视化」；家人档案入口在此页顶部露出（pkg-family 的家属代办是差异化优势，参考长辈就医「亲属代收代办」规范）。</td>
+  </tr>
+  <tr>
+    <td class="pg">会员等级与权益</td>
+    <td><span class="ref">卓旭会员中心 + 方向 C 夜色金</span></td>
+    <td class="do">顶部等级徽章大卡（银 / 金 / 钻分级 + 成长值进度条）+ 权益清单逐条可读（不用图标墙）+ 积分 / 储值余额；A 级会员进入夜色金专属皮肤，形成「升级看得见」的视觉奖励。</td>
+  </tr>
+  <tr>
+    <td class="pg">我的 / 设置</td>
+    <td><span class="ref">河狸家我的页</span></td>
+    <td class="do">头像 + 等级徽章 + 顾问入口（1 对 1 顾问是美业标配信任触点）；列表项图标 + 文字 + 右箭头，行高 ≥ 56px；「长辈模式」开关做成显眼的一等入口而非藏在三级设置里（适老规范：适老版入口必须固定且显著）。</td>
+  </tr>
+</table>
+</div>
+
+<!-- ============ 4 适老化自查 ============ -->
+<h2><span class="num">4</span>乐龄模式自查清单（工信部规范对照）</h2>
+<p class="sub">雪姬目标用户以乐龄女性为主，这份硬规范应作为 UI 验收标准。</p>
+
+<div class="card">
+  <ul class="check">
+    <li><b>字号：</b>乐龄模式正文 ≥ 18pt（现 elder 模式 body 17px 偏小，建议提到 19–20px）<span class="spec">—— 工信部《APP 适老化通用设计规范》</span></li>
+    <li><b>对比度：</b>文本对比度 ≥ 4.5:1；状态不能只靠颜色区分，必须配文字标签（现有 --ink3 #767676 在 #f5f5f5 上约 4.4:1，临界，建议加深）</li>
+    <li><b>触控：</b>适老版主要组件热区 ≥ 60×60pt；按钮间距拉开防误触；现有 --btn-h 48px 在 elder 模式建议提到 ≥ 52px 并配合 padding 扩热区</li>
+    <li><b>行距：</b>段内行距 ≥ 1.3 倍、段间距 ≥ 行距 1.3 倍（现 1.6 行距达标）</li>
+    <li><b>图标：</b>金刚区 / tab 图标必须带文字标签，图标用具体形象不用抽象符号</li>
+    <li><b>流程：</b>预约、测评等主流程无弹窗干扰、无分支；每步可返回；关键节点支持语音播报</li>
+    <li><b>文案：</b>「查报告」优于「报告查询」，动词 + 大白话；避免「骨密度 T 值」这类裸术语，跟一句解释</li>
+    <li><b>家属代办：</b>pkg-family 邀请入口在适老版首页显著露出，子女可代约、代查、代收消息</li>
+    <li><b>禁区：</b>适老界面禁止广告插件与诱导按钮（合规红线）</li>
+  </ul>
+</div>
+
+<p class="footer-note">调研来源：美团丽人 / 河狸家产品分析（UICN、简书）· 新氧魔镜产品资料 · 卓旭、德材翌、码云数智等美业 SaaS 模版方案 · 工信部《移动互联网应用（APP）适老化通用设计规范》· 广州市医疗机构微信适老化建设指引 · 移动端体检数据可视化设计研究 · 为雪姬美业整理，2026 年 10 月</p>
+
+</div>
+</body>
+</html>

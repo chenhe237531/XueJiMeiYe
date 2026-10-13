@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>默认风格模版 · 面向 30–40 岁女性 · 雪姬美业</title>
+<style>
+  :root {
+    --ink: #2b2622; --ink2: #5c544d; --ink3: #8d8479;
+    --bg: #f7f4ee; --card: #fff; --line: #e9e2d7;
+    --champagne: #c9a063; --champagne-deep: #a8824d;
+    --sage: #7a8b6f; --blush: #c4707f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Noto Sans SC", "Songti SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.75; font-size: 15px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, #2b2622 0%, #4a3f33 55%, #8a6f4d 100%);
+    color: #f5efe4; border-radius: 20px; padding: 44px 40px; margin-bottom: 36px;
+  }
+  header.hero h1 { font-size: 27px; font-weight: 700; letter-spacing: 1px; }
+  header.hero h1 em { font-style: normal; color: #d9bc8c; }
+  header.hero p { margin-top: 12px; opacity: .85; font-size: 15px; max-width: 680px; }
+  header.hero .tags { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+  header.hero .tag {
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
+    padding: 4px 14px; border-radius: 999px; font-size: 13px;
+  }
+  h2 { font-size: 21px; margin: 48px 0 6px; display: flex; align-items: center; gap: 10px; }
+  h2 .num {
+    background: var(--champagne); color: #fff; width: 28px; height: 28px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 15px; flex: none;
+  }
+  .sub { color: var(--ink3); font-size: 14px; margin-bottom: 20px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 24px; margin-bottom: 16px;
+  }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 720px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+
+  .persona { border-radius: 16px; border: 1px solid var(--line); background: #fff; padding: 22px; }
+  .persona h3 { font-size: 16px; margin-bottom: 8px; color: var(--ink); }
+  .persona p { font-size: 14px; color: var(--ink2); }
+  .persona .k { color: var(--champagne-deep); font-weight: 600; }
+
+  .phones { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+  .phone { width: 232px; }
+  .phone .frame {
+    border: 8px solid #1d1a17; border-radius: 30px; overflow: hidden;
+    box-shadow: 0 14px 34px rgba(0,0,0,.14);
+  }
+  .phone .caption { text-align: center; margin-top: 14px; }
+  .phone .caption .t { font-weight: 700; font-size: 15px; }
+  .phone .caption .d { font-size: 13px; color: var(--ink3); margin-top: 2px; line-height: 1.6; }
+  .pill { display:inline-block; font-size:12px; padding:2px 10px; border-radius:999px; margin-left:4px; vertical-align:2px; }
+  .pill.a { background:#f3e8d5; color:#8a6a2a; }
+  .pill.b { background:#f9e7ea; color:#a34d5e; }
+  .pill.c { background:#e9eee4; color:#55663f; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { padding: 9px 13px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { background: #faf8f3; font-weight: 600; white-space: nowrap; }
+  code { font-family: "SF Mono", Menlo, monospace; font-size: 12.5px; background:#f3efe6; padding:1px 7px; border-radius:5px; color:#6b4e2e; }
+  .tok { display: flex; align-items: center; gap: 8px; }
+  .dot { width: 20px; height: 20px; border-radius: 6px; border: 1px solid rgba(0,0,0,.1); flex: none; }
+  .arrow { color: var(--ink3); padding: 0 2px; }
+
+  .rec { margin-top: 20px; background: #f3ead8; border: 1px solid #dcc79c; border-radius: 16px; padding: 20px 24px; }
+  .rec b { color: #7a5a1e; }
+  .rec p { font-size: 14px; color: #5c4a26; margin-top: 6px; }
+  .footer-note { text-align: center; color: var(--ink3); font-size: 13px; margin-top: 60px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>默认风格模版 · <em>面向 30–40 岁女性</em></h1>
+  <p>目标用户从「乐龄女性」切换为 30–40 岁轻熟龄女性后，整套默认视觉语言需要重新定位：从「大字大按钮的信任感」转向「轻奢精致的专业感」。本报告给出三套候选默认风格（含首页示意稿）、推荐方案、以及映射到现有 CSS 设计令牌的落地参数。</p>
+  <div class="tags">
+    <span class="tag">调研时间 2026-10</span>
+    <span class="tag">人群：抗衰初老 · 轻医美消费主力</span>
+    <span class="tag">含设计令牌映射表</span>
+  </div>
+</header>
+
+<!-- ============ 1 人群画像 ============ -->
+<h2><span class="num">1</span>30–40 岁女性：审美与消费画像</h2>
+<p class="sub">这一人群是医美与高端护肤的核心消费层（新氧主力用户 20–35 岁、抗衰项目模板主流采用 30+ 轻熟女模特），设计上与乐龄用户几乎是两套语言。</p>
+
+<div class="grid3">
+  <div class="persona">
+    <h3>🎨 审美偏好</h3>
+    <p><span class="k">「静奢」而非「甜妹」</span>：抗拒少女感粉嫩堆砌，偏爱低饱和、大留白、材质感——香槟金、裸杏、鼠尾草绿、奶油白这类 clean beauty 色系（观夏、谷雨等品牌审美）。</p>
+  </div>
+  <div class="persona">
+    <h3>💰 消费动机</h3>
+    <p><span class="k">抗衰 + 初老焦虑 + 悦己</span>：六维测评若包装成「冻龄资本评估」，比「健康测评」更能打动她们；在意专业背书（医院、仪器、资质），也在意体验的仪式感。</p>
+  </div>
+  <div class="persona">
+    <h3>📱 使用习惯</h3>
+    <p><span class="k">熟练用户</span>：无需适老化放大，但要求信息层级干净、操作路径短；重视界面「像不像大品牌」——85% 用户会因「设计过时」而放弃体验。</p>
+  </div>
+</div>
+
+<!-- ============ 2 三套候选 ============ -->
+<h2><span class="num">2</span>三套候选默认风格</h2>
+<p class="sub">医美行业成熟的视觉三体系（科技蓝专业版 / 柔金轻奢版 / 马卡龙少女版）+ 女性向应用设计研究，收敛为以下三个方向。</p>
+
+<div class="card">
+  <div class="phones">
+
+    <!-- ============ A 柔金轻奢 ============ -->
+    <div class="phone">
+      <div class="frame">
+        <svg viewBox="0 0 216 440" width="216" height="440" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#3a3128"/><stop offset="1" stop-color="#5c4c38"/>
+            </linearGradient>
+          </defs>
+          <rect width="216" height="440" fill="#faf7f2"/>
+          <!-- header -->
+          <rect x="0" y="0" width="216" height="96" fill="url(#goldGrad)"/>
+          <text x="14" y="28" font-size="14" fill="#e8d5b0" font-weight="700" font-family="Songti SC, serif">雪姬美业</text>
+          <text x="14" y="47" font-size="9" fill="#b3a184">王女士，你的冻龄资本 82 分</text>
+          <!-- score hero -->
+          <rect x="10" y="74" width="196" height="86" rx="16" fill="#ffffff" stroke="#eadfce" stroke-width="1"/>
+          <circle cx="56" cy="117" r="27" fill="none" stroke="#f1e8d8" stroke-width="6"/>
+          <circle cx="56" cy="117" r="27" fill="none" stroke="#c9a063" stroke-width="6" stroke-dasharray="139 170" stroke-linecap="round" transform="rotate(-90 56 117)"/>
+          <text x="56" y="115" font-size="15" fill="#a8824d" text-anchor="middle" font-weight="700">82</text>
+          <text x="56" y="128" font-size="7.5" fill="#a99e8f" text-anchor="middle">冻龄资本</text>
+          <text x="98" y="102" font-size="10.5" fill="#2b2622" font-weight="600">六维测评 · 10 月更新</text>
+          <text x="98" y="118" font-size="8.5" fill="#8d8479">紧致与柔韧下降 2 分，建议关注</text>
+          <rect x="98" y="128" width="98" height="22" rx="11" fill="#c9a063"/>
+          <text x="147" y="142.5" font-size="9.5" fill="#fff" text-anchor="middle" font-weight="600">生成抗衰方案</text>
+          <!-- kingkong -->
+          <rect x="10" y="170" width="196" height="74" rx="16" fill="#ffffff" stroke="#eadfce" stroke-width="1"/>
+          <g text-anchor="middle">
+            <rect x="22" y="182" width="40" height="40" rx="12" fill="#f7ede0"/><text x="42" y="207" font-size="15">🧬</text>
+            <rect x="72" y="182" width="40" height="40" rx="12" fill="#e9eee2"/><text x="92" y="207" font-size="15">🌿</text>
+            <rect x="122" y="182" width="40" height="40" rx="12" fill="#f5e9e7"/><text x="142" y="207" font-size="15">💆</text>
+            <rect x="172" y="182" width="24" height="40" rx="12" fill="#efeae1"/>
+            <text x="42" y="234" font-size="8.5" fill="#5c544d">六维测评</text>
+            <text x="92" y="234" font-size="8.5" fill="#5c544d">皮肤管理</text>
+            <text x="142" y="234" font-size="8.5" fill="#5c544d">门店养护</text>
+          </g>
+          <!-- store card -->
+          <rect x="10" y="254" width="196" height="66" rx="16" fill="#ffffff" stroke="#eadfce" stroke-width="1"/>
+          <rect x="20" y="264" width="46" height="46" rx="10" fill="#e8ddc9"/>
+          <text x="76" y="279" font-size="10.5" fill="#2b2622" font-weight="600">胶原紧致管理 75min</text>
+          <text x="76" y="294" font-size="8.5" fill="#8d8479">五月花旗舰店 · 顾问一对一</text>
+          <text x="76" y="310" font-size="11" fill="#a8824d" font-weight="700">¥580</text>
+          <rect x="158" y="296" width="40" height="20" rx="10" fill="#2b2622"/>
+          <text x="178" y="309.5" font-size="9" fill="#e8d5b0" text-anchor="middle" font-weight="600">预约</text>
+          <!-- mirror -->
+          <rect x="10" y="330" width="196" height="56" rx="16" fill="#2b2622"/>
+          <text x="22" y="352" font-size="10" fill="#e8d5b0" font-weight="600">🪞 小镜</text>
+          <text x="22" y="368" font-size="8.5" fill="#a99e8f">「昨晚睡眠不错，今天皮肤状态 89 分」</text>
+          <text x="186" y="368" font-size="9" fill="#c9a063">›</text>
+          <!-- tabbar -->
+          <rect x="0" y="396" width="216" height="44" fill="#ffffff"/>
+          <rect x="0" y="396" width="216" height="1" fill="#eee8dd"/>
+          <g font-size="9" fill="#a99e8f" text-anchor="middle">
+            <text x="27" y="418" font-size="13">✦</text><text x="27" y="432" fill="#a8824d" font-weight="600">首页</text>
+            <text x="81" y="418" font-size="13">📁</text><text x="81" y="432">档案</text>
+            <text x="135" y="418" font-size="13">🪞</text><text x="135" y="432">魔镜</text>
+            <text x="189" y="418" font-size="13">👤</text><text x="189" y="432">我的</text>
+          </g>
+        </svg>
+      </div>
+      <div class="caption">
+        <div class="t">A · 柔金轻奢 <span class="pill a">推荐默认</span></div>
+        <div class="d">暖米白底 + 香槟金 #C9A063 主色 + 深棕墨文字 + 衬线标题。医美行业「柔金轻奢版」成熟体系，专配高客单抗衰项目——正好匹配六维测评「冻龄资本」的高端叙事，也最大化复用现有 --gold 令牌与夜版。</div>
+      </div>
+    </div>
+
+    <!-- ============ B 雾粉轻医美 ============ -->
+    <div class="phone">
+      <div class="frame">
+        <svg viewBox="0 0 216 440" width="216" height="440" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="blushGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#e8a7ae"/><stop offset="1" stop-color="#c4707f"/>
+            </linearGradient>
+          </defs>
+          <rect width="216" height="440" fill="#fdf8f7"/>
+          <rect x="0" y="0" width="216" height="96" fill="url(#blushGrad)"/>
+          <text x="14" y="28" font-size="14" fill="#fff" font-weight="700">雪姬美业</text>
+          <text x="14" y="47" font-size="9" fill="#fbe3e6">六维测评 · 看看你的身体几岁了</text>
+          <rect x="10" y="74" width="196" height="86" rx="16" fill="#ffffff"/>
+          <circle cx="56" cy="117" r="27" fill="none" stroke="#f7e3e6" stroke-width="6"/>
+          <circle cx="56" cy="117" r="27" fill="none" stroke="#d98e96" stroke-width="6" stroke-dasharray="139 170" stroke-linecap="round" transform="rotate(-90 56 117)"/>
+          <text x="56" y="115" font-size="15" fill="#b95c6a" text-anchor="middle" font-weight="700">28</text>
+          <text x="56" y="128" font-size="7.5" fill="#c9a3a8" text-anchor="middle">肌体年龄</text>
+          <text x="98" y="102" font-size="10.5" fill="#2b2622" font-weight="600">比实际年龄年轻 6 岁 ✨</text>
+          <text x="98" y="118" font-size="8.5" fill="#9c8f90">平衡与代谢还有提升空间</text>
+          <rect x="98" y="128" width="98" height="22" rx="11" fill="#d98e96"/>
+          <text x="147" y="142.5" font-size="9.5" fill="#fff" text-anchor="middle" font-weight="600">查看抗衰方案</text>
+          <rect x="10" y="170" width="196" height="74" rx="16" fill="#ffffff"/>
+          <g text-anchor="middle">
+            <rect x="22" y="182" width="40" height="40" rx="12" fill="#fbeef0"/><text x="42" y="207" font-size="15">🧬</text>
+            <rect x="72" y="182" width="40" height="40" rx="12" fill="#fdf0ee"/><text x="92" y="207" font-size="15">💧</text>
+            <rect x="122" y="182" width="40" height="40" rx="12" fill="#f9eef0"/><text x="142" y="207" font-size="15">💆</text>
+            <text x="42" y="234" font-size="8.5" fill="#5c544d">六维测评</text>
+            <text x="92" y="234" font-size="8.5" fill="#5c544d">皮肤管理</text>
+            <text x="142" y="234" font-size="8.5" fill="#5c544d">门店养护</text>
+          </g>
+          <rect x="10" y="254" width="196" height="66" rx="16" fill="#ffffff"/>
+          <rect x="20" y="264" width="46" height="46" rx="10" fill="#f5dade"/>
+          <text x="76" y="279" font-size="10.5" fill="#2b2622" font-weight="600">水光焕肤体验 · 新客价</text>
+          <text x="76" y="294" font-size="8.5" fill="#9c8f90">已种草 2.4w 人 · 真实日记 380 篇</text>
+          <text x="76" y="310" font-size="11" fill="#b95c6a" font-weight="700">¥299</text>
+          <rect x="158" y="296" width="40" height="20" rx="10" fill="#c4707f"/>
+          <text x="178" y="309.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="600">抢购</text>
+          <rect x="10" y="330" width="196" height="56" rx="16" fill="#ffffff"/>
+          <text x="22" y="352" font-size="10" fill="#b95c6a" font-weight="600">🪞 小镜</text>
+          <text x="22" y="368" font-size="8.5" fill="#9c8f90">「今天适合做一次补水护理哦」</text>
+          <rect x="0" y="396" width="216" height="44" fill="#ffffff"/>
+          <rect x="0" y="396" width="216" height="1" fill="#f4e6e8"/>
+          <g font-size="9" fill="#c0a8ab" text-anchor="middle">
+            <text x="27" y="418" font-size="13">✦</text><text x="27" y="432" fill="#b95c6a" font-weight="600">首页</text>
+            <text x="81" y="418" font-size="13">📁</text><text x="81" y="432">档案</text>
+            <text x="135" y="418" font-size="13">🪞</text><text x="135" y="432">魔镜</text>
+            <text x="189" y="418" font-size="13">👤</text><text x="189" y="432">我的</text>
+          </g>
+        </svg>
+      </div>
+      <div class="caption">
+        <div class="t">B · 雾粉轻医美 <span class="pill b">转化最强</span></div>
+        <div class="d">新氧系粉白语言：干枯玫瑰 #C4707F + 「肌体年龄」游戏化钩子 + 种草数字 + 真实日记。转化与传播力最强，但用户 35+ 后对「少女粉」的认同下降，且与雪姬的医疗转介气质有冲突。</div>
+      </div>
+    </div>
+
+    <!-- ============ C 鼠尾草疗愈 ============ -->
+    <div class="phone">
+      <div class="frame">
+        <svg viewBox="0 0 216 440" width="216" height="440" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="sageGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#dfe5d5"/><stop offset="1" stop-color="#9fae90"/>
+            </linearGradient>
+          </defs>
+          <rect width="216" height="440" fill="#f7f5f0"/>
+          <rect x="0" y="0" width="216" height="96" fill="url(#sageGrad)"/>
+          <text x="14" y="28" font-size="14" fill="#3d4433" font-weight="700">雪姬美业</text>
+          <text x="14" y="47" font-size="9" fill="#5f6b52">由内而外，慢慢变好</text>
+          <rect x="10" y="74" width="196" height="86" rx="16" fill="#ffffff"/>
+          <circle cx="56" cy="117" r="27" fill="none" stroke="#e8ecdf" stroke-width="6"/>
+          <circle cx="56" cy="117" r="27" fill="none" stroke="#8a9b7c" stroke-width="6" stroke-dasharray="139 170" stroke-linecap="round" transform="rotate(-90 56 117)"/>
+          <text x="56" y="115" font-size="15" fill="#6b7a5a" text-anchor="middle" font-weight="700">82</text>
+          <text x="56" y="128" font-size="7.5" fill="#a3ab97" text-anchor="middle">健康分</text>
+          <text x="98" y="102" font-size="10.5" fill="#2b2622" font-weight="600">六维测评 · 身体状态平稳</text>
+          <text x="98" y="118" font-size="8.5" fill="#8d8779">睡眠与压力两项值得关注</text>
+          <rect x="98" y="128" width="98" height="22" rx="11" fill="#8a9b7c"/>
+          <text x="147" y="142.5" font-size="9.5" fill="#fff" text-anchor="middle" font-weight="600">制定调理方案</text>
+          <rect x="10" y="170" width="196" height="74" rx="16" fill="#ffffff"/>
+          <g text-anchor="middle">
+            <rect x="22" y="182" width="40" height="40" rx="12" fill="#eef1e6"/><text x="42" y="207" font-size="15">🧬</text>
+            <rect x="72" y="182" width="40" height="40" rx="12" fill="#f5ece2"/><text x="92" y="207" font-size="15">♨️</text>
+            <rect x="122" y="182" width="40" height="40" rx="12" fill="#eef1e6"/><text x="142" y="207" font-size="15">💆</text>
+            <text x="42" y="234" font-size="8.5" fill="#5c544d">六维测评</text>
+            <text x="92" y="234" font-size="8.5" fill="#5c544d">身心调理</text>
+            <text x="142" y="234" font-size="8.5" fill="#5c544d">门店养护</text>
+          </g>
+          <rect x="10" y="254" width="196" height="66" rx="16" fill="#ffffff"/>
+          <rect x="20" y="264" width="46" height="46" rx="10" fill="#e4e8da"/>
+          <text x="76" y="279" font-size="10.5" fill="#2b2622" font-weight="600">草本温养 SPA 90min</text>
+          <text x="76" y="294" font-size="8.5" fill="#8d8779">五月花店 · 小班制预约</text>
+          <text x="76" y="310" font-size="11" fill="#6b7a5a" font-weight="700">¥398</text>
+          <rect x="158" y="296" width="40" height="20" rx="10" fill="#6b7a5a"/>
+          <text x="178" y="309.5" font-size="9" fill="#fff" text-anchor="middle" font-weight="600">预约</text>
+          <rect x="10" y="330" width="196" height="56" rx="16" fill="#ffffff"/>
+          <text x="22" y="352" font-size="10" fill="#6b7a5a" font-weight="600">🪞 小镜</text>
+          <text x="22" y="368" font-size="8.5" fill="#8d8779">「今天风很好，适合散步 30 分钟」</text>
+          <rect x="0" y="396" width="216" height="44" fill="#ffffff"/>
+          <rect x="0" y="396" width="216" height="1" fill="#e8e5dc"/>
+          <g font-size="9" fill="#a3ab97" text-anchor="middle">
+            <text x="27" y="418" font-size="13">✦</text><text x="27" y="432" fill="#6b7a5a" font-weight="600">首页</text>
+            <text x="81" y="418" font-size="13">📁</text><text x="81" y="432">档案</text>
+            <text x="135" y="418" font-size="13">🪞</text><text x="135" y="432">魔镜</text>
+            <text x="189" y="418" font-size="13">👤</text><text x="189" y="432">我的</text>
+          </g>
+        </svg>
+      </div>
+      <div class="caption">
+        <div class="t">C · 鼠尾草疗愈 <span class="pill c">气质最稳</span></div>
+        <div class="d">女性向 wellness 应用主流色系（sage + warm white + 裸杏）：把「抗衰焦虑」翻译成「身心疗愈」，30–40 岁接受度好、最耐看；但转化钩子弱，客单价天花板低，适合作为健康档案/测评等信任场景的辅助色而非全局主色。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rec">
+    <b>推荐：A 柔金轻奢为全局默认，C 鼠尾草绿降级为「健康语义色」，B 雾粉仅用于裂变营销分包。</b>
+    <p>理由：① 30–40 岁是抗衰高客单人群，「柔金轻奢版」是医美行业验证过的成熟体系；② 现有令牌体系迁移成本最低——<code>--gold #D2B47A</code> 已存在，夜版 <code>.night</code> 天然就是 A 风格的深色形态，A 级会员皮肤与默认风格归一；③ 健康相关页面继续用绿系表达专业与安全（<code>--care</code> 由医疗青调整为鼠尾草绿即可），语义不变、色相变柔；④ 拼团/砍价等营销分包（pkg-group）用雾粉制造「活动感」，与主品牌隔离。</p>
+  </div>
+</div>
+
+<!-- ============ 3 令牌映射 ============ -->
+<h2><span class="num">3</span>设计令牌映射表（可直接落地）</h2>
+<p class="sub">映射到 <code>apps/miniapp/src/style/index.scss</code> 的 page 级 CSS 变量。默认档 = 30–40 岁轻熟风；elder 乐龄模式作为无障碍层保留，仅放大字号与触控区，不改色板。</p>
+
+<div class="card" style="padding:12px;">
+<table>
+  <tr><th>令牌</th><th>现值（美团黄体系）</th><th>新值（柔金轻奢体系）</th><th>说明</th></tr>
+  <tr>
+    <td><code>--brand</code></td>
+    <td><div class="tok"><span class="dot" style="background:#ffd100"></span><code>#FFD100</code></div></td>
+    <td><div class="tok"><span class="dot" style="background:#c9a063"></span><code>#C9A063</code></div></td>
+    <td class="arrow">主操作、选中态；配白字（香槟金上白字对比度达标，深字不再适用）</td>
+  </tr>
+  <tr>
+    <td><code>--brand-dark</code></td>
+    <td><span class="dot" style="background:#f5be00;display:inline-block;vertical-align:-4px"></span> <code>#F5BE00</code></td>
+    <td><span class="dot" style="background:#a8824d;display:inline-block;vertical-align:-4px"></span> <code>#A8824D</code></td>
+    <td class="arrow">按压态；按钮主色统一用深金而非浅金，质感更稳</td>
+  </tr>
+  <tr>
+    <td><code>--brand-soft</code></td>
+    <td><span class="dot" style="background:#fff8dc;display:inline-block;vertical-align:-4px"></span> <code>#FFF8DC</code></td>
+    <td><span class="dot" style="background:#f7ede0;display:inline-block;vertical-align:-4px"></span> <code>#F7EDE0</code></td>
+    <td class="arrow">浅金背景：标签底、提示卡、选中背景</td>
+  </tr>
+  <tr>
+    <td><code>--brand-line</code></td>
+    <td><span class="dot" style="background:#ffe58a;display:inline-block;vertical-align:-4px"></span> <code>#FFE58A</code></td>
+    <td><span class="dot" style="background:#e3cdb0;display:inline-block;vertical-align:-4px"></span> <code>#E3CDB0</code></td>
+    <td class="arrow">细金描边：卡片强调线、分割装饰</td>
+  </tr>
+  <tr>
+    <td><code>--brand-ink</code> / <code>--on-brand</code></td>
+    <td><code>#8A5A00</code> / <code>#222</code></td>
+    <td><code>#6B4E2E</code> / <code>#FFFFFF</code></td>
+    <td class="arrow">金底文字改白；金色语境文字用深金棕</td>
+  </tr>
+  <tr>
+    <td><code>--care</code></td>
+    <td><span class="dot" style="background:#1f6e68;display:inline-block;vertical-align:-4px"></span> <code>#1F6E68</code> 医疗青</td>
+    <td><span class="dot" style="background:#6e7f5c;display:inline-block;vertical-align:-4px"></span> <code>#6E7F5C</code> 鼠尾草绿</td>
+    <td class="arrow">健康语义色：就医、安全、报告正常态；色相变柔但语义不变，红/橙警示令牌全部保留</td>
+  </tr>
+  <tr>
+    <td><code>--care-soft</code> / <code>--care-line</code></td>
+    <td><code>#E6F1EF</code> / <code>#C3DDD9</code></td>
+    <td><span class="dot" style="background:#e9eee2;display:inline-block;vertical-align:-4px"></span> <code>#E9EEE2</code> / <code>#C8D4BC</code></td>
+    <td class="arrow">报告卡、体检模块背景系</td>
+  </tr>
+  <tr>
+    <td><code>--bg</code> / <code>--surface</code></td>
+    <td><code>#F5F5F5</code> / <code>#FFF</code></td>
+    <td><span class="dot" style="background:#faf7f2;display:inline-block;vertical-align:-4px"></span> <code>#FAF7F2</code> / <code>#FFF</code></td>
+    <td class="arrow">冷灰底 → 暖米白底，是「轻奢感」的第一来源</td>
+  </tr>
+  <tr>
+    <td><code>--ink</code> / <code>--ink-2</code> / <code>--ink-3</code></td>
+    <td><code>#222</code> / <code>#555</code> / <code>#767676</code></td>
+    <td><code>#2B2622</code> / <code>#5C544D</code> / <code>#8D8479</code></td>
+    <td class="arrow">黑灰 → 深棕墨系；同步修掉 --ink3 对比度临界问题</td>
+  </tr>
+  <tr>
+    <td><code>--price</code></td>
+    <td><span class="dot" style="background:#f2481b;display:inline-block;vertical-align:-4px"></span> <code>#F2481B</code></td>
+    <td><span class="dot" style="background:#b95c6a;display:inline-block;vertical-align:-4px"></span> <code>#B95C6A</code></td>
+    <td class="arrow">美团的橙红促销色 → 干枯玫瑰红，降低促销感、保留价格锚点</td>
+  </tr>
+  <tr>
+    <td><code>--r-card</code> / <code>--r-inner</code></td>
+    <td><code>12px</code> / <code>8px</code></td>
+    <td><code>16px</code> / <code>10px</code></td>
+    <td class="arrow">女性向应用研究建议 16–20px 圆角 + 大留白，卡片 padding 建议由 12px 提到 16px</td>
+  </tr>
+  <tr>
+    <td>字体</td>
+    <td>全 sans-serif</td>
+    <td>标题衬线 + 正文 sans</td>
+    <td class="arrow">大标题用 Songti SC / Noto Serif SC（高端感），正文保持 PingFang SC；数字（分数/价格）可用衬线体强化质感</td>
+  </tr>
+  <tr>
+    <td><code>--gold</code> / <code>--night</code></td>
+    <td><code>#D2B47A</code> / <code>#131013</code></td>
+    <td>不变 / 微调 <code>#1C1712</code> 暖黑</td>
+    <td class="arrow">夜版与默认风格统一为「金×暖黑」，A 级会员皮肤无需单独设计</td>
+  </tr>
+</table>
+</div>
+
+<!-- ============ 4 页面应用要点 ============ -->
+<h2><span class="num">4</span>页面级应用要点</h2>
+<p class="sub">换了色板不等于换了气质，以下几处决定「像不像大品牌」。</p>
+
+<div class="grid2">
+  <div class="card">
+    <b>首页（A 风格示范稿）</b>
+    <ul style="margin:8px 0 0 18px; font-size:14px; color:var(--ink2);">
+      <li>深棕墨渐变头部 + 一句话问候（「你的冻龄资本 82 分」），把六维测评重新包装为资产化叙事</li>
+      <li>金刚区图标底改浅金/浅绿/浅粉圆角方块（16px 圆角），图标带文字</li>
+      <li>门店卡片沿用美团式结构但换质感：浅金描边、衬线价格、深棕主按钮</li>
+      <li>魔镜用深色卡片嵌入首页（夜版同款），制造「一页之内有明有暗」的层次</li>
+    </ul>
+  </div>
+  <div class="card">
+    <b>测评与报告</b>
+    <ul style="margin:8px 0 0 18px; font-size:14px; color:var(--ink2);">
+      <li>结果页主指标从「健康分」双包装：健康分 + 肌体年龄（B 方案钩子借用，可 A/B 测试）</li>
+      <li>雷达图线色用香槟金，正常态数据点用鼠尾草绿、异常用保留的警示红</li>
+      <li>每维度卡：衬线大数字 + 一句轻专业解读，底部「定制抗衰方案」金按钮</li>
+      <li>体检报告/医院报告保持绿系语义色，与门店金系形成「医疗/消费」双区隔</li>
+    </ul>
+  </div>
+  <div class="card">
+    <b>会员与夜版</b>
+    <ul style="margin:8px 0 0 18px; font-size:14px; color:var(--ink2);">
+      <li>会员卡用金描边深底（示意稿头部），等级名建议改「臻选/尊享/黑金」三级，贴合 30–40 人群语感</li>
+      <li>夜版从「A 级会员专属」松绑为全局深色模式（跟随系统），A 级会员额外加金色徽章即可</li>
+      <li>海外 VIP 通道页（pkg-module/vip）保持现有深色+白字，只需把强调色统一到 #C9A063</li>
+    </ul>
+  </div>
+  <div class="card">
+    <b>氛围细节（2025–26 趋势借用）</b>
+    <ul style="margin:8px 0 0 18px; font-size:14px; color:var(--ink2);">
+      <li>低饱和渐变：头部、健康分环、活动 Banner 用金/绿低饱和渐变，替代纯色块</li>
+      <li>轻磨砂玻璃：浮动胶囊按钮、弹层用半透明+模糊（backdrop-filter），H5 与小程序 skyline 均支持</li>
+      <li>大字排版：衬线大字号数字做视觉锚点（分数、价格、排名），正文克制</li>
+      <li>动效：金按钮按压反馈用缓动放大而非变色，整体「慢呼吸」而非「弹跳」</li>
+    </ul>
+  </div>
+</div>
+
+<p class="footer-note">参考来源：新氧用户运营分析（人人都是产品经理）· 医美机构视觉模板三体系（如丽）· Feminine App Design 研究（VP0，beauty &amp; skincare 色系与排版建议）· 2025/2026 移动端 UI 趋势报告 · 为雪姬美业整理，2026 年 10 月</p>
+
+</div>
+</body>
+</html>
