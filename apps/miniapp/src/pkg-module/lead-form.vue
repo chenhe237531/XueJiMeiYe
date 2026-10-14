@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
+import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
 import { afterSubmit, toast } from '@/xj/utils'
@@ -40,8 +41,16 @@ async function submit() {
 
 <template>
   <view :class="[...xj.pageClass, 'has-footer']">
-    <view v-if="m" class="stack" style="padding-top: 12px">
-      <text class="t-title">{{ m.name }}</text>
+    <view v-if="m" class="page-head">
+      <view class="ph-deco" :class="`i-tabler-${m.icon || 'calendar-plus'}`" />
+      <text class="ph-title">{{ m.name }}</text>
+      <text class="ph-sub">填写意向，顾问会尽快联系您确认</text>
+      <view class="ph-meta">
+        <view><XIcon name="headset" :size="14" />顾问一对一跟进</view>
+        <view><XIcon name="wallet" :size="14" />平台不在线收款</view>
+      </view>
+    </view>
+    <view v-if="m" class="stack">
       <view class="card stack">
         <view v-for="f in fields" :key="f.key" class="col gap8">
           <view class="row gap4"><text class="t-md">{{ f.label }}</text><text v-if="f.required && !(f.type === 'phone' && xj.me?.phone)" class="c-brand">*</text></view>
@@ -68,6 +77,6 @@ async function submit() {
 
 <style scoped>
 .step { width: 44px; height: 44px; border-radius: 22px; background: var(--brand-soft); color: var(--brand-ink); font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-.chip { height: 44px; padding: 0 18px; border-radius: 22px; background: var(--bg); display: flex; align-items: center; font-size: var(--fs-body); }
-.chip.on { background: var(--brand); color: var(--on-brand); font-weight: 600; }
+.chip { height: 44px; padding: 0 18px; border-radius: 22px; background: var(--surface); border: 1.5px solid var(--line-2); box-sizing: border-box; display: flex; align-items: center; font-size: var(--fs-body); }
+.chip.on { background: linear-gradient(160deg, var(--surface), var(--brand-soft)); border-color: var(--brand-dark); color: var(--brand-ink); font-weight: 700; }
 </style>

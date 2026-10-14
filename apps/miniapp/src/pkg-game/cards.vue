@@ -40,10 +40,19 @@ function flip(idx: number) {
 
 <template>
   <view :class="xj.pageClass">
-    <view class="stack" style="padding-top: 12px">
-      <text class="t-sm c2">轻松小游戏，翻开两张一样的牌就配对成功。不做认知评估，放松一下就好。</text>
-      <view class="row gap8">
+    <view class="page-head">
+      <view class="ph-deco i-tabler-cards" />
+      <text class="ph-title">记忆翻牌</text>
+      <text class="ph-sub">翻开两张一样的牌就配对成功。不做认知评估，放松一下就好</text>
+    </view>
+    <view class="stack">
+      <view class="segs">
         <view v-for="l in [[3, '简单'], [4, '普通'], [6, '有挑战']]" :key="l[0]" class="seg" :class="{ on: level === l[0] }" @click="start(l[0])">{{ l[1] }}</view>
+      </view>
+      <view class="card stat-row" style="padding: 10px 0">
+        <view class="stat"><text class="stat-n">{{ moves }}</text><text class="stat-l">已翻次数</text></view>
+        <view class="stat"><text class="stat-n c-care">{{ cards.filter((c) => c.matched).length / 2 }}</text><text class="stat-l">已配对</text></view>
+        <view class="stat"><text class="stat-n">{{ cards.length / 2 }}</text><text class="stat-l">共几对</text></view>
       </view>
       <view class="grid" :style="{ gridTemplateColumns: `repeat(${level === 3 ? 3 : 4}, minmax(0, 1fr))` }">
         <view v-for="(c, i) in cards" :key="c.id" class="cardx" :class="{ up: c.matched || open.includes(i), matched: c.matched }" @click="flip(i)">
@@ -51,17 +60,23 @@ function flip(idx: number) {
           <XIcon v-else name="sparkles" :size="22" color="var(--on-brand)" />
         </view>
       </view>
-      <view class="row-between t-body"><text>已翻 {{ moves }} 次</text><text class="link" @click="start()">重新开始</text></view>
-      <view v-if="done" class="card care t-lg" style="text-align: center">全部配对成功，真棒！</view>
+      <view v-if="done" class="card care row gap12 done">
+        <view class="icon-box care"><XIcon name="award" /></view>
+        <view class="col flex1"><text class="t-lg">全部配对成功，真棒！</text><text class="t-sm c2">用了 {{ moves }} 次翻牌</text></view>
+      </view>
+      <view class="btn plain" @click="start()"><XIcon name="refresh" />重新开始</view>
     </view>
   </view>
 </template>
 
 <style scoped>
-.seg { flex: 1; height: 44px; border-radius: 22px; background: #fff; display: flex; align-items: center; justify-content: center; }
-.seg.on { background: var(--brand); color: var(--on-brand); font-weight: 700; }
+.segs { display: flex; gap: 4px; padding: 4px; border-radius: 26px; background: var(--surface); box-shadow: var(--shadow-card); }
+.seg { flex: 1; height: 42px; border-radius: 21px; display: flex; align-items: center; justify-content: center; color: var(--ink-2); }
+.seg.on { background: linear-gradient(135deg, var(--brand-hi), var(--brand-dark)); color: var(--on-brand); font-weight: 700; box-shadow: 0 4px 10px -4px rgba(168, 130, 77, 0.6); }
 .grid { display: grid; gap: 10px; }
-.cardx { aspect-ratio: 1; min-height: 72px; border-radius: 16px; background: var(--brand); display: flex; align-items: center; justify-content: center; }
-.cardx.up { background: #fff; border: 2px solid var(--brand-line); }
+/* 牌背：渐变 + 内描边，像真牌；翻开后白底 */
+.cardx { aspect-ratio: 1; min-height: 72px; border-radius: 16px; background: linear-gradient(145deg, var(--brand-hi), var(--brand-dark)); box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.28), 0 6px 14px -8px rgba(60, 48, 34, 0.5); display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+.cardx:active { transform: scale(0.95); }
+.cardx.up { background: #fff; border: 2px solid var(--brand-line); box-shadow: var(--shadow-card); }
 .cardx.matched { background: var(--care-soft); border-color: var(--care-line); }
 </style>

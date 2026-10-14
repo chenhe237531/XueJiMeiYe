@@ -54,7 +54,16 @@ async function spin(usePoints: boolean) {
 
 <template>
   <view v-if="d" :class="xj.pageClass">
-    <view class="card stack" style="align-items: center; padding-bottom: 20px">
+    <view class="page-head">
+      <view class="ph-deco i-tabler-gift" />
+      <text class="ph-title">积分转盘</text>
+      <text class="ph-sub">每天免费转一次，转出积分和好礼</text>
+      <view class="ph-meta">
+        <view><XIcon name="coins" :size="14" />存折 {{ d.balance }} 积分</view>
+        <view><XIcon name="refresh" :size="14" />免费余 {{ d.freeLeft }} 次</view>
+      </view>
+    </view>
+    <view class="card raised stack" style="align-items: center; padding-bottom: 20px">
       <view class="wheel-wrap">
         <view class="pointer" />
         <view class="wheel" :style="{ background: conic, transform: `rotate(${angle}deg)` }">
@@ -76,6 +85,7 @@ async function spin(usePoints: boolean) {
       <text class="t-xs c3">当前健康存折 {{ d.balance }} 积分 · 积分抽奖每日 3 次</text>
 
       <view v-if="result" class="result col gap6">
+        <view class="icon-box result-ic" :class="result.prize.type === 'none' ? 'gray' : ''"><XIcon :name="result.prize.type === 'none' ? 'mood-smile' : 'gift'" :size="26" /></view>
         <text class="t-lg semi">{{ result.prize.type === 'none' ? '谢谢参与' : `恭喜抽中：${result.prize.label}` }}</text>
         <text class="t-sm c2">{{ result.prize.type === 'lead' ? '专属顾问会尽快联系您安排发放' : (result.prize.type === 'points' ? '积分已计入健康存折' : '明天再来转一转') }}</text>
       </view>
@@ -83,7 +93,7 @@ async function spin(usePoints: boolean) {
 
     <view class="card stack">
       <view class="row-between" @click="showOdds = !showOdds">
-        <text class="t-lg">奖品与概率公示</text>
+        <view class="section-title" style="margin-top: 0"><text>奖品与概率公示</text></view>
         <XIcon :name="showOdds ? 'chevron-right' : 'chevron-right'" :size="20" :style="{ transform: showOdds ? 'rotate(90deg)' : 'none', transition: 'transform .2s' }" />
       </view>
       <view v-if="showOdds" class="stack gap4">
@@ -105,9 +115,10 @@ async function spin(usePoints: boolean) {
 .wheel-label { font-size: 12px; font-weight: 700; color: var(--brand-ink); text-align: center; line-height: 1.25; max-width: 56px; }
 .wheel-label.muted { color: var(--ink-3); font-weight: 600; }
 .pointer { position: absolute; top: -6px; left: 50%; z-index: 3; width: 0; height: 0; margin-left: -12px; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 22px solid var(--price); filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.18)); }
-.hub { position: absolute; left: 50%; top: 50%; z-index: 2; width: 68px; height: 68px; margin: -34px 0 0 -34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--brand); color: var(--on-brand); font-size: 22px; font-weight: 800; border: 4px solid var(--surface); box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.35); transition: transform 0.15s; }
+.hub { position: absolute; left: 50%; top: 50%; z-index: 2; width: 68px; height: 68px; margin: -34px 0 0 -34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 35% 30%, var(--brand-hi), var(--brand-dark)); color: var(--on-brand); font-size: 22px; font-weight: 800; border: 4px solid var(--surface); box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.35); transition: transform 0.15s; }
 .hub:active { transform: scale(0.94); }
 .hub.busy { opacity: 0.85; }
-.result { margin-top: 14px; padding: 14px; border-radius: var(--r-inner); background: var(--brand-soft); width: 100%; box-sizing: border-box; text-align: center; }
+.result { margin-top: 14px; padding: 16px 14px; border-radius: var(--r-card); background: linear-gradient(160deg, var(--surface), var(--brand-soft)); border: 1px solid var(--brand-line); width: 100%; box-sizing: border-box; text-align: center; align-items: center; }
+.icon-box.result-ic { width: 48px; height: 48px; border-radius: 16px; }
 .btn.off { opacity: 0.55; }
 </style>

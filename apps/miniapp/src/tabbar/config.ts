@@ -41,10 +41,11 @@ export const nativeTabbarList: NativeTabBarItem[] = [
 // TODO: 3/3. 使用 CUSTOM_TABBAR 时，更新下面的 tabbar 配置
 // 如果需要配置鼓包，需要在 'tabbar/store.ts' 里面设置，最后在 `tabbar/index.vue` 里面更改鼓包的图片
 export const customTabbarList: CustomTabBarItem[] = [
-  { text: '首页', pagePath: 'pages/index/index', iconType: 'unocss', icon: 'i-tabler-home' },
-  { text: '档案', pagePath: 'pages/archive/index', iconType: 'unocss', icon: 'i-tabler-clipboard-heart' },
-  { text: '魔镜', pagePath: 'pages/mirror/index', iconType: 'unocss', icon: 'i-tabler-sparkles' },
-  { text: '我的', pagePath: 'pages/me/index', iconType: 'unocss', icon: 'i-tabler-user' },
+  // iconActive：选中态换实心图标（需同时加入 uno.config.ts safelist）
+  { text: '首页', pagePath: 'pages/index/index', iconType: 'unocss', icon: 'i-tabler-home', iconActive: 'i-tabler-home-filled' },
+  { text: '档案', pagePath: 'pages/archive/index', iconType: 'unocss', icon: 'i-tabler-clipboard-heart', iconActive: 'i-tabler-clipboard-heart' },
+  { text: '魔镜', pagePath: 'pages/mirror/index', iconType: 'unocss', icon: 'i-tabler-sparkles', iconActive: 'i-tabler-sparkles-filled' },
+  { text: '我的', pagePath: 'pages/me/index', iconType: 'unocss', icon: 'i-tabler-user', iconActive: 'i-tabler-user-filled' },
 ]
 
 /**

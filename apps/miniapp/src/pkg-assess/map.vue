@@ -48,14 +48,24 @@ async function demoFill() {
 <template>
   <view :class="[...xj.pageClass, 'has-footer']">
     <view v-if="a" class="stack" style="padding-top: 12px">
-      <view class="col gap8">
-        <view class="row-between">
-          <text class="t-xl">已完成 {{ a.doneCount }} / {{ a.totalLevels }} 关</text>
-          <text class="t-sm c2">{{ allDone ? '可以查看结果了' : `还需约 ${a.remainingMinutes} 分钟` }}</text>
+      <!-- 进度总览卡：完成关数 + 剩余时间 + 积分 -->
+      <view class="card raised prog">
+        <view class="row-between" style="align-items: flex-end">
+          <view class="col gap4">
+            <text class="t-sm c2">测评进度</text>
+            <view class="row gap4" style="align-items: baseline">
+              <text class="prog-n num">{{ a.doneCount }}</text>
+              <text class="t-md c2">/ {{ a.totalLevels }} 关</text>
+            </view>
+          </view>
+          <view class="col gap4" style="align-items: flex-end">
+            <text class="t-sm" :class="allDone ? 'c-care semi' : 'c2'">{{ allDone ? '可以查看结果了' : `还需约 ${a.remainingMinutes} 分钟` }}</text>
+            <text class="tag gold"><XIcon name="coins" :size="14" />已得 {{ a.earnedPoints }} 积分</text>
+          </view>
         </view>
-        <view class="progress"><view :style="{ width: `${(a.doneCount / a.totalLevels) * 100}%` }" /></view>
-        <text class="t-sm c2">每完成一关 +10 积分，已得 {{ a.earnedPoints }} 积分</text>
-        <view v-if="a.assistCode" class="tag care" style="align-self: flex-start">顾问陪填码 {{ a.assistCode }}</view>
+        <view class="progress" style="margin-top: 12px"><view :style="{ width: `${(a.doneCount / a.totalLevels) * 100}%` }" /></view>
+        <text class="t-xs c3" style="display: block; margin-top: 8px">每完成一关 +10 积分</text>
+        <view v-if="a.assistCode" class="tag care" style="margin-top: 8px">顾问陪填码 {{ a.assistCode }}</view>
       </view>
 
       <view class="card dots">
@@ -99,10 +109,14 @@ async function demoFill() {
 </template>
 
 <style scoped>
+.prog { padding: 16px; background: radial-gradient(circle at 100% 0%, var(--brand-soft) 0, rgba(255, 255, 255, 0) 60%), var(--surface); }
+.prog-n { font-size: 40px; font-weight: 700; line-height: 1; color: var(--brand-ink); }
 .dots { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); padding: 14px 8px; }
-.dot-item { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--ink-2); }
-.dot { width: 30px; height: 30px; border-radius: 15px; background: #efeaec; display: flex; align-items: center; justify-content: center; font-size: 13px; }
-.dot.done { background: var(--brand); }
-.dot.done.safety { background: var(--care); }
-.dot.cur { background: #fff; border: 2px solid var(--brand); color: var(--brand-ink); font-weight: 700; box-sizing: border-box; }
+.dot-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--ink-2); }
+/* 关卡之间的连接线 */
+.dot-item + .dot-item::before { content: ''; position: absolute; top: 14px; left: -50%; right: 50%; height: 2px; background: var(--line-2); }
+.dot { position: relative; z-index: 1; width: 30px; height: 30px; border-radius: 15px; background: var(--placeholder); display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.dot.done { background: linear-gradient(145deg, var(--brand-hi), var(--brand-dark)); box-shadow: 0 4px 10px -4px rgba(168, 130, 77, 0.6); }
+.dot.done.safety { background: linear-gradient(145deg, #b3c69b, #6e7f5c); box-shadow: 0 4px 10px -4px rgba(102, 120, 78, 0.6); }
+.dot.cur { background: #fff; border: 2px solid var(--brand); color: var(--brand-ink); font-weight: 700; box-sizing: border-box; box-shadow: 0 0 0 4px var(--brand-soft); }
 </style>

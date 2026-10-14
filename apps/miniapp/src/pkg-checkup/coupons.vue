@@ -19,7 +19,6 @@ onShow(async () => {
   <view :class="xj.pageClass">
     <view class="stack" style="padding-top: 12px">
       <view v-if="!list.length" class="card empty stack">
-        <XIcon name="ticket" :size="48" color="var(--care)" />
         <text class="t-md">完成健康安全关和六关测评，就可以领取免费基础体检券</text>
         <view class="btn care" @click="go('/pkg-assess/intro')">去测评</view>
       </view>

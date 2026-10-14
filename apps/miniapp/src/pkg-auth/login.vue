@@ -61,14 +61,15 @@ async function demoReset() {
 </script>
 
 <template>
-  <view :class="xj.stdPageClass">
-    <!-- 品牌头区（issue #2）：衬线品牌名 + 柔金渐变标识 -->
+  <view :class="[...xj.stdPageClass, 'washed']">
+    <!-- 品牌头区（issue #2）：衬线品牌名 + 柔金渐变标识；顶部品牌晕染 + 装饰光点 -->
     <view class="brand-hero">
       <view class="brand-mark">雪</view>
       <view class="col gap4 flex1">
         <text class="brand-name">雪姬美业</text>
         <text class="t-sm c2">科技护美 · 一对一健康养护</text>
       </view>
+      <view class="hero-deco i-tabler-sparkles" />
     </view>
 
     <!-- 卖点卡（issue #2） -->
@@ -82,9 +83,14 @@ async function demoReset() {
       </view>
     </view>
 
-    <view class="card stack mt12">
-      <text class="t-lg">手机号快速验证</text>
-      <input v-model="phone" class="input" type="number" maxlength="11" placeholder="请输入手机号">
+    <view class="card raised stack mt12">
+      <view class="section-title" style="margin-top: 0"><text>手机号快速验证</text></view>
+      <view class="phone-field row gap8">
+        <XIcon name="phone" :size="20" color="var(--brand-ink)" />
+        <text class="t-md semi">+86</text>
+        <view class="phone-sep" />
+        <input v-model="phone" class="phone-input flex1" type="number" maxlength="11" placeholder="请输入手机号">
+      </view>
       <text class="t-xs c3">演示环境：输入任意手机号即可登录。老客户按手机号匹配，继承原有等级、门店和顾问。</text>
       <view class="row gap8" @click="agreed = !agreed">
         <view class="check" :class="{ on: agreed }"><XIcon v-if="agreed" name="check" :size="16" color="var(--on-brand)" /></view>
@@ -92,6 +98,7 @@ async function demoReset() {
       </view>
       <view v-if="showC1" class="card hint t-sm">提供平台基本服务；收集微信标识、手机号、称呼、出生年份、性别、使用记录；保存到账号注销为止。健康信息另行单独征得您的同意。</view>
       <view class="btn" @click="phoneLogin">登录</view>
+      <view class="row gap6 t-xs c3 trust"><XIcon name="shield-check" :size="14" color="var(--care)" /><text>健康信息单独授权 · 不向第三方出售</text></view>
     </view>
 
     <!-- 演示账号区（issue #2）：虚线金边与正式登录区分 -->
@@ -116,8 +123,9 @@ async function demoReset() {
 </template>
 
 <style scoped lang="scss">
-.brand-hero { display: flex; align-items: center; gap: 14px; padding: 22px 4px 16px; }
-.brand-mark { width: 54px; height: 54px; border-radius: 18px; background: linear-gradient(135deg, #e3cdb0 0%, #c9a063 55%, #a8824d 100%); color: var(--on-brand); font-family: var(--font-title); font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 22px -12px rgba(168, 130, 77, 0.55); flex-shrink: 0; }
+.brand-hero { position: relative; display: flex; align-items: center; gap: 14px; padding: 28px 4px 20px; }
+.hero-deco { position: absolute; right: 4px; top: 10px; font-size: 76px; color: var(--brand); opacity: 0.22; pointer-events: none; }
+.brand-mark { width: 58px; height: 58px; border-radius: 20px; border: 3px solid rgba(255, 255, 255, 0.85); background: linear-gradient(135deg, #e3cdb0 0%, #c9a063 55%, #a8824d 100%); color: var(--on-brand); font-family: var(--font-title); font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 22px -12px rgba(168, 130, 77, 0.55); flex-shrink: 0; }
 .brand-name { font-family: var(--font-title); font-size: 30px; font-weight: 700; color: var(--ink); letter-spacing: 1px; line-height: 1.2; }
 
 .sell-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -128,7 +136,11 @@ async function demoReset() {
 
 .check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #c9bec4; display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0; }
 .check.on { background: var(--brand); border-color: var(--brand); }
-.avatar { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; background: var(--brand-soft); color: var(--brand-ink); }
-.avatar.tA { background: #1c1712; color: #d2b47a; }
-.avatar.tB { background: var(--brand); color: var(--on-brand); }
+.phone-field { height: 52px; padding: 0 14px; border-radius: var(--r-inner); background: var(--surface); border: 1.5px solid var(--line-2); box-sizing: border-box; }
+.phone-sep { width: 1px; height: 20px; background: var(--line-2); }
+.phone-input { height: 48px; font-size: var(--fs-md); }
+.trust { justify-content: center; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-weight: 700; font-size: 18px; background: linear-gradient(145deg, #fbf4e8, #e9cf9f); color: var(--brand-ink); box-shadow: 0 4px 10px -5px rgba(168, 130, 77, 0.5); }
+.avatar.tA { background: linear-gradient(145deg, #3d3228, #1c1712); color: #d2b47a; }
+.avatar.tB { background: linear-gradient(145deg, var(--brand-hi), var(--brand-dark)); color: var(--on-brand); }
 </style>

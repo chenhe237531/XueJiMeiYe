@@ -27,14 +27,15 @@ async function decide(granted: boolean) {
 
 <template>
   <view :class="[...xj.stdPageClass, 'has-footer']">
-    <view v-if="text" class="stack" style="padding-top: 16px">
-      <view class="row gap8">
-        <XIcon name="shield-check" :size="28" color="var(--care)" />
-        <text class="t-title">{{ text.title }}</text>
-      </view>
+    <view v-if="text" class="page-head consent-head">
+      <view class="ph-deco i-tabler-shield-check" />
+      <text class="ph-title">{{ text.title }}</text>
+      <text class="ph-sub">请先看看以下要点，再决定是否同意</text>
+    </view>
+    <view v-if="text" class="stack">
       <view class="card care stack">
         <view v-for="s in text.summary" :key="s" class="row gap8" style="align-items: flex-start">
-          <XIcon name="check" :size="18" color="var(--care)" style="margin-top: 4px" />
+          <view class="tick"><XIcon name="check" :size="14" color="#fff" /></view>
           <text class="t-body" style="color: #3f4a35">{{ s }}</text>
         </view>
         <text class="link t-sm" style="color: var(--care)" @click="full = !full">{{ full ? '收起' : '查看完整说明' }}</text>
@@ -43,8 +44,17 @@ async function decide(granted: boolean) {
       <text class="t-xs c3">文本版本 {{ text.version }}。本授权为单独同意，不会默认勾选；授权行为不发放积分。</text>
     </view>
     <view class="footer-bar">
-      <view class="btn" @click="decide(true)">同意</view>
-      <view class="btn plain" @click="decide(false)">不同意</view>
+      <view class="row gap12">
+        <view class="btn plain flex1" @click="decide(false)">不同意</view>
+        <view class="btn care flex1" style="flex: 2" @click="decide(true)">同意</view>
+      </view>
     </view>
   </view>
 </template>
+
+<style scoped>
+/* 健康授权用鼠尾草绿（健康语义）：头部晕染与对勾统一为绿 */
+.consent-head { background: linear-gradient(180deg, var(--care-soft) 0%, var(--bg) 100%); }
+.consent-head .ph-deco { color: var(--care); }
+.tick { width: 20px; height: 20px; margin-top: 3px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(145deg, #b3c69b, #6e7f5c); }
+</style>

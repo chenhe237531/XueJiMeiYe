@@ -58,6 +58,40 @@ function tailSpan(g: { feature: any, rest: any[] }, i: number) {
   return left === 1 ? 'span3' : 'span2'
 }
 
+/**
+ * 入口彩色图标块的色系：常用模块固定配色（体检 = 健康绿），其余按后台 tone，缺省按序轮换，
+ * 保证同屏相邻入口颜色不重复（参考商业小程序多色入口的识别度）。
+ */
+const CHIP_TONES = ['brand', 'rose', 'sky', 'plum', 'terra', 'care', 'green']
+const TONE_BY_CODE: Record<string, string> = {
+  assessment: 'brand',
+  checkup_coupon: 'care',
+  my_plan: 'rose',
+  mirror: 'plum',
+  store_services: 'terra',
+  buddy_group: 'sky',
+  daily_quiz: 'brand',
+  family: 'rose',
+  game_tree: 'green',
+  game_wheel: 'plum',
+  memory_cards: 'sky',
+  passbook: 'brand',
+}
+const ROTATE = ['brand', 'rose', 'sky', 'plum', 'terra']
+function chipTone(it: any, i: number | string) {
+  return TONE_BY_CODE[it?.code] || (CHIP_TONES.includes(it?.tone) ? it.tone : ROTATE[Number(i) % ROTATE.length])
+}
+
+/** 「会员价 ¥299 起」拆成 前缀 / 金额 / 后缀，金额放大显示；不含 ¥ 的文案原样展示 */
+function splitPrice(t?: string | null) {
+  const i = t ? t.indexOf('¥') : -1
+  if (!t || i < 0)
+    return null
+  const rest = t.slice(i + 1).trim()
+  const amt = rest.match(/^\d[\d.,]*/)?.[0]
+  return amt ? { pre: t.slice(0, i).trim(), amt, post: rest.slice(amt.length).trim() } : null
+}
+
 /** 六维测评卖点宫格（issue #4）：XIcon 均在 uno safelist 内 */
 const DIMS = [
   { icon: 'droplet', tone: '', name: '肌肤', sub: '水润与细腻' },
@@ -137,7 +171,7 @@ const DIMS = [
           <text class="t-sm c-care semi" style="text-align: center">完成测评可以领取免费体检券</text>
         </view>
         <view v-for="t in c.props.todos" :key="t.text" class="todo row gap12" @click="go(t.link)">
-          <view class="icon-box" :class="t.tone === 'care' ? 'care' : ''"><XIcon :name="t.icon" /></view>
+          <view class="ic-chip" :class="t.tone === 'care' ? 'care' : 'brand'"><XIcon :name="t.icon" /></view>
           <view class="col flex1">
             <text class="t-md">{{ t.text }}</text>
             <text v-if="t.sub" class="t-sm c2">{{ t.sub }}</text>
@@ -180,7 +214,7 @@ const DIMS = [
           <view class="btn">{{ c.props.health.cta || '开始六维测评，约 8 分钟' }}</view>
         </view>
         <view v-for="t in c.props.health.todos" :key="t.text" class="todo row gap12" @click="go(t.link)">
-          <view class="icon-box" :class="t.tone === 'care' ? 'care' : ''"><XIcon :name="t.icon" /></view>
+          <view class="ic-chip" :class="t.tone === 'care' ? 'care' : 'brand'"><XIcon :name="t.icon" /></view>
           <view class="col flex1">
             <text class="t-md">{{ t.text }}</text>
             <text v-if="t.sub" class="t-sm c2">{{ t.sub }}</text>
@@ -216,9 +250,9 @@ const DIMS = [
           </view>
         </view>
         <view v-else class="grid4 card">
-          <view v-for="it in c.props.items" :key="it.code" class="g4 col gap6" @click="open(it, 'entryGrid')">
-            <view class="icon-box" :class="it.code === 'checkup_coupon' ? 'care' : ''"><XIcon :name="it.icon" :size="24" /></view>
-            <text class="t-sm">{{ it.name }}</text>
+          <view v-for="(it, k) in c.props.items" :key="it.code" class="g4 col gap8" @click="open(it, 'entryGrid')">
+            <view class="ic-chip" :class="chipTone(it, k)"><XIcon :name="it.icon" :size="24" /></view>
+            <text class="t-sm g4-name">{{ it.name }}</text>
           </view>
         </view>
       </view>
@@ -226,15 +260,17 @@ const DIMS = [
       <!-- 轮播（乐龄模式停用自动轮播） -->
       <swiper v-else-if="c.type === 'banner'" class="banner" :autoplay="c.props.autoplay" circular :indicator-dots="c.props.items.length > 1" indicator-color="rgba(60, 50, 42, 0.14)" :indicator-active-color="themeHex().brand">
         <swiper-item v-for="it in c.props.items" :key="it.code">
-          <view class="card row gap12 banner-card" @click="open(it, 'banner')">
-            <view class="photo-slot" style="width: 84px; height: 84px">
-              <image v-if="it.cover && !imgErr.has(it.code)" class="ph-img" :src="absUrl(it.cover)" mode="aspectFill" @error="imgErr.add(it.code)" />
-              <view v-else class="ph-fallback"><XIcon :name="it.icon || 'sparkles'" :size="30" /></view>
-            </view>
-            <view class="col gap4 flex1">
-              <text class="t-xs semi" :class="`tone-${it.tone || 'care'}`">{{ it.name }}</text>
-              <text class="t-lg">{{ it.summary }}</text>
-              <text class="t-sm c-brand semi">{{ it.priceText || '查看详情' }}</text>
+          <!-- 大图横幅：封面铺满 + 底部渐变压字（参考商业小程序首页主视觉）；无封面时用品牌渐变底 -->
+          <view class="hero" @click="open(it, 'banner')">
+            <image v-if="it.cover && !imgErr.has(it.code)" class="ph-img" :src="absUrl(it.cover)" mode="aspectFill" @error="imgErr.add(it.code)" />
+            <view v-else class="ph-fallback hero-fallback"><XIcon :name="it.icon || 'sparkles'" :size="64" /></view>
+            <view class="hero-shade" />
+            <view class="hero-text col gap4">
+              <text class="hero-kicker">{{ it.name }}</text>
+              <text class="hero-title">{{ it.summary }}</text>
+              <view class="row gap8">
+                <text class="hero-cta">{{ it.priceText || '查看详情' }}</text>
+              </view>
             </view>
           </view>
         </swiper-item>
@@ -249,21 +285,47 @@ const DIMS = [
       <view v-else-if="c.type === 'moduleList'" class="stack">
         <text v-if="c.props.title" class="t-lg">{{ c.props.title }}</text>
         <template v-if="c.props.style === 'card'">
+          <!-- 内容卡：大缩略图 + 左上角标 + 放大金额 + 右侧行动胶囊 -->
           <view v-for="it in c.props.items" :key="it.code" class="card row gap12 mcard" @click="open(it, 'moduleList')">
-            <view class="photo-slot" :style="{ width: elder ? '92px' : '84px', height: elder ? '92px' : '84px' }">
+            <view class="photo-slot mthumb">
               <image v-if="it.cover && !imgErr.has(it.code)" class="ph-img" :src="absUrl(it.cover)" mode="aspectFill" @error="imgErr.add(it.code)" />
               <view v-else class="ph-fallback"><XIcon :name="it.icon || 'sparkles'" :size="30" /></view>
+              <text v-if="it.days && !it.summary?.includes(it.days)" class="corner-tag">{{ it.days }}</text>
             </view>
-            <view class="col gap4 flex1">
-              <text class="t-lg" style="line-height: 1.35">{{ it.name }}</text>
-              <text class="t-sm c2">{{ it.days || it.summary }}</text>
-              <text v-if="it.priceText" class="t-md c-brand bold">{{ it.priceText }}</text>
+            <view class="col flex1 mbody">
+              <view class="col gap4">
+                <text class="t-lg mname">{{ it.name }}</text>
+                <text v-if="it.summary" class="t-sm c2 clamp1">{{ it.summary }}</text>
+              </view>
+              <view class="row-between gap8">
+                <view v-if="splitPrice(it.priceText)" class="mprice">
+                  <text v-if="splitPrice(it.priceText)!.pre" class="mprice-aux">{{ splitPrice(it.priceText)!.pre }}</text>
+                  <text class="mprice-yen">¥</text>
+                  <text class="mprice-amt">{{ splitPrice(it.priceText)!.amt }}</text>
+                  <text v-if="splitPrice(it.priceText)!.post" class="mprice-aux">{{ splitPrice(it.priceText)!.post }}</text>
+                </view>
+                <text v-else-if="it.priceText" class="t-md c-brand bold">{{ it.priceText }}</text>
+                <view v-else />
+                <!-- 有价格时收成圆形箭头，给「会员价 ¥4,680 起」留足宽度 -->
+                <view v-if="!elder && it.priceText" class="go-round"><XIcon name="chevron-right" :size="16" /></view>
+                <view v-else-if="!elder" class="go-pill">去看看<XIcon name="chevron-right" :size="14" /></view>
+              </view>
             </view>
           </view>
         </template>
+        <!-- 标准模式：双列小卡；乐龄模式保留单列大行，热区与字号更友好 -->
+        <view v-else-if="!elder" class="grid2">
+          <view v-for="(it, k) in c.props.items" :key="it.code" class="mini row gap10" :class="{ span2: c.props.items.length % 2 === 1 && k === c.props.items.length - 1 }" @click="open(it, 'moduleList')">
+            <view class="ic-chip sm" :class="chipTone(it, k)"><XIcon :name="it.icon" :size="18" /></view>
+            <view class="col flex1">
+              <text class="t-body semi clamp1">{{ it.name }}</text>
+              <text class="t-xs c3 clamp1">{{ it.summary }}</text>
+            </view>
+          </view>
+        </view>
         <view v-else class="group">
-          <view v-for="it in c.props.items" :key="it.code" class="cell" @click="open(it, 'moduleList')">
-            <view class="icon-box" :class="it.tone || ''"><XIcon :name="it.icon" /></view>
+          <view v-for="(it, k) in c.props.items" :key="it.code" class="cell" @click="open(it, 'moduleList')">
+            <view class="ic-chip sm" :class="chipTone(it, k)"><XIcon :name="it.icon" :size="22" /></view>
             <view class="col flex1">
               <text class="t-md">{{ it.name }}</text>
               <text class="t-sm c2">{{ it.summary }}</text>
@@ -275,8 +337,9 @@ const DIMS = [
 
       <!-- 活动卡 -->
       <view v-else-if="c.type === 'activityCard'" class="card row gap12" @click="open(c.props, 'activityCard')">
-        <view class="icon-box care"><XIcon name="calendar-event" /></view>
+        <view class="ic-chip care"><XIcon name="calendar-event" /></view>
         <view class="col flex1"><text class="t-md">{{ c.props.name }}</text><text class="t-sm c2">{{ c.props.summary }}</text></view>
+        <XIcon name="chevron-right" :size="20" color="#786E74" />
       </view>
 
       <!-- 公告条 -->
@@ -306,7 +369,7 @@ const DIMS = [
 .tier-C::before { content: '悦'; }
 .tier-B::before { content: '悦'; }
 .tier-A::before { content: '臻'; }
-.tier-C { background: var(--brand-soft); color: var(--brand-ink); border: 1px solid var(--brand-line); }
+.tier-C { background: radial-gradient(circle at 88% 12%, rgba(255, 255, 255, 0.9) 0, rgba(255, 255, 255, 0) 45%), linear-gradient(135deg, #fbf4e8 0%, #f0dcbc 100%); color: var(--brand-ink); border: 1px solid rgba(201, 160, 99, 0.35); }
 .tier-B { background: linear-gradient(135deg, #d9b984 0%, #c9a063 55%, #a8824d 100%); color: var(--on-brand); }
 .tier-A { background: linear-gradient(150deg, #262019 0%, #1c1712 70%); color: #f2ece8; border: 1px solid rgba(210, 180, 122, 0.35); }
 .tier-A .tier-name { color: #d2b47a; font-family: var(--font-title); }
@@ -328,7 +391,8 @@ const DIMS = [
 .tone-sky { color: var(--aux-sky); }
 .tone-plum { color: var(--aux-plum); }
 
-.health { padding-bottom: 4px; }
+.health { padding-bottom: 4px; background: radial-gradient(circle at 92% 0%, var(--brand-soft) 0, rgba(255, 255, 255, 0) 55%), var(--surface); }
+.night .health { background: var(--surface); }
 .todo { border-top: 1px solid var(--line); padding: 14px 0 12px; margin-top: 12px; }
 
 .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -342,12 +406,38 @@ const DIMS = [
 .tile.span3 { grid-column: span 3; }
 .tile.span2, .tile.span3 { flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px; }
 .tile-sub { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-.grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 4px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 4px; padding: 16px 8px; }
 .g4 { align-items: center; text-align: center; text-wrap: balance; }
+.g4-name { color: var(--ink); font-weight: 500; line-height: 1.3; }
+.night .g4-name { color: var(--ink); }
 
-.banner { height: 120px; }
-.banner-card { height: 116px; }
-.mcard { padding: 12px; }
+.clamp1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+
+.banner { height: 156px; }
+.hero { position: relative; height: 150px; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 24px -14px rgba(60, 48, 34, 0.45); }
+.hero-fallback { justify-content: flex-end; padding-right: 24px; }
+.hero-shade { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: linear-gradient(90deg, rgba(43, 32, 22, 0.72) 0%, rgba(43, 32, 22, 0.35) 55%, rgba(43, 32, 22, 0) 100%); }
+.hero-text { position: absolute; left: 18px; top: 0; bottom: 0; right: 40%; justify-content: center; color: #fff; }
+.hero-kicker { font-size: 12px; font-weight: 600; letter-spacing: 1px; opacity: 0.9; }
+.hero-title { font-family: var(--font-title); font-size: 21px; font-weight: 700; line-height: 1.3; text-wrap: balance; }
+.hero-cta { margin-top: 4px; padding: 3px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.94); color: var(--brand-ink); font-size: 12px; font-weight: 700; }
+
+.mcard { padding: 12px; align-items: stretch; }
+.mthumb { width: 104px; height: 104px; border-radius: 12px; }
+.elder .mthumb { width: 96px; height: 96px; }
+.mbody { justify-content: space-between; gap: 8px; }
+.mname { line-height: 1.35; }
+.mprice { display: flex; align-items: baseline; gap: 1px; color: var(--brand-ink); font-weight: 700; white-space: nowrap; }
+.mprice-yen { font-size: 13px; margin-left: 2px; }
+.mprice-amt { font-size: 24px; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.elder .mprice-amt { font-size: 28px; }
+.mprice-aux { font-size: var(--fs-xs); font-weight: 500; color: var(--ink-2); margin-left: 2px; white-space: nowrap; }
+.go-round { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--brand-soft); border: 1px solid var(--brand-line); color: var(--brand-ink); }
+
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.mini { padding: 12px; border-radius: var(--r-card); background: var(--surface); border: 1px solid var(--card-line); box-shadow: var(--shadow-card); }
+.mini.span2 { grid-column: span 2; }
+.gap10 { gap: 10px; }
 .photo-slot { position: relative; overflow: hidden; }
 .ph-img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 /* 没有实拍图时的品牌底图：柔金渐变 + 光斑 + 图标，不再露出"实拍位"字样 */

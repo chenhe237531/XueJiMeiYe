@@ -67,10 +67,26 @@ function redeem() {
 
 <template>
   <view v-if="d" :class="xj.pageClass">
-    <view class="card stack">
-      <view class="col gap8" style="align-items: center; padding: 8px 0">
+    <view class="page-head">
+      <view class="ph-deco i-tabler-plant" />
+      <text class="ph-title">种健康树</text>
+      <text class="ph-sub">打卡答题攒水滴，树长成兑换积分</text>
+      <view class="ph-meta">
+        <view><XIcon name="droplet" :size="14" />水滴 {{ d.drops }}</view>
+        <view><XIcon name="plant" :size="14" />{{ d.stageNames[d.stage] }}</view>
+      </view>
+    </view>
+    <view class="card raised stack">
+      <!-- 小场景：天空到草地渐变 + 土坡，树在中间生长 -->
+      <view class="scene">
+        <view class="sun" />
         <text class="tree-emoji" :class="[`s${d.stage}`, { bounce: watering }]">{{ STAGES[d.stage] }}</text>
-        <text class="t-md semi">{{ d.stageNames[d.stage] }}（{{ d.stage + 1 }} / 5）</text>
+        <view class="soil" />
+      </view>
+      <view class="col gap8" style="align-items: center">
+        <view class="timeline stages">
+          <view v-for="(n, k) in d.stageNames" :key="k" class="tl-step" :class="{ on: k <= d.stage }"><view class="tl-dot" /><text>{{ n }}</text></view>
+        </view>
         <view class="bar"><view class="bar-in" :style="{ width: `${Math.round((d.watered % d.stageDrops) / d.stageDrops * 100)}%` }" /></view>
         <text class="t-sm c2">{{ d.stage < 4 ? `再浇 ${d.stageDrops - d.watered % d.stageDrops} 滴水到「${d.stageNames[d.stage + 1]}」` : '树已长成，可以兑换奖励啦' }}</text>
       </view>
@@ -84,13 +100,13 @@ function redeem() {
     </view>
 
     <view class="card stack">
-      <text class="t-lg">今日可得水滴</text>
+      <view class="section-title" style="margin-top: 0"><text>今日可得水滴</text></view>
       <view class="claim row-between" @click="claim('checkin')">
-        <view class="row gap8"><XIcon name="calendar-check" :size="22" /><text class="t-md">完成每日打卡</text></view>
+        <view class="row gap12"><view class="icon-box"><XIcon name="calendar-check" /></view><text class="t-md">完成每日打卡</text></view>
         <text class="claim-btn" :class="{ off: !d.canClaim.checkin && d.claimed?.checkin, todo: !d.canClaim.checkin && !d.claimed?.checkin }">{{ d.canClaim.checkin ? '领 2 滴' : d.claimed?.checkin ? '已领取' : '去打卡' }}</text>
       </view>
       <view class="claim row-between" @click="claim('quiz')">
-        <view class="row gap8"><XIcon name="bulb" :size="22" /><text class="t-md">答健康问答（每题 1 滴）</text></view>
+        <view class="row gap12"><view class="icon-box sky"><XIcon name="bulb" /></view><text class="t-md">答健康问答（每题 1 滴）</text></view>
         <text class="claim-btn" :class="{ off: !d.canClaim.quizCount && d.claimed?.quizAll, todo: !d.canClaim.quizCount && !d.claimed?.quizAll }">{{ d.canClaim.quizCount ? `领 ${d.canClaim.quizCount} 滴` : d.claimed?.quizAll ? '已领完' : '去答题' }}</text>
       </view>
       <text class="t-xs c3">水滴通过打卡、答题获得，每天各限一次；树长成兑换后重新种一棵。</text>
@@ -106,9 +122,14 @@ function redeem() {
 .bar { width: 100%; height: 10px; border-radius: 5px; background: var(--placeholder); overflow: hidden; }
 .bar-in { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--care-soft), var(--care)); transition: width 0.3s; }
 .claim { padding: 14px 0; border-top: 1px solid var(--line); }
-.claim-btn { padding: 6px 16px; border-radius: 18px; background: var(--brand); color: var(--on-brand); font-size: var(--fs-sm); font-weight: 600; min-width: 72px; text-align: center; }
-.claim-btn.off { background: var(--placeholder); color: var(--ink-3); }
-.claim-btn.todo { background: var(--surface); color: var(--brand-ink); border: 1px solid var(--brand-line); }
+.scene { position: relative; height: 170px; margin: -2px -2px 4px; border-radius: 14px; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; background: linear-gradient(180deg, #e8f0f4 0%, #f4f1e6 62%, #dfe8cf 100%); }
+.sun { position: absolute; right: 22px; top: 18px; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle, #fff3c9 0%, #f6d98a 70%); box-shadow: 0 0 24px 6px rgba(246, 217, 138, 0.5); }
+.soil { position: absolute; left: 50%; bottom: -26px; width: 220px; height: 56px; margin-left: -110px; border-radius: 50%; background: linear-gradient(180deg, #b9a184, #9d8468); }
+.scene .tree-emoji { position: relative; z-index: 1; margin-bottom: 14px; }
+.stages { width: 100%; margin-bottom: 4px; }
+.claim-btn { padding: 6px 16px; border-radius: 18px; background: linear-gradient(135deg, var(--brand-hi), var(--brand-dark)); color: var(--on-brand); box-shadow: 0 4px 10px -4px rgba(168, 130, 77, 0.6); font-size: var(--fs-sm); font-weight: 600; min-width: 72px; text-align: center; }
+.claim-btn.off { background: var(--placeholder); color: var(--ink-3); box-shadow: none; }
+.claim-btn.todo { background: var(--surface); color: var(--brand-ink); border: 1px solid var(--brand-line); box-shadow: none; }
 .drop-anim { display: inline-block; }
 .drop-anim.on { animation: drop-fall 0.4s ease-in; }
 @keyframes drop-fall { 0% { transform: translateY(-6px); opacity: 1; } 100% { transform: translateY(4px); opacity: 0; } }
