@@ -211,7 +211,7 @@ export class AdminController {
           tier: c.tier, tierName: TIER_NAMES[c.tier], elderMode: c.elderMode, store: stores.find(s => s.id === c.storeId)?.name, advisor: smap.get(c.advisorId || 0)?.name,
           lastVisitAt: fmt(c.lastVisitAt, 'YYYY-MM-DD'), amount12m: canSeeSpend ? Math.round(spend.get(c.id) || 0) : null,
           assessStatus: a ? (a.status === 'completed' ? '已完成' : '进行中') : '未测评', riskLevel: a?.riskLevel || null,
-          labels: labels.filter(l => l.customerId === c.id).map(l => l.labelCode), family: families.some(f => f.elderId === c.id), isDemo: c.isDemo, source: c.source,
+          labels: labels.filter(l => l.customerId === c.id).map(l => l.labelCode), family: families.some(f => f.elderId === c.id), isDemo: c.isDemo || !!c.demoOf, source: c.source,
         }
       }),
     }

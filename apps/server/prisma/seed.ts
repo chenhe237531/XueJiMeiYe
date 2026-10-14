@@ -14,6 +14,7 @@ import { CHECKUP_PACKAGES, CONTRAINDICATIONS, LIFESTYLE_TIPS, MEDICAL_SERVICES, 
 import { ArchiveService } from '../src/services/archive.service'
 import { AssessmentService } from '../src/services/assessment.service'
 import { CheckupService } from '../src/services/checkup.service'
+import { DemoSandboxService } from '../src/services/demo-sandbox.service'
 import { EngineService } from '../src/services/engine.service'
 import { MirrorService } from '../src/services/mirror.service'
 import { PlanService } from '../src/services/plan.service'
@@ -453,6 +454,8 @@ async function main() {
   }
   await prisma.staffNotice.deleteMany({ where: { title: '预警超时升级' } })
   await tier.recalc()
+  // 记下演示账号的初始数据范围：各设备的演示副本只从这里复制
+  await app.get(DemoSandboxService).snapshotBaseline()
   log('done', { customers: await prisma.customer.count(), assessments: await prisma.assessment.count(), plans: await prisma.plan.count(), alerts: await prisma.riskAlert.count(), referrals: await prisma.referral.count() })
   void ops; void admin; void manager
   await app.close()
