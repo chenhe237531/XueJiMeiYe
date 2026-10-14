@@ -25,7 +25,9 @@ export function deviceId() {
 }
 
 export function toast(title: string) {
-  uni.showToast({ title, icon: 'none', duration: 2200 })
+  // 乐龄模式提示停留更久，避免"没看见提示"反复操作
+  const elder = uni.getStorageSync('xj_elder') === 'on'
+  uni.showToast({ title, icon: 'none', duration: elder ? 4000 : 2200 })
 }
 
 /** 原生组件（switch / slider / 弹窗按钮）不支持 CSS 变量，按当前风格给十六进制色：默认柔金、乐龄墨绿 */
@@ -37,6 +39,22 @@ export function themeHex() {
 export function confirm(title: string, content: string, confirmText = '确认'): Promise<boolean> {
   return new Promise((resolve) => {
     uni.showModal({ title, content, confirmText, cancelText: '再想想', confirmColor: themeHex().ink, success: r => resolve(!!r.confirm), fail: () => resolve(false) })
+  })
+}
+
+/** 意向 / 预约提交成功：告诉用户去哪里看进度，避免"提交即失联" */
+export function afterSubmit(content: string) {
+  uni.showModal({
+    title: '已提交',
+    content: `${content}\n进度可以在"我的 - 我的预约与意向"里查看。`,
+    confirmText: '查看进度',
+    cancelText: '好的',
+    confirmColor: themeHex().ink,
+    success: (r) => {
+      if (r.confirm) uni.redirectTo({ url: '/pkg-me/requests' })
+      else back()
+    },
+    fail: () => back(),
   })
 }
 
@@ -93,6 +111,16 @@ export function stopSpeak() {
 }
 
 /** 语音识别：H5 使用浏览器 SpeechRecognition（Chrome / 安卓）；不支持时返回 null */
+/** 当前环境能否语音识别：H5 依赖浏览器 Web Speech；小程序端同声传译插件未接入前不展示语音入口，避免"按了没反应" */
+export function voiceSupported() {
+  // #ifdef H5
+  return !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
+  // #endif
+  // #ifndef H5
+  return false
+  // #endif
+}
+
 export function createRecognizer(onResult: (text: string) => void, onEnd?: () => void) {
   // #ifdef H5
   const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition

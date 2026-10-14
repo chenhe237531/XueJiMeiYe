@@ -37,6 +37,9 @@ const REDEEM_ITEMS = [
   { code: 'R_BMD', name: '体检加项：骨密度', points: 500 },
 ]
 
+/** 打卡类型；plan = 养护方案里的"日常小事"勾选（M3：方案从只读变成每日清单） */
+const CHECKIN_NAMES: Record<string, string> = { sleep: '睡眠', exercise: '运动', water: '喝水', period: '经期日记', plan: '方案日常小事' }
+
 const validDevice = (d?: string) => /^[\w-]{8,64}$/.test(d || '')
 
 @Controller('app/auth')
@@ -242,6 +245,26 @@ export class AppController {
     await this.wf.notifyStaff({ staffIds: [c?.advisorId], roles: sla <= 4 ? ['ops'] : [] }, '新线索', `${c?.salutation}提交「${m.name}」意向${body.form?.people ? `（${body.form.people} 人）` : ''}，请 ${sla} 小时内联系`, sla <= 4 ? 'high' : 'medium', '/marketing/leads')
     await this.wf.event(u.id, 'lead_submit', { moduleCode: m.code, type: lc.type })
     return { leadNo: lead.leadNo, slaHours: sla }
+  }
+
+  /** 我提交的意向 / 接送 / VIP 申请：只给进度，不含顾问跟进内容、成交金额等内部信息 */
+  @Get('leads')
+  @Aud('app')
+  async myLeads(@CurrentUser() u: CustomerUser) {
+    const list = await this.prisma.lead.findMany({ where: { customerId: u.id }, orderBy: { id: 'desc' }, take: 50 })
+    const firstFollow = list.length
+      ? await this.prisma.leadFollowup.groupBy({ by: ['leadId'], where: { leadId: { in: list.map(l => l.id) } }, _min: { createdAt: true } })
+      : []
+    const contactedAt = new Map(firstFollow.map(f => [f.leadId, f._min.createdAt]))
+    const STATUS: Record<string, string> = { new: '已提交，等待顾问联系', contacted: '顾问已联系', negotiating: '顾问沟通中', won: '已完成', lost: '已结束' }
+    return list.map(l => {
+      const project = (l.formData as any)?.project
+      return {
+        id: l.id, leadNo: l.leadNo, name: `${l.moduleName || '意向咨询'}${project ? ` · ${project}` : ''}`, type: l.type, status: l.status, statusName: STATUS[l.status] || l.status,
+        createdAt: fmt(l.createdAt, 'YYYY-MM-DD HH:mm'), slaDueAt: l.status === 'new' && l.slaDueAt ? fmt(l.slaDueAt, 'M月D日 HH:mm') : null,
+        contactedAt: contactedAt.get(l.id) ? fmt(contactedAt.get(l.id)!, 'M月D日 HH:mm') : null,
+      }
+    })
   }
 
   @Get('tier')
@@ -535,9 +558,9 @@ export class AppController {
     await this.prisma.checkin.create({ data: { customerId: u.id, type: body.type, date: today(), data: body.data } })
     const todayPoints = await this.prisma.pointsLedger.aggregate({ where: { customerId: u.id, reasonCode: 'checkin', createdAt: { gte: dayjs().startOf('day').toDate() } }, _sum: { change: true } })
     let pts = 0
-    if ((todayPoints._sum.change || 0) < 6) { pts = 2; await this.wf.addPoints(u.id, 2, 'checkin', `打卡：${{ sleep: '睡眠', exercise: '运动', water: '喝水', period: '经期日记' }[body.type] || body.type}`) }
+    if ((todayPoints._sum.change || 0) < 6) { pts = 2; await this.wf.addPoints(u.id, 2, 'checkin', `打卡：${CHECKIN_NAMES[body.type] || body.type}`) }
     if (body.type === 'period' && body.data?.start) await this.wf.setTag(u.id, 'menstruation_now', 'assessment', undefined, dayjs().add(5, 'day').toDate())
-    await this.wf.addRecord({ customerId: u.id, recordType: 'checkin', sourceLabel: 'SELF', title: `${{ sleep: '睡眠', exercise: '运动', water: '喝水', period: '经期日记' }[body.type] || ''}打卡`, summary: body.data?.summary || '' })
+    await this.wf.addRecord({ customerId: u.id, recordType: 'checkin', sourceLabel: 'SELF', title: `${CHECKIN_NAMES[body.type] || ''}打卡`, summary: body.data?.summary || '' })
     await this.wf.event(u.id, 'checkin_submit', { type: body.type })
     return { ok: true, points: pts }
   }
@@ -823,6 +846,6 @@ export class AppHealthController {
   @Get('referrals')
   async myReferrals(@CurrentUser() u: CustomerUser) {
     const list = await this.prisma.referral.findMany({ where: { customerId: u.id }, orderBy: { id: 'desc' } })
-    return Promise.all(list.map(r => this.checkup.referralDetail(r.id, {}).then(d => ({ id: d.id, referralNo: d.referralNo, status: d.status, statusName: d.statusName, hospitalName: d.hospitalName, services: d.serviceList, appointmentAt: d.appointmentAt, createdAt: d.createdAt }))))
+    return Promise.all(list.map(r => this.checkup.referralDetail(r.id, {}).then(d => ({ id: d.id, referralNo: d.referralNo, status: d.status, statusName: d.statusName, hospitalName: d.hospitalName, services: d.serviceList, appointmentAt: d.appointmentAt, createdAt: d.createdAt, isCheckup: !!d.couponId }))))
   }
 }

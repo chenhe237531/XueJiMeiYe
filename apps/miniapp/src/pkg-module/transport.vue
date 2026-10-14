@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { back, themeHex, toast } from '@/xj/utils'
+import { afterSubmit, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '接送预约' } })
 
@@ -13,8 +13,7 @@ const form = ref<any>({ date: '', time: '09:30', from: '', to: '门店', people:
 async function submit() {
   if (!form.value.date || !form.value.from) return toast('请填写日期和上车地点')
   const res: any = await http.post('/app/transport/requests', form.value, { loading: '提交中' })
-  await new Promise(r => uni.showModal({ title: '已提交', content: `门店会确认车辆和司机后通知您（单号 ${res.leadNo}）。`, showCancel: false, confirmText: '好的', confirmColor: themeHex().ink, complete: r }))
-  back()
+  afterSubmit(`门店会确认车辆和司机后通知您（单号 ${res.leadNo}）。`)
 }
 </script>
 

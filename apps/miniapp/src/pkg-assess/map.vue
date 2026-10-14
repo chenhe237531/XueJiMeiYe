@@ -20,6 +20,9 @@ const next = computed(() => {
 const allDone = computed(() => !!a.value && safety.value?.done && dims.value.every((l: any) => l.done))
 
 async function load() {
+  if (!xj.me) await xj.loadMe()
+  // 没有出生年份时先回介绍页补填，否则分支题按兜底年龄出题
+  if (xj.me && !xj.me.birthYear) return uni.redirectTo({ url: '/pkg-assess/intro' })
   a.value = await http.get('/app/assessments/current')
   if (!a.value) go('/pkg-assess/intro')
 }

@@ -13,6 +13,15 @@ const r = ref<any>(null)
 const prevDims = ref<any>(null)
 const scores = computed(() => Object.fromEntries((r.value?.dims || []).filter((d: any) => d.score !== null).map((d: any) => [d.code, d.score])))
 const paused = computed(() => ['L2', 'L3'].includes(r.value?.riskLevel))
+const RISK_LABEL: Record<string, string> = { L0: '状态良好', L1: '需要留意', L2: '建议就医', L3: '请尽快就医' }
+/** 测完是动机最高的时刻：页脚主按钮直接给"下一步"，按就医 → 体检券 → 方案的优先级 */
+const nextStep = computed(() => {
+  if (!r.value) return null
+  if (paused.value && r.value.medical?.length) return { text: '预约合作医院', icon: 'building-hospital', link: '/pkg-checkup/book?mode=referral' }
+  if (r.value.coupon) return { text: '查看我的体检券', icon: 'ticket', link: '/pkg-checkup/coupons' }
+  if (r.value.plan) return { text: '查看初步方案', icon: 'clipboard-heart', link: '/pkg-plan/detail' }
+  return { text: '回到首页', icon: 'home', link: '/pages/index/index' }
+})
 
 onLoad(async (q: any) => {
   r.value = q?.id ? await http.get(`/app/assessments/${q.id}/result`) : await http.get('/app/assessments/latest-result')
@@ -88,9 +97,8 @@ function readAll() {
             <text class="t-lg">{{ m.name }}</text>
             <text class="t-sm" style="color: #4d5a3f">{{ m.reason }}</text>
           </view>
-          <text class="t-sm semi c-care">顾问可代约</text>
+          <view class="row gap4 t-sm semi c-care book-link" @click="go('/pkg-checkup/book?mode=referral')">请顾问代约<XIcon name="chevron-right" :size="16" /></view>
         </view>
-        <view v-if="paused" class="btn care" @click="go('/pkg-checkup/book?mode=referral')">预约合作医院</view>
       </view>
 
       <view class="group">
@@ -98,7 +106,7 @@ function readAll() {
           <view class="icon-box care"><XIcon name="ticket" /></view>
           <view class="col flex1">
             <text class="t-md">{{ r.coupon.type === 'BASIC_ELDER' ? '乐龄基础体检券' : '基础体检券' }}</text>
-            <text class="t-sm c2">已发放，到店领取后可预约</text>
+            <text class="t-sm c2">已发放，到店领取（或请顾问代领）后可预约</text>
           </view>
           <XIcon name="chevron-right" :size="18" color="#786E74" />
         </view>
@@ -113,17 +121,25 @@ function readAll() {
         <view class="cell">
           <view class="icon-box gray"><XIcon name="info-circle" /></view>
           <view class="col flex1">
-            <text class="t-md">风险等级 {{ r.riskLevel }}</text>
+            <text class="t-md">{{ RISK_LABEL[r.riskLevel] || '风险等级' }}<text class="t-sm c3">（{{ r.riskLevel }}）</text></text>
             <text class="t-sm c2">{{ riskText(r.riskLevel) }}，由医生确认的规则判断</text>
           </view>
+        </view>
+        <view class="cell" @click="go('/pkg-family/list')">
+          <view class="icon-box"><XIcon name="users" /></view>
+          <view class="col flex1">
+            <text class="t-md">邀请家人一起关注</text>
+            <text class="t-sm c2">生成邀请，家人确认后可以看到报告、收到复查提醒</text>
+          </view>
+          <XIcon name="chevron-right" :size="18" color="#786E74" />
         </view>
       </view>
       <text class="t-xs c3" style="text-align: center">完成时间 {{ r.completedAt }}。结果仅作生活美容参考，不作为医学诊断。</text>
     </view>
     <view v-if="r" class="footer-bar">
       <view class="row gap12">
-        <view class="btn ghost flex1" @click="readAll"><XIcon name="volume" />朗读全部</view>
-        <view class="btn flex1" @click="go('/pkg-family/list')"><XIcon name="share" />分享给家人</view>
+        <view class="btn ghost icon-btn" @click="readAll"><XIcon name="volume" /></view>
+        <view v-if="nextStep" class="btn flex1" :class="{ care: paused }" @click="go(nextStep.link)"><XIcon :name="nextStep.icon" />{{ nextStep.text }}</view>
       </view>
     </view>
   </view>
@@ -133,4 +149,5 @@ function readAll() {
 .lg { width: 14px; height: 2px; }
 .lg.brand { background: var(--brand); }
 .lg.dash { border-top: 2px dashed #9a8f95; height: 0; }
+.book-link { flex-shrink: 0; align-items: center; min-height: 44px; }
 </style>

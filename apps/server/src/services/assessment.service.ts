@@ -25,6 +25,9 @@ export class AssessmentService {
 
   async start(customerId: number, mode = 'self') {
     if (!(await this.wf.hasConsent(customerId, 'C2'))) throw Err.needConsent('C2')
+    // 无出生年份时引擎按 45 岁兜底，分支题、OSTA、SARC-F、体检券类型都会算错，测评前必须补齐
+    const customer = await this.prisma.customer.findUnique({ where: { id: customerId }, select: { birthYear: true } })
+    if (!customer?.birthYear) throw Err.bad('请先选择出生年份，年龄会影响测评题目')
     const exist = await this.prisma.assessment.findFirst({ where: { customerId, status: 'in_progress' }, orderBy: { id: 'desc' } })
     if (exist) {
       if (mode !== exist.mode) await this.prisma.assessment.update({ where: { id: exist.id }, data: { mode, assistCode: mode === 'staff_assisted' ? exist.assistCode || this.code6() : exist.assistCode } })
@@ -71,11 +74,18 @@ export class AssessmentService {
   async levelQuestions(customerId: number, id: number, level: string) {
     const a = await this.own(customerId, id)
     const { facts, questions } = await this.engine.factsFor(a.id)
-    const answers = await this.prisma.assessmentAnswer.findMany({ where: { assessmentId: a.id, level } })
+    const all = await this.prisma.assessmentAnswer.findMany({ where: { assessmentId: a.id } })
     const amap: Record<string, any> = {}
-    answers.forEach(x => { amap[x.questionCode] = x.answer })
+    all.filter(x => x.level === level).forEach(x => { amap[x.questionCode] = x.answer })
     const qs = visibleQuestions(questions, facts, level).map(q => this.publicQ(q, facts))
-    return { level: LEVELS.find(l => l.code === level), questions: qs, answers: amap }
+    // 全局进度：答题页同时显示"第几关"和全部必答关的题量，不必回关卡地图才知道还剩多少
+    let overall = null
+    if (SCORED_LEVELS.includes(level)) {
+      const answered = new Set(all.map(x => x.questionCode))
+      const others = SCORED_LEVELS.filter(c => c !== level).flatMap(c => visibleQuestions(questions, facts, c))
+      overall = { levelNo: SCORED_LEVELS.indexOf(level) + 1, levelCount: SCORED_LEVELS.length, otherTotal: others.length, otherAnswered: others.filter(q => answered.has(q.code)).length }
+    }
+    return { level: LEVELS.find(l => l.code === level), questions: qs, answers: amap, overall }
   }
 
   private publicQ(q: QDef, facts: any) {
@@ -240,7 +250,7 @@ export class AssessmentService {
         packageCode: elder ? 'CP02' : 'CP01', hospitalId: hospital.id, sourceAssessmentId: assessmentId, year,
       },
     })
-    await this.wf.message(customerId, '免费体检券已发放', `您的${elder ? '乐龄' : ''}基础体检券已发放，请到店出示券码领取。体检由${hospital.name}执行。`, '/pkg-checkup/coupons')
+    await this.wf.message(customerId, '免费体检券已发放', `您的${elder ? '乐龄' : ''}基础体检券已发放，请到店出示券码领取；不方便到店可以联系顾问帮您登记领取。体检由${hospital.name}执行。`, '/pkg-checkup/coupons')
     await this.wf.event(customerId, 'coupon_issue', { type: c.type })
     return c
   }

@@ -16,6 +16,7 @@ const quick = [
 ]
 
 const menus = [
+  { name: '我的预约与意向', icon: 'calendar-check', link: '/pkg-me/requests' },
   { name: '门店项目与预约', icon: 'building-store', link: '/pkg-module/store' },
   { name: '会员等级与权益', icon: 'crown', link: '/pkg-me/tier' },
   { name: '我的家人', icon: 'users', link: '/pkg-family/list', key: 'family' },

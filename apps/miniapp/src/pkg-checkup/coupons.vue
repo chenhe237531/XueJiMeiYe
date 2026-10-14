@@ -48,7 +48,11 @@ onShow(async () => {
           <text class="t-sm">{{ c.booking.appointmentAt || '等待医院确认时间' }}{{ c.booking.notice ? `，${c.booking.notice}` : '' }}</text>
         </view>
         <view v-if="c.status === 'claimed'" class="btn care" @click="go(`/pkg-checkup/book?couponId=${c.id}`)">预约体检日期</view>
-        <view v-if="c.status === 'issued'" class="card hint t-sm">到店出示券码，员工扫码核销"到店领取"后即可预约体检日期。</view>
+        <view v-if="c.status === 'issued'" class="card hint stack">
+          <text class="t-sm">到店出示券码，员工扫码核销"到店领取"后即可预约体检日期。</text>
+          <text class="t-sm">不方便到店？把券号 {{ c.couponNo }} 告诉顾问，顾问可以帮您登记领取，领取后这里就能直接预约。</text>
+          <view class="btn ghost small" style="align-self: flex-start" @click="go('/pkg-me/advisor')"><XIcon name="headset" :size="18" />联系顾问代领</view>
+        </view>
       </view>
     </view>
   </view>
