@@ -3,9 +3,13 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { get, post, RISK_TYPE } from "@/api/xj";
 import { message } from "@/utils/message";
+import { currentUser } from "@/api/user";
 
 defineOptions({ name: "HealthAlerts" });
 const router = useRouter();
+const me = currentUser();
+/** L3 预警只能由店长或健康顾问关闭（服务端同样校验），其他角色只记录联系 */
+const canClose = (a: any) => a?.level !== "L3" || ["super_admin", "store_manager", "health_advisor"].includes(me.role);
 const status = ref("open");
 const list = ref<any[]>([]);
 const cur = ref<any>(null);
@@ -76,7 +80,7 @@ async function close() {
             <el-form-item><el-button type="primary" @click="saveContact">记录联系</el-button></el-form-item>
             <el-divider />
             <el-form-item label="处理结论"><el-input v-model="conclusion" type="textarea" placeholder="关闭预警必须填写结论；L3 需店长或健康顾问复核" /></el-form-item>
-            <el-form-item><el-button type="danger" :disabled="!conclusion" @click="close">关闭预警</el-button></el-form-item>
+            <el-form-item><el-button v-if="canClose(cur)" type="danger" :disabled="!conclusion" @click="close">关闭预警</el-button><span v-else class="text-gray-500 text-sm">L3 预警需店长或健康顾问复核后关闭，请先记录联系结果</span></el-form-item>
           </el-form>
         </template>
         <el-alert v-else type="success" :closable="false" :title="`已关闭：${cur.conclusion}（${cur.closedBy} ${cur.closedAt}）`" />

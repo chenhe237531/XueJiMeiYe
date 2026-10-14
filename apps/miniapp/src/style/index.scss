@@ -121,6 +121,10 @@ page {
 .xj.has-footer {
   padding-bottom: calc(120px + env(safe-area-inset-bottom));
 }
+/* 底栏两行（主按钮 + 次要文字链接） */
+.xj.has-footer.tall {
+  padding-bottom: calc(168px + env(safe-area-inset-bottom));
+}
 
 /* 臻享皮肤「夜色金」：暖黑 + 金（issue #8，与默认风格统一为金×暖黑） */
 .xj.night {
@@ -290,6 +294,7 @@ page {
 .btn.gold { background: var(--gold); color: var(--night); box-shadow: 0 6px 16px -8px rgba(160, 124, 64, 0.5); }
 .btn.small { height: 40px; font-size: var(--fs-sm); padding: 0 16px; }
 .elder .btn.small { height: 46px; font-size: var(--fs-body); }
+.btn.icon-btn { flex: 0 0 auto; width: var(--btn-h); padding: 0; }
 .btn.disabled { background: #e0e0e0; color: #8c8c8c; border: 0; box-shadow: none; }
 .link { color: var(--brand-ink); font-weight: 600; }
 

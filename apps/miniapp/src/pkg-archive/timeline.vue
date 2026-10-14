@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { go, SOURCE_STYLE } from '@/xj/utils'
+import { go, srcStyle } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '时间轴' } })
 
@@ -33,11 +33,11 @@ function open(r: any) {
     </scroll-view>
     <view class="timeline">
       <view v-for="r in list" :key="r.id" class="node" @click="open(r)">
-        <view class="dot" :style="{ background: SOURCE_STYLE[r.source].fg }" />
+        <view class="dot" :style="{ background: srcStyle(r.source).fg }" />
         <view class="card col gap4">
           <view class="row-between">
             <text class="t-sm c2 num">{{ r.date }}</text>
-            <text class="tag" :style="{ background: SOURCE_STYLE[r.source].bg, color: SOURCE_STYLE[r.source].fg }">{{ r.sourceName }}</text>
+            <text class="tag" :style="{ background: srcStyle(r.source).bg, color: srcStyle(r.source).fg }">{{ r.sourceName }}</text>
           </view>
           <text class="t-md">{{ r.title }}</text>
           <text v-if="r.summary" class="t-sm c2">{{ r.summary }}</text>

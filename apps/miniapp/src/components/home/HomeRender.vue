@@ -50,6 +50,13 @@ const featuredFirst = (items: any[], featured?: string) => {
   const f = items.find(i => i.code === featured)
   return { feature: f || null, rest: items.filter(i => i.code !== featured) }
 }
+/** 三列宫格最后一行补满：剩 1 个占满一行，剩 2 个时最后一个占两格 */
+function tailSpan(g: { feature: any, rest: any[] }, i: number) {
+  const cells = (g.feature ? 2 : 0) + g.rest.length
+  const left = cells % 3
+  if (i !== g.rest.length - 1 || !left) return ''
+  return left === 1 ? 'span3' : 'span2'
+}
 
 /** 六维测评卖点宫格（issue #4）：XIcon 均在 uno safelist 内 */
 const DIMS = [
@@ -200,9 +207,12 @@ const DIMS = [
               <text class="t-sm" style="opacity: 0.88">{{ featuredFirst(c.props.items, c.props.featured).feature.summary }}</text>
             </view>
           </view>
-          <view v-for="it in featuredFirst(c.props.items, c.props.featured).rest" :key="it.code" class="tile" @click="open(it, 'entryGrid')">
+          <view v-for="(it, i) in featuredFirst(c.props.items, c.props.featured).rest" :key="it.code" class="tile" :class="tailSpan(featuredFirst(c.props.items, c.props.featured), i)" @click="open(it, 'entryGrid')">
             <XIcon :name="it.icon" :size="30" :color="it.code === 'checkup_coupon' ? 'var(--care)' : (night ? '#D2B47A' : 'var(--brand-ink)')" />
-            <text class="tile-name">{{ it.name }}</text>
+            <view class="col tile-text">
+              <text class="tile-name">{{ it.name }}</text>
+              <text v-if="tailSpan(featuredFirst(c.props.items, c.props.featured), i) && it.summary" class="t-sm c2 tile-sub">{{ it.summary }}</text>
+            </view>
           </view>
         </view>
         <view v-else class="grid4 card">
@@ -219,7 +229,7 @@ const DIMS = [
           <view class="card row gap12 banner-card" @click="open(it, 'banner')">
             <view class="photo-slot" style="width: 84px; height: 84px">
               <image v-if="it.cover && !imgErr.has(it.code)" class="ph-img" :src="absUrl(it.cover)" mode="aspectFill" @error="imgErr.add(it.code)" />
-              <template v-else><XIcon :name="it.icon" :size="24" /><text>实拍位</text></template>
+              <view v-else class="ph-fallback"><XIcon :name="it.icon || 'sparkles'" :size="30" /></view>
             </view>
             <view class="col gap4 flex1">
               <text class="t-xs semi" :class="`tone-${it.tone || 'care'}`">{{ it.name }}</text>
@@ -242,7 +252,7 @@ const DIMS = [
           <view v-for="it in c.props.items" :key="it.code" class="card row gap12 mcard" @click="open(it, 'moduleList')">
             <view class="photo-slot" :style="{ width: elder ? '92px' : '84px', height: elder ? '92px' : '84px' }">
               <image v-if="it.cover && !imgErr.has(it.code)" class="ph-img" :src="absUrl(it.cover)" mode="aspectFill" @error="imgErr.add(it.code)" />
-              <template v-else><XIcon :name="it.icon" :size="22" /><text>实拍位</text></template>
+              <view v-else class="ph-fallback"><XIcon :name="it.icon || 'sparkles'" :size="30" /></view>
             </view>
             <view class="col gap4 flex1">
               <text class="t-lg" style="line-height: 1.35">{{ it.name }}</text>
@@ -327,6 +337,11 @@ const DIMS = [
 .tile-name { font-size: var(--fs-md); font-weight: 600; line-height: 1.3; text-wrap: balance; }
 .tile.featured { grid-column: span 2; background: var(--brand); color: var(--on-brand); height: 112px; box-shadow: 0 10px 22px -12px rgba(168, 130, 77, 0.5); }
 .night .tile.featured { color: #1c1712; }
+/* 最后一行只剩 1~2 个时拉宽补满，不留孤零零的一格 */
+.tile.span2 { grid-column: span 2; }
+.tile.span3 { grid-column: span 3; }
+.tile.span2, .tile.span3 { flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px; }
+.tile-sub { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 4px; }
 .g4 { align-items: center; text-align: center; text-wrap: balance; }
 
@@ -335,6 +350,9 @@ const DIMS = [
 .mcard { padding: 12px; }
 .photo-slot { position: relative; overflow: hidden; }
 .ph-img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+/* 没有实拍图时的品牌底图：柔金渐变 + 光斑 + 图标，不再露出"实拍位"字样 */
+.ph-fallback { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; color: var(--brand-ink); background: radial-gradient(circle at 78% 18%, rgba(255, 255, 255, 0.75) 0, rgba(255, 255, 255, 0) 42%), linear-gradient(145deg, var(--brand-soft), var(--brand-line)); }
+.night .ph-fallback { color: #d2b47a; background: radial-gradient(circle at 78% 18%, rgba(210, 180, 122, 0.28) 0, rgba(210, 180, 122, 0) 45%), linear-gradient(145deg, #3a3026, #2a231c); box-shadow: inset 0 0 0 1px rgba(210, 180, 122, 0.22); }
 
 .fab { position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 60; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--brand); color: var(--on-brand); display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; box-shadow: 0 8px 24px -8px rgba(168, 130, 77, 0.5); }
 .fab.elder { height: 58px; padding: 0 20px; font-size: 18px; bottom: calc(88px + env(safe-area-inset-bottom)); }

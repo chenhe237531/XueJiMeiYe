@@ -98,6 +98,7 @@ export default defineConfig({
     'i-tabler-users-group',
     'i-tabler-leaf',
     'i-tabler-gift',
+    'i-tabler-coins',
     'i-tabler-presentation',
     'i-tabler-beach',
     'i-tabler-trees',

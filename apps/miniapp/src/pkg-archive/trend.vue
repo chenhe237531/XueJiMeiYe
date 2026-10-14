@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { lineSvg, SOURCE_STYLE } from '@/xj/utils'
+import { lineSvg, SOURCE_STYLE, srcStyle } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '指标趋势' } })
 
@@ -46,7 +46,7 @@ onLoad(async (q: any) => {
         <view v-for="p in [...t.points].reverse()" :key="p.date + p.value" class="cell">
           <text class="flex1 t-body num">{{ p.date }}</text>
           <text class="t-md semi num">{{ p.value }} {{ t.unit }}</text>
-          <text class="tag" :style="{ background: SOURCE_STYLE[p.source].bg, color: SOURCE_STYLE[p.source].fg }">{{ SOURCE_STYLE[p.source].name }}</text>
+          <text class="tag" :style="{ background: srcStyle(p.source).bg, color: srcStyle(p.source).fg }">{{ srcStyle(p.source).name }}</text>
         </view>
       </view>
     </view>

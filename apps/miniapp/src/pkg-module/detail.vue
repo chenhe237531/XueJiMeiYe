@@ -60,10 +60,10 @@ function submit() {
       </view>
       <text class="t-title">{{ m.name }}</text>
       <text v-if="m.summary" class="c2">{{ m.summary }}</text>
-      <view v-if="d.priceText" class="row gap8" style="align-items: baseline">
-        <text class="t-sm c2">会员价</text>
-        <text class="num bold c-brand" style="font-size: 28px">{{ d.priceText.replace('会员价 ', '') }}</text>
-        <text class="t-xs c3">{{ d.priceNote || '以合作方最终报价为准' }}</text>
+      <view v-if="d.priceText" class="row gap8 wrap" style="align-items: baseline">
+        <text v-if="/\d/.test(d.priceText)" class="t-sm c2" style="flex-shrink: 0">会员价</text>
+        <text class="bold c-brand" :class="{ num: /\d/.test(d.priceText) }" :style="{ fontSize: /\d/.test(d.priceText) ? '28px' : '20px', flexShrink: 0 }">{{ d.priceText.replace('会员价 ', '') }}</text>
+        <text class="t-xs c3" style="flex-basis: 100%">{{ d.priceNote || '以合作方最终报价为准' }}</text>
       </view>
       <view v-if="d.highlights?.length" class="hl">
         <view v-for="h in d.highlights" :key="h" class="hl-item"><XIcon name="circle-check" :size="20" color="var(--brand-ink)" /><text class="t-sm">{{ h }}</text></view>

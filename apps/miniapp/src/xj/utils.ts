@@ -186,39 +186,73 @@ export function radarLabels(scores: Record<string, number>) {
 const SRC_COLOR: Record<string, string> = { HOSPITAL: '#6E7F5C', STORE: '#C9A063', SELF: '#666666' }
 
 /** 指标趋势折线图，每个点按来源着色 */
-export function lineSvg(points: { date: string, value: number, source?: string }[], opts: { width?: number, height?: number, refLow?: number | null, refHigh?: number | null } = {}) {
+export function lineSvg(points: { date: string, value: number, source?: string }[], opts: { width?: number, height?: number, refLow?: number | null, refHigh?: number | null, color?: string } = {}) {
   const W = opts.width || 340
   const H = opts.height || 180
-  const pad = { l: 34, r: 12, t: 16, b: 28 }
+  const color = opts.color || themeHex().brand
+  const pad = { l: 34, r: 14, t: 22, b: 26 }
   if (!points.length) return svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"></svg>`)
   const vals = points.map(p => p.value)
-  let min = Math.min(...vals, ...(opts.refLow != null ? [opts.refLow] : []))
-  let max = Math.max(...vals, ...(opts.refHigh != null ? [opts.refHigh] : []))
-  if (min === max) { min -= 1; max += 1 }
-  const span = max - min
-  min -= span * 0.15
-  max += span * 0.15
+  // 刻度取整齐的数（1 / 2 / 2.5 / 5 × 10ⁿ），坐标轴不会出现 61.8、52.2 这类数字
+  const { min, max, step } = niceScale(
+    Math.min(...vals, ...(opts.refLow != null ? [opts.refLow] : [])),
+    Math.max(...vals, ...(opts.refHigh != null ? [opts.refHigh] : [])),
+  )
   const x = (i: number) => pad.l + (points.length === 1 ? (W - pad.l - pad.r) / 2 : (i * (W - pad.l - pad.r)) / (points.length - 1))
   const y = (v: number) => pad.t + ((max - v) * (H - pad.t - pad.b)) / (max - min)
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="sans-serif">`
+  const fmtNum = (v: number) => String(Math.round(v * 100) / 100)
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="-apple-system, PingFang SC, sans-serif">`
+  svg += `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity="0.22"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>`
   if (opts.refLow != null && opts.refHigh != null) svg += `<rect x="${pad.l}" y="${y(opts.refHigh)}" width="${W - pad.l - pad.r}" height="${Math.max(1, y(opts.refLow) - y(opts.refHigh))}" fill="#E9EEE2" opacity="0.7"/>`
-  for (let k = 0; k <= 3; k++) {
-    const v = min + ((max - min) * k) / 3
-    svg += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="#EEEEEE"/><text x="${pad.l - 6}" y="${y(v) + 4}" font-size="10" fill="#767676" text-anchor="end">${Math.round(v * 10) / 10}</text>`
+  for (let v = min; v <= max + step / 2; v += step) {
+    svg += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="#EFEAE6" stroke-dasharray="${v === min ? '0' : '3 3'}"/><text x="${pad.l - 8}" y="${y(v) + 3.5}" font-size="10" fill="#8C8287" text-anchor="end">${fmtNum(v)}</text>`
   }
-  svg += `<polyline points="${points.map((p, i) => `${x(i)},${y(p.value)}`).join(' ')}" fill="none" stroke="#C9A063" stroke-width="2" stroke-linejoin="round"/>`
+  const line = points.map((p, i) => `${x(i)},${y(p.value)}`).join(' ')
+  if (points.length > 1) svg += `<polygon points="${x(0)},${y(min)} ${line} ${x(points.length - 1)},${y(min)}" fill="url(#g)"/>`
+  svg += `<polyline points="${line}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`
+  const showValues = points.length <= 8
   points.forEach((p, i) => {
-    svg += `<circle cx="${x(i)}" cy="${y(p.value)}" r="4.5" fill="#fff" stroke="${SRC_COLOR[p.source || 'STORE']}" stroke-width="2.5"/>`
-    if (points.length <= 8 || i % Math.ceil(points.length / 6) === 0) svg += `<text x="${x(i)}" y="${H - 8}" font-size="10" fill="#767676" text-anchor="middle">${p.date}</text>`
+    const last = i === points.length - 1
+    svg += `<circle cx="${x(i)}" cy="${y(p.value)}" r="${last ? 5.5 : 4}" fill="${last ? color : '#fff'}" stroke="${last ? '#fff' : SRC_COLOR[p.source || 'STORE']}" stroke-width="2.5"/>`
+    if (showValues) svg += `<text x="${x(i)}" y="${y(p.value) - 10}" font-size="11" font-weight="${last ? 700 : 500}" fill="${last ? '#2A2427' : '#6F666B'}" text-anchor="middle">${fmtNum(p.value)}</text>`
+    if (points.length <= 8 || i % Math.ceil(points.length / 6) === 0) svg += `<text x="${x(i)}" y="${H - 7}" font-size="10" fill="#8C8287" text-anchor="middle">${p.date}</text>`
   })
   svg += '</svg>'
   return svgUri(svg)
+}
+
+/** 坐标轴刻度：3~4 格，步长取 1 / 2 / 2.5 / 5 × 10ⁿ */
+function niceScale(lo: number, hi: number) {
+  if (lo === hi) { lo -= 1; hi += 1 }
+  const raw = (hi - lo) / 3
+  const mag = 10 ** Math.floor(Math.log10(raw))
+  const step = [1, 2, 2.5, 5, 10].map(k => k * mag).find(s => s >= raw) || 10 * mag
+  let min = Math.floor(lo / step) * step
+  let max = Math.ceil(hi / step) * step
+  // 留一点上下余量，数据点不贴边
+  if (lo - min < step * 0.2) min -= step
+  if (max - hi < step * 0.2) max += step
+  return { min, max, step }
 }
 
 export const SOURCE_STYLE: Record<string, { name: string, bg: string, fg: string }> = {
   HOSPITAL: { name: '医院出具', bg: '#E9EEE2', fg: '#6E7F5C' },
   STORE: { name: '门店测量', bg: '#F7EDE0', fg: '#6B4E2E' },
   SELF: { name: '本人记录', bg: '#EFEAEC', fg: '#463E43' },
+}
+
+/** 来源样式（缺省按本人记录，避免数据缺字段时整页渲染失败） */
+export function srcStyle(source?: string | null) {
+  return SOURCE_STYLE[source || ''] || SOURCE_STYLE.SELF
+}
+
+/** 参考范围显示：旧报告里存的是 "35-" / "-139" / "90-139"，统一成 "≥ 35" / "≤ 139" / "90–139" */
+export function refText(ref?: string | null) {
+  const m = /^(-?[\d.]*)[-–](-?[\d.]*)$/.exec((ref || '').replace(/\s/g, ''))
+  if (!m) return ref || ''
+  const [, low, high] = m
+  if (low && high) return `${low}–${high}`
+  return low ? `≥ ${low}` : high ? `≤ ${high}` : ''
 }
 
 export function riskText(level?: string | null) {
