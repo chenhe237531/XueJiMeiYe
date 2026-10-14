@@ -15,12 +15,16 @@ export function signToken(payload: Record<string, any>, aud: 'app' | 'admin' | '
   return jwt.sign(payload, SECRET, { audience: aud, expiresIn: aud === 'app' ? '30d' : '12h' })
 }
 
+/** 演示账号模板 id：只用来复制副本，不能直接登录（改造前签发给模板的令牌一律失效，避免多人共用一份数据） */
+export const demoTemplateIds = new Set<number>()
+
 function parse(req: any) {
   const h: string = req.headers?.authorization || ''
   const token = h.startsWith('Bearer ') ? h.slice(7) : (req.query?.token as string)
   if (!token) return null
   try {
     const p: any = jwt.verify(token, SECRET)
+    if (p?.aud === 'app' && demoTemplateIds.has(p.id)) return null
     return p
   }
   catch {

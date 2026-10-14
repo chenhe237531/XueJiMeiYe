@@ -14,6 +14,16 @@ export function back(fallback = '/pages/index/index') {
   else go(fallback)
 }
 
+/** 本机标识：演示账号按设备各用一份独立数据；不随退出登录清除 */
+export function deviceId() {
+  let id = uni.getStorageSync('xj_device')
+  if (!id) {
+    id = `d${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`
+    uni.setStorageSync('xj_device', id)
+  }
+  return id as string
+}
+
 export function toast(title: string) {
   uni.showToast({ title, icon: 'none', duration: 2200 })
 }

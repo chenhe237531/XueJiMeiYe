@@ -111,9 +111,15 @@ model Customer {
   status          String    @default("active")
   isDemo          Boolean   @default(false)
   demoTitle       String?
+  /// 演示副本：来源演示账号 id（每台设备一份，数据互不共用）
+  demoOf          Int?
+  /// 演示副本归属的设备标识
+  demoDevice      String?
   lastVisitAt     DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+
+  @@index([demoOf, demoDevice])
 }
 
 model CustomerLabel {

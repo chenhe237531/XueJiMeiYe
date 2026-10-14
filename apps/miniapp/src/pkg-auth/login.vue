@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { go, toast } from '@/xj/utils'
+import { confirm, deviceId, go, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '登录' } })
 
@@ -44,13 +44,19 @@ async function phoneLogin() {
   const w: any = await http.post('/app/auth/wx-login', { code, q: uni.getStorageSync('xj_q') }, { silent: true }).catch(() => ({}))
   openid = w.openid
   // #endif
-  const res = await http.post('/app/auth/phone', { phone: phone.value, q: uni.getStorageSync('xj_q'), openid }, { loading: '正在登录' })
+  const res = await http.post('/app/auth/phone', { phone: phone.value, q: uni.getStorageSync('xj_q'), openid, deviceId: deviceId() }, { loading: '正在登录' })
   afterLogin(res)
 }
 
 async function demo(p: any) {
-  const res = await http.post('/app/auth/demo-login', { customerId: p.id }, { loading: '正在进入' })
+  const res = await http.post('/app/auth/demo-login', { customerId: p.id, deviceId: deviceId() }, { loading: '正在进入' })
   afterLogin(res)
+}
+
+async function demoReset() {
+  if (!(await confirm('重新开始演示', '本机演示账号的测评、积分等记录会清空，恢复到初始状态（不影响其他人）', '重新开始'))) return
+  await http.post('/app/auth/demo-reset', { deviceId: deviceId() }, { loading: '处理中' })
+  toast('已恢复初始状态，选择账号进入即可')
 }
 </script>
 
@@ -92,8 +98,9 @@ async function demo(p: any) {
     <view class="demo-zone">
       <view class="row-between">
         <view class="row gap8"><text class="t-md semi">演示账号</text><text class="tag">演示</text></view>
-        <text class="t-xs c3">黑客松演示用</text>
+        <text class="t-xs link" @click="demoReset">重新开始</text>
       </view>
+      <text class="t-xs c3 demo-note">每台手机各用一份演示数据，做的测评别人看不到</text>
       <view class="group mt8">
         <view v-for="p in personas" :key="p.id" class="cell" @click="demo(p)">
           <view class="avatar" :class="`t${p.tier}`">{{ p.salutation.slice(0, 1) }}</view>
@@ -116,6 +123,7 @@ async function demo(p: any) {
 .sell-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .sell { display: flex; flex-direction: row; align-items: center; gap: 10px; padding: 11px 12px; }
 
+.demo-note { display: block; margin-top: 4px; }
 .demo-zone { margin-top: 24px; border: 1.5px dashed var(--brand-line); border-radius: var(--r-card); padding: 14px; background: rgba(201, 160, 99, 0.05); }
 
 .check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #c9bec4; display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0; }

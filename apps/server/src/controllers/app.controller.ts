@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query } from '@nestjs/common'
-import { createHash } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import dayjs from 'dayjs'
 import { Aud, CurrentUser, type CustomerUser, OptionalAuth, signToken } from '../common/auth'
 import { PrismaService } from '../common/prisma.service'
@@ -10,6 +10,7 @@ import { TAG_NAMES } from '../engine/rules-data'
 import { ArchiveService } from '../services/archive.service'
 import { AssessmentService } from '../services/assessment.service'
 import { CheckupService } from '../services/checkup.service'
+import { DemoSandboxService } from '../services/demo-sandbox.service'
 import { HomeService, moduleCard, moduleVisible, TIER_BENEFITS } from '../services/home.service'
 import { MirrorService } from '../services/mirror.service'
 import { WorkflowService } from '../services/workflow.service'
@@ -36,9 +37,11 @@ const REDEEM_ITEMS = [
   { code: 'R_BMD', name: '体检加项：骨密度', points: 500 },
 ]
 
+const validDevice = (d?: string) => /^[\w-]{8,64}$/.test(d || '')
+
 @Controller('app/auth')
 export class AppAuthController {
-  constructor(private prisma: PrismaService, private wf: WorkflowService) {}
+  constructor(private prisma: PrismaService, private wf: WorkflowService, private sandbox: DemoSandboxService) {}
 
   /** 演示：wx.login code → openid（正式版调用 code2Session） */
   @Post('wx-login')
@@ -57,20 +60,38 @@ export class AppAuthController {
     return list.map(c => ({ id: c.id, salutation: c.salutation, age: ageOf(c.birthYear), tier: c.tier, tierName: TIER_NAMES[c.tier], elderMode: c.elderMode, title: c.demoTitle }))
   }
 
+  /** 演示账号只当模板：每台设备进入自己的副本，测评等数据不和别人共用 */
   @Post('demo-login')
-  async demoLogin(@Body() body: { customerId: number }) {
-    const c = await this.prisma.customer.findUnique({ where: { id: Number(body.customerId) } })
-    if (!c) throw Err.notFound()
-    await this.wf.event(c.id, 'login_success', { isNew: false, demo: true })
-    return { token: signToken({ id: c.id }, 'app'), isNew: false, needConsent: (await this.wf.hasConsent(c.id, 'C1')) ? [] : ['C1'] }
+  async demoLogin(@Body() body: { customerId: number, deviceId?: string }) {
+    const persona = await this.prisma.customer.findFirst({ where: { id: Number(body.customerId), isDemo: true } })
+    if (!persona) throw Err.notFound('演示账号不存在')
+    return this.enterDemo(persona.id, body.deviceId)
+  }
+
+  /** 本机演示数据重新开始（如现场再演示一遍完整测评） */
+  @Post('demo-reset')
+  async demoReset(@Body() body: { deviceId?: string }) {
+    if (!validDevice(body.deviceId)) throw Err.bad('缺少设备标识')
+    await this.sandbox.reset(body.deviceId!)
+    return { ok: true }
+  }
+
+  private async enterDemo(personaId: number, deviceId?: string) {
+    // 老版本前端不带设备标识：每次登录给一份全新副本，也不会和别人共用
+    const did = validDevice(deviceId) ? deviceId! : `anon-${randomUUID()}`
+    const id = await this.sandbox.customerFor(personaId, did)
+    await this.wf.event(id, 'login_success', { isNew: false, demo: true })
+    return { token: signToken({ id }, 'app'), isNew: false, needConsent: (await this.wf.hasConsent(id, 'C1')) ? [] : ['C1'] }
   }
 
   /** 手机号快速验证（演示：直接输入手机号）。匹配老客户则继承等级、门店、顾问；否则按码归属为新客 */
   @Post('phone')
-  async phone(@Body() body: { phone: string, q?: string, openid?: string, salutation?: string }) {
+  async phone(@Body() body: { phone: string, q?: string, openid?: string, salutation?: string, deviceId?: string }) {
     const phone = `${body.phone || ''}`.trim()
     if (!/^1\d{10}$/.test(phone)) throw Err.bad('请输入正确的手机号')
     let c = await this.prisma.customer.findUnique({ where: { phone } })
+    // 输入演示账号的手机号，同样进入本设备的演示副本
+    if (c?.isDemo) return { ...(await this.enterDemo(c.id, body.deviceId)), needProfile: false }
     let isNew = false
     if (!c) {
       const qr = body.q ? await this.prisma.qrcode.findUnique({ where: { code: body.q } }) : null

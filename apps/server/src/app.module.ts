@@ -9,6 +9,7 @@ import { AiService } from './services/ai.service'
 import { ArchiveService } from './services/archive.service'
 import { AssessmentService } from './services/assessment.service'
 import { CheckupService } from './services/checkup.service'
+import { DemoSandboxService } from './services/demo-sandbox.service'
 import { EngineService } from './services/engine.service'
 import { HomeService } from './services/home.service'
 import { MirrorService } from './services/mirror.service'
@@ -20,6 +21,6 @@ import { JobsService } from './services/jobs.service'
 @Module({
   imports: [PrismaModule],
   controllers: [AppAuthController, AppController, AppHealthController, GameController, AdminAuthController, AdminController, AdminConfigController, HospitalController],
-  providers: [AiService, WorkflowService, EngineService, PlanService, AssessmentService, HomeService, MirrorService, CheckupService, ArchiveService, TierService, JobsService],
+  providers: [AiService, WorkflowService, EngineService, PlanService, AssessmentService, HomeService, MirrorService, CheckupService, ArchiveService, TierService, JobsService, DemoSandboxService],
 })
 export class AppModule {}

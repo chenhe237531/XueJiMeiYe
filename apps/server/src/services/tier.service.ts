@@ -76,7 +76,7 @@ export class TierService {
     let down = 0
     let keep = 0
     for (const c of customers) {
-      if (c.isDemo) continue
+      if (c.isDemo || c.demoOf) continue
       if (c.tierLockedUntil && c.tierLockedUntil > new Date()) continue
       const amt = spend.get(c.id) || 0
       const target = amt >= rule.thresholdA ? 'A' : amt >= rule.thresholdB ? 'B' : 'C'
