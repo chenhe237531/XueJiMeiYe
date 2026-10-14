@@ -40,8 +40,8 @@ onPullDownRefresh(async () => { await load(); uni.stopPullDownRefresh() })
 </script>
 
 <template>
-  <view :class="[...xj.pageClass, 'has-tabbar', night ? 'night' : '']">
-    <XNav />
+  <view :class="[...xj.pageClass, 'has-tabbar', 'washed', night ? 'night' : '']">
+    <XNav transparent />
     <view v-if="offline" class="card hint row gap8 t-sm" style="margin-bottom: 12px">
       <XIcon name="wifi-off" :size="18" />
       <text>网络不太好，展示的可能是缓存内容</text>

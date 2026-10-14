@@ -28,7 +28,7 @@ onShow(async () => {
 <template>
   <view :class="xj.pageClass">
     <view class="stack" style="padding-top: 12px">
-      <text class="section-title">体检与就医</text>
+      <view class="section-title" style="margin-top: 0"><text>体检与就医</text></view>
       <view class="group">
         <view v-for="r in refs" :key="r.id" class="cell" @click="go(r.isCheckup ? '/pkg-checkup/coupons' : '/pkg-archive/hospital')">
           <view class="icon-box care"><XIcon :name="r.isCheckup ? 'ticket' : 'building-hospital'" /></view>
@@ -41,16 +41,17 @@ onShow(async () => {
         <view v-if="loaded && !refs.length" class="empty">还没有体检预约。完成测评领取体检券后即可预约</view>
       </view>
 
-      <text class="section-title">门店项目与服务意向</text>
+      <view class="section-title"><text>门店项目与服务意向</text></view>
       <view v-for="l in leads" :key="l.id" class="card stack">
-        <view class="row-between">
+        <view class="row gap12">
+          <view class="icon-box" :class="l.status === 'won' ? 'care' : l.status === 'lost' ? 'gray' : ''"><XIcon name="calendar-event" /></view>
           <text class="t-md flex1">{{ l.name }}</text>
           <text class="tag" :class="l.status === 'won' ? 'care' : l.status === 'lost' ? 'gray' : ''">{{ l.statusName }}</text>
         </view>
-        <view class="steps">
-          <view v-for="(s, i) in ['已提交', '顾问已联系', l.status === 'lost' ? '已结束' : '已完成']" :key="s" class="step" :class="{ on: i <= STEP[l.status] }">
-            <view class="sdot" />
-            <text class="t-xs">{{ s }}</text>
+        <view class="timeline">
+          <view v-for="(s, i) in ['已提交', '顾问已联系', l.status === 'lost' ? '已结束' : '已完成']" :key="s" class="tl-step" :class="{ on: i <= STEP[l.status] }">
+            <view class="tl-dot" />
+            <text>{{ s }}</text>
           </view>
         </view>
         <text class="t-sm c2">
@@ -69,11 +70,3 @@ onShow(async () => {
     </view>
   </view>
 </template>
-
-<style scoped>
-.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.step { display: flex; flex-direction: column; gap: 4px; color: var(--ink-3); }
-.step.on { color: var(--ink); font-weight: 600; }
-.sdot { width: 14px; height: 14px; border-radius: 8px; border: 2px solid #d3c8ce; background: #fff; box-sizing: border-box; }
-.step.on .sdot { background: var(--brand); border-color: var(--brand); }
-</style>

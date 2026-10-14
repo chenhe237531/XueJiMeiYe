@@ -46,11 +46,8 @@ function submit() {
   <view v-if="m" :class="[...xj.pageClass, 'has-footer']" style="padding: 0">
     <view class="hero photo-slot">
       <image v-if="m.cover && !heroErr" class="hero-img" :src="absUrl(m.cover)" mode="aspectFill" @error="heroErr = true" />
-      <template v-else>
-        <XIcon :name="m.icon" :size="40" />
-        <text class="t-sm semi">实拍：{{ m.name }}</text>
-        <text class="t-xs">建议尺寸 1170 x 900</text>
-      </template>
+      <!-- 无封面：品牌渐变底图（与首页一致，不露出「实拍位」字样） -->
+      <view v-else class="hero-fallback"><XIcon :name="m.icon" :size="64" /></view>
     </view>
     <view class="nav-float"><XNav show-back transparent /></view>
     <view class="sheet stack">
@@ -60,17 +57,17 @@ function submit() {
       </view>
       <text class="t-title">{{ m.name }}</text>
       <text v-if="m.summary" class="c2">{{ m.summary }}</text>
-      <view v-if="d.priceText" class="row gap8 wrap" style="align-items: baseline">
+      <view v-if="d.priceText" class="row gap8 wrap price-strip" style="align-items: baseline">
         <text v-if="/\d/.test(d.priceText)" class="t-sm c2" style="flex-shrink: 0">会员价</text>
         <text class="bold c-brand" :class="{ num: /\d/.test(d.priceText) }" :style="{ fontSize: /\d/.test(d.priceText) ? '28px' : '20px', flexShrink: 0 }">{{ d.priceText.replace('会员价 ', '') }}</text>
         <text class="t-xs c3" style="flex-basis: 100%">{{ d.priceNote || '以合作方最终报价为准' }}</text>
       </view>
       <view v-if="d.highlights?.length" class="hl">
-        <view v-for="h in d.highlights" :key="h" class="hl-item"><XIcon name="circle-check" :size="20" color="var(--brand-ink)" /><text class="t-sm">{{ h }}</text></view>
+        <view v-for="h in d.highlights" :key="h" class="hl-item"><view class="icon-box hl-ic"><XIcon name="check" :size="18" /></view><text class="t-sm">{{ h }}</text></view>
       </view>
-      <view v-if="d.suitable" class="row gap8"><text class="t-sm c2">适合人群</text><text class="t-sm">{{ d.suitable }}</text></view>
+      <view v-if="d.suitable" class="info-row"><text class="ir-label"><XIcon name="users" :size="16" />适合人群</text><text class="ir-value">{{ d.suitable }}</text></view>
       <view v-if="d.content?.length" class="col gap8">
-        <text class="t-lg">行程与内容</text>
+        <view class="section-title"><text>行程与内容</text></view>
         <text v-for="p in d.content" :key="p" class="t-body" style="color: #3b3337">{{ p }}</text>
       </view>
       <view v-for="n in m.healthNotices" :key="n.id" class="card hint stack">
@@ -96,9 +93,12 @@ function submit() {
 .hero { height: 280px; border-radius: 0; background: #e4dee1; position: relative; overflow: hidden; }
 .hero-img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 .nav-float { position: absolute; top: 0; left: 16px; right: 16px; }
-.sheet { background: #fff; border-radius: 24px 24px 0 0; margin-top: -24px; position: relative; padding: 20px 18px 24px; min-height: 60vh; }
+.sheet { background: var(--surface); border-radius: 24px 24px 0 0; margin-top: -24px; position: relative; padding: 20px 18px 24px; min-height: 60vh; }
 .hl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.hl-item { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 10px 4px; border-radius: 14px; background: #f7f3f5; }
+.hl-item { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 12px 4px; border-radius: 14px; background: var(--brand-soft); }
+.hl-ic { width: 30px; height: 30px; border-radius: 10px; }
+.hero-fallback { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; color: var(--brand-ink); background: radial-gradient(circle at 78% 18%, rgba(255, 255, 255, 0.75) 0, rgba(255, 255, 255, 0) 42%), linear-gradient(145deg, var(--brand-soft), var(--brand-line)); }
+.price-strip { padding: 12px 14px; border-radius: var(--r-inner); background: linear-gradient(120deg, var(--brand-soft) 0%, var(--surface) 100%); border: 1px solid var(--brand-line); }
 .check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #c9a35e; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
 .check.on { background: var(--brand); border-color: var(--brand); }
 </style>

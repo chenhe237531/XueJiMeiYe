@@ -4,13 +4,14 @@ import { computed, ref } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { call, go, toast } from '@/xj/utils'
+import { absUrl, call, go, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '门店项目' } })
 
 const xj = useXj()
 const d = ref<any>(null)
 const cat = ref('all')
+const heroErr = ref(false)
 
 onLoad(async () => {
   d.value = await http.get('/app/store')
@@ -49,13 +50,15 @@ function copyAddr() {
   <view :class="[...xj.pageClass, 'has-footer']">
     <template v-if="d?.store">
       <!-- 门店头图：实拍图到位前用插画占位 -->
-      <view class="hero">
-        <view class="col gap4">
+      <view class="hero" :class="{ photo: d.cover && !heroErr }">
+        <image v-if="d.cover && !heroErr" class="hero-img" :src="absUrl(d.cover)" mode="aspectFill" @error="heroErr = true" />
+        <view v-if="d.cover && !heroErr" class="hero-shade" />
+        <view class="col gap4 hero-text">
           <text class="hero-brand">雪姬美业 · 科技护美</text>
           <text class="hero-name">AI 智能健康美容体验馆</text>
           <text class="hero-sub">面部护理 · 身体 SPA · 一对一服务</text>
         </view>
-        <XIcon name="building-store" :size="64" color="rgba(0,0,0,0.14)" />
+        <XIcon v-if="!d.cover || heroErr" name="building-store" :size="64" color="rgba(0,0,0,0.14)" />
         <text class="hero-tip">示意图</text>
       </view>
 
@@ -88,17 +91,14 @@ function copyAddr() {
       </view>
 
       <view v-if="d.store.promises?.length" class="card">
-        <view class="row gap6 mb8"><XIcon name="shield-check" :size="18" color="var(--brand-ink)" /><text class="t-md">门店承诺</text></view>
+        <view class="section-title mb8" style="margin-top: 0"><text>门店承诺</text></view>
         <view class="promises">
           <view v-for="p in d.store.promises" :key="p" class="row gap4"><XIcon name="circle-check" :size="15" color="var(--brand-ink)" /><text class="t-xs c2">{{ p }}</text></view>
         </view>
       </view>
 
       <view class="card deals">
-        <view class="row-between">
-          <text class="t-md">门店项目</text>
-          <text class="t-xs c3">与美团团购同价</text>
-        </view>
+        <view class="section-title" style="margin-top: 0"><text>门店项目</text><text class="more">与美团团购同价</text></view>
         <scroll-view scroll-x class="tabs-scroll" :show-scrollbar="false">
           <view class="tabs">
             <view v-for="t in tabs" :key="t.key" class="tab" :class="{ on: cat === t.key }" @click="cat = t.key">{{ t.title }}<text class="tab-n">{{ t.n }}</text></view>
@@ -140,11 +140,18 @@ function copyAddr() {
 </template>
 
 <style scoped>
-.hero { position: relative; margin: 0 calc(-1 * var(--pad)); padding: 22px var(--pad) 44px; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(120deg, #e3cdb0 0%, #c9a063 55%, #a8824d 100%); color: var(--on-brand); }
+.hero { position: relative; overflow: hidden; margin: 0 calc(-1 * var(--pad)); padding: 22px var(--pad) 44px; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(120deg, #e3cdb0 0%, #c9a063 55%, #a8824d 100%); color: var(--on-brand); }
+/* 有照片时 image 会盖住底色，乐龄墨绿底只在无图时可见 */
+.elder .hero { background: linear-gradient(120deg, #7fa48a 0%, #3f6b4f 60%, #345a41 100%); color: #fff; }
+/* 有封面图时：照片铺底 + 左侧压暗，文字改白 */
+.hero.photo { min-height: 150px; color: #fff; }
+.hero-img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.hero-shade { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: linear-gradient(90deg, rgba(43, 32, 22, 0.78) 0%, rgba(43, 32, 22, 0.4) 60%, rgba(43, 32, 22, 0.1) 100%); }
+.hero-text { position: relative; z-index: 1; }
 .hero-brand { font-size: var(--fs-xs); opacity: 0.75; letter-spacing: 1px; }
 .hero-name { font-size: var(--fs-xl); font-weight: 700; line-height: 1.3; }
 .hero-sub { font-size: var(--fs-sm); opacity: 0.8; }
-.hero-tip { position: absolute; right: 10px; bottom: 30px; font-size: 10px; padding: 0 6px; border-radius: 4px; background: rgba(0, 0, 0, 0.35); color: #fff; }
+.hero-tip { z-index: 1; position: absolute; right: 10px; bottom: 30px; font-size: 10px; padding: 0 6px; border-radius: 4px; background: rgba(0, 0, 0, 0.35); color: #fff; }
 .head { position: relative; margin-top: -24px; }
 .rating { color: var(--price); font-weight: 700; font-size: var(--fs-md); }
 .act { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--ink-2); font-size: var(--fs-xs); min-width: 40px; }
@@ -153,14 +160,14 @@ function copyAddr() {
 .elder .promises { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .tabs-scroll { margin: 10px 0 2px; white-space: nowrap; }
 .tabs { display: inline-flex; gap: 8px; }
-.tab { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 12px; border-radius: 15px; background: #f5f5f5; color: var(--ink-2); font-size: var(--fs-sm); }
+.tab { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 12px; border-radius: 15px; background: var(--placeholder); color: var(--ink-2); font-size: var(--fs-sm); }
 .elder .tab { height: 40px; padding: 0 16px; border-radius: 20px; font-size: var(--fs-body); }
-.tab.on { background: var(--brand-soft); color: var(--brand-ink); font-weight: 700; }
+.tab.on { background: linear-gradient(135deg, var(--brand-hi), var(--brand-dark)); color: var(--on-brand); font-weight: 700; }
 .tab-n { font-size: var(--fs-xs); opacity: 0.7; }
 .deal { display: flex; gap: 10px; padding: 12px 0; border-top: 1px solid var(--line); }
 .tabs-scroll + .deal { border-top: 0; }
 .deal-title { font-size: var(--fs-md); font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-.mini { height: 30px; padding: 0 14px; border-radius: 15px; background: var(--brand); color: var(--on-brand); font-weight: 700; font-size: var(--fs-sm); display: flex; align-items: center; flex-shrink: 0; }
+.mini { height: 30px; padding: 0 14px; border-radius: 15px; background: linear-gradient(135deg, var(--brand-hi), var(--brand-dark)); color: var(--on-brand); box-shadow: 0 4px 10px -4px rgba(168, 130, 77, 0.6); font-weight: 700; font-size: var(--fs-sm); display: flex; align-items: center; flex-shrink: 0; }
 .elder .mini { height: 40px; padding: 0 18px; border-radius: 20px; font-size: var(--fs-body); }
 .note { display: block; line-height: 1.6; }
 .foot-act { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 48px; color: var(--ink-2); font-size: var(--fs-xs); }

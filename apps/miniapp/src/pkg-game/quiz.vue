@@ -41,14 +41,25 @@ function next() {
 <template>
   <view :class="xj.pageClass">
     <view v-if="q" class="stack" style="padding-top: 12px">
-      <text class="c2">第 {{ i + 1 }} 题，共 {{ qs.length }} 题</text>
+      <view class="card qhead">
+        <view class="row-between">
+          <view class="row gap8"><view class="icon-box sm-ic"><XIcon name="bulb" :size="18" /></view><text class="t-md semi">每日健康问答</text></view>
+          <text class="t-sm c2">第 <text class="c-brand semi">{{ i + 1 }}</text> / {{ qs.length }} 题 · 已得 {{ score }} 分</text>
+        </view>
+        <view class="progress" style="margin-top: 10px"><view :style="{ width: `${((i + 1) / qs.length) * 100}%` }" /></view>
+      </view>
       <text class="t-title">{{ q.title }}</text>
       <view class="pill" style="align-self: flex-start" @click="speak(q.title)"><XIcon name="volume" :size="18" /><text>朗读</text></view>
       <view v-for="(o, k) in q.options" :key="k" class="option" :class="{ on: chosen === k, right: res && res.answer === k, wrong: res && chosen === k && !res.correct }" @click="answer(k)">
         <view class="dot" /><text class="flex1">{{ o }}</text>
+        <text v-if="res && res.answer === k" class="mark ok">✓</text>
+        <text v-else-if="res && chosen === k && !res.correct" class="mark no">✗</text>
       </view>
       <view v-if="res" class="card stack" :class="res.correct ? 'care' : 'hint'">
-        <text class="t-lg">{{ res.correct ? `答对了${res.points ? `，+${res.points} 积分` : ''}` : '再接再厉' }}</text>
+        <view class="row gap12">
+          <view class="icon-box" :class="res.correct ? 'care' : 'terra'"><XIcon :name="res.correct ? 'circle-check' : 'bulb'" /></view>
+          <text class="t-lg flex1">{{ res.correct ? `答对了${res.points ? `，+${res.points} 积分` : ''}` : '再接再厉' }}</text>
+        </view>
         <text class="t-body">{{ res.knowledge }}</text>
       </view>
       <view v-if="res && i < qs.length - 1" class="btn" @click="next">下一题</view>
@@ -65,4 +76,9 @@ function next() {
 <style scoped>
 .option.right { border: 2px solid var(--care); background: var(--care-soft); color: var(--care); }
 .option.wrong { border: 2px solid #d9a441; background: var(--hint); color: var(--warn-ink); }
+.qhead { padding: 12px 14px; }
+.icon-box.sm-ic { width: 30px; height: 30px; border-radius: 10px; }
+.mark { width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 800; }
+.mark.ok { background: var(--care); }
+.mark.no { background: #d9a441; }
 </style>

@@ -153,8 +153,17 @@ function nextLevel() {
 <template>
   <view v-if="d" :class="xj.pageClass">
     <!-- 选关 -->
+    <view v-if="!lv" class="page-head">
+      <view class="ph-deco i-tabler-grid-dots" />
+      <text class="ph-title">健康消消乐</text>
+      <text class="ph-sub">三个相同连成一线即消除，通关得积分</text>
+      <view class="ph-meta">
+        <view><XIcon name="award" :size="14" />已通关 {{ d.maxLevel }} 关</view>
+        <view><XIcon name="coins" :size="14" />今日还可得 {{ d.pointsLeftToday }} 分</view>
+      </view>
+    </view>
     <view v-if="!lv" class="card stack">
-      <text class="t-lg">选择关卡</text>
+      <view class="section-title" style="margin-top: 0"><text>选择关卡</text></view>
       <view v-for="l in d.levels" :key="l.level" class="lvrow row-between" :class="{ lock: l.level > d.maxLevel + 1 }" @click="l.level <= d.maxLevel + 1 && start(l.level)">
         <view class="row gap8">
           <text class="lvno">{{ l.level }}</text>
@@ -205,11 +214,11 @@ function nextLevel() {
 <style scoped lang="scss">
 .lvrow { padding: 14px 0; border-top: 1px solid var(--line); min-height: 60px; }
 .lvrow.lock { opacity: 0.45; }
-.lvno { width: 34px; height: 34px; border-radius: 10px; background: var(--brand-soft); color: var(--brand-ink); font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.lvno { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(145deg, var(--brand-hi), var(--brand-dark)); color: var(--on-brand); box-shadow: 0 4px 10px -4px rgba(168, 130, 77, 0.6); font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .bar { width: 100%; height: 10px; border-radius: 5px; background: var(--placeholder); overflow: hidden; }
 .bar-in { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--brand-soft), var(--brand)); transition: width 0.25s; }
-.board { display: grid; gap: 6px; margin-top: 12px; }
-.tile { aspect-ratio: 1; border-radius: 12px; background: var(--placeholder); display: flex; align-items: center; justify-content: center; line-height: 1.2; }
+.board { display: grid; gap: 6px; margin-top: 12px; padding: 8px; border-radius: 16px; background: var(--placeholder); }
+.tile { aspect-ratio: 1; border-radius: 12px; background: var(--surface); box-shadow: 0 2px 6px -2px rgba(60, 48, 34, 0.25), inset 0 -2px 0 rgba(60, 48, 34, 0.06); display: flex; align-items: center; justify-content: center; line-height: 1.2; }
 .tile.sel { background: var(--brand-soft); border: 2px solid var(--brand); transform: scale(0.94); }
 .tile.shake { animation: tile-shake 0.3s ease; }
 @keyframes tile-shake { 0%, 100% { transform: translateX(0); } 30% { transform: translateX(-4px); } 60% { transform: translateX(4px); } }

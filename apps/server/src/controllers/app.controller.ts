@@ -614,8 +614,10 @@ export class AppController {
     const mine = groups.filter(g => (g.members as number[]).includes(u.id))
     const people = await this.prisma.customer.findMany({ where: { id: { in: [...new Set(groups.flatMap(g => g.members as number[]))] } } })
     const view = (g: any) => ({ id: g.id, activityId: g.activityId, status: g.status, expiresAt: fmt(g.expiresAt), members: (g.members as number[]).map(id => people.find(p => p.id === id)?.salutation || '团友'), leaderIsMe: g.leaderId === u.id })
+    // 活动封面沿用关联模块的封面图（后台模块配置里换图即可）
+    const mods = await this.prisma.module.findMany({ where: { code: { in: acts.map(a => a.moduleCode).filter((c): c is string => !!c) } } })
     return {
-      activities: acts.map(a => ({ ...a, openGroups: groups.filter(g => g.activityId === a.id && g.status === 'open' && !(g.members as number[]).includes(u.id) && g.expiresAt > new Date()).slice(0, 3).map(view) })),
+      activities: acts.map(a => ({ ...a, cover: mods.find(m => m.code === a.moduleCode)?.cover || null, openGroups: groups.filter(g => g.activityId === a.id && g.status === 'open' && !(g.members as number[]).includes(u.id) && g.expiresAt > new Date()).slice(0, 3).map(view) })),
       mine: mine.map(view),
     }
   }
@@ -688,7 +690,10 @@ export class AppController {
     const projects = await this.prisma.project.findMany({ where: { onMeituan: true, status: 'active' }, orderBy: { code: 'asc' } })
     const view = (p: any) => ({ code: p.code, name: p.name, shortName: p.shortName, category: p.category, durationMin: p.durationMin, priceRef: p.priceRef, groupPrice: p.groupPrice, priceNote: p.priceNote, audience: p.audience, salesNote: p.salesNote })
     if (u) await this.wf.event(u.id, 'module_view', { moduleCode: 'store_services' })
+    // 门店头图沿用后台「门店项目」模块的封面，运营在模块配置里换图即可
+    const mod = await this.prisma.module.findUnique({ where: { code: 'store_services' } })
     return {
+      cover: mod?.cover || null,
       store: store && { id: store.id, name: store.name, address: store.address, mall: store.mall, district: store.district, phone: store.phone, openHours: store.openHours, category: store.category, facilities: store.facilities, promises: store.promises, rating: store.rating, reviewCount: store.reviewCount },
       groups: [
         { title: '面部护理', items: projects.filter(p => p.category === 'face').map(view) },

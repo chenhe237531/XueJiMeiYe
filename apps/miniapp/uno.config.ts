@@ -182,6 +182,9 @@ export default defineConfig({
     'i-tabler-wifi-off',
     'i-tabler-plant',
     'i-tabler-grid-dots',
+    'i-tabler-home-filled',
+    'i-tabler-sparkles-filled',
+    'i-tabler-user-filled',
   ],
   rules: [
     [

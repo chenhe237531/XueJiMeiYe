@@ -54,19 +54,20 @@ function read() {
 <template>
   <view :class="[...xj.pageClass, 'has-footer']">
     <view v-if="d && !d.plan" class="card empty stack" style="margin-top: 16px">
-      <XIcon name="clipboard-heart" :size="48" color="var(--brand-ink)" />
       <text class="t-md">{{ d.preparing ? '顾问正在为您整理方案，审核后会发给您' : '完成六维测评后，顾问会为您整理养护方案' }}</text>
       <view v-if="!d.preparing" class="btn" @click="go('/pkg-assess/intro')">开始六维测评</view>
     </view>
-    <view v-else-if="d" class="stack" style="padding-top: 12px">
-      <view class="col gap4">
-        <view class="row-between">
-          <text class="t-title">{{ c.title }}</text>
-          <view class="pill" @click="read"><XIcon name="volume" :size="18" /></view>
-        </view>
-        <text class="t-body c2">{{ c.summary }}</text>
-        <text class="t-sm c3">{{ sk.packages?.map((p) => `${p.name}${p.weeks ? ` ${p.weeks} 周` : ''}`).join(' + ') }} · {{ d.plan.sentAt }} 由{{ d.plan.sentBy }}发送</text>
+    <view v-else-if="d" class="page-head">
+      <view class="ph-deco i-tabler-clipboard-heart" />
+      <text class="ph-title">{{ c.title }}</text>
+      <text class="ph-sub">{{ c.summary }}</text>
+      <view class="ph-meta">
+        <view v-for="p in sk.packages || []" :key="p.name">{{ p.name }}{{ p.weeks ? ` · ${p.weeks} 周` : '' }}</view>
+        <view @click="read"><XIcon name="volume" :size="14" />朗读方案</view>
       </view>
+      <text class="t-xs c3 sent">{{ d.plan.sentAt }} 由{{ d.plan.sentBy }}发送</text>
+    </view>
+    <view v-if="d && d.plan" class="stack">
 
       <view v-if="d.paused" class="card hint row gap8"><XIcon name="alert-triangle" /><text class="t-md">门店项目暂停中，等医生确认后再安排。</text></view>
 
@@ -86,7 +87,7 @@ function read() {
       </view>
 
       <view v-if="c.storeItems?.length" class="card stack">
-        <text class="t-sm c2 semi">门店安排</text>
+        <view class="section-title" style="margin-top: 0"><text>门店安排</text></view>
         <view v-for="s in c.storeItems" :key="s.project" class="item">
           <view class="row-between" style="align-items: flex-start"><text class="t-md flex1">{{ s.name }}</text><text class="t-sm c2" style="margin-left: 8px">{{ s.freq }}</text></view>
           <text class="t-sm c2">{{ s.why }}</text>
@@ -99,9 +100,9 @@ function read() {
       </view>
 
       <view v-if="c.lifestyle?.length" class="stack">
-        <view class="row-between">
-          <text class="t-sm c2 semi">日常小事 · 今天完成 {{ doneToday.filter((x) => c.lifestyle.includes(x)).length }}/{{ c.lifestyle.length }}</text>
-          <text class="t-xs c3">做到了就点一下</text>
+        <view class="section-title" style="margin-top: 0">
+          <text>日常小事</text>
+          <text class="more">今天完成 {{ doneToday.filter((x) => c.lifestyle.includes(x)).length }}/{{ c.lifestyle.length }} · 做到了就点一下</text>
         </view>
         <view class="row gap8 wrap">
           <view v-for="l in c.lifestyle" :key="l" class="life" :class="{ on: doneToday.includes(l) }" @click="toggleLife(l)">
@@ -112,12 +113,12 @@ function read() {
       </view>
 
       <view v-if="sk.followUps?.length" class="card stack">
-        <text class="t-sm c2 semi">跟进计划</text>
-        <view class="steps">
-          <view v-for="(f, i) in sk.followUps" :key="i" class="step">
-            <view class="sdot" :class="{ on: i === 0 }" />
+        <view class="section-title" style="margin-top: 0"><text>跟进计划</text></view>
+        <view class="timeline">
+          <view v-for="(f, i) in sk.followUps" :key="i" class="tl-step" :class="{ on: i === 0 }">
+            <view class="tl-dot" />
             <text class="t-sm semi">{{ whenText(f.when) }}</text>
-            <text class="t-xs c2">{{ f.action }}</text>
+            <text class="t-xs c2" style="font-weight: 400">{{ f.action }}</text>
           </view>
         </view>
       </view>
@@ -136,10 +137,7 @@ function read() {
 <style scoped>
 .item { padding-top: 10px; border-top: 1px solid var(--line); }
 .item:first-of-type { border-top: 0; }
-.life { display: flex; align-items: center; gap: 6px; min-height: 40px; box-sizing: border-box; padding: 8px 14px; border-radius: 20px; background: #fff; border: 1px solid transparent; font-size: var(--fs-sm); }
+.sent { position: relative; z-index: 1; margin-top: 2px; }
+.life { display: flex; align-items: center; gap: 6px; min-height: 40px; box-sizing: border-box; padding: 8px 14px; border-radius: 20px; background: var(--surface); border: 1px solid transparent; box-shadow: var(--shadow-card); font-size: var(--fs-sm); }
 .life.on { background: var(--care-soft); border-color: var(--care); color: var(--care-dark); }
-.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.step { display: flex; flex-direction: column; gap: 4px; }
-.sdot { width: 14px; height: 14px; border-radius: 8px; border: 2px solid #d3c8ce; background: #fff; }
-.sdot.on { background: var(--brand); border-color: var(--brand); }
 </style>

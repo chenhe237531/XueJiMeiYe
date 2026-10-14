@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
+import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
 import { confirm, go, themeHex, toast } from '@/xj/utils'
@@ -32,23 +33,34 @@ async function save(skip = false) {
 </script>
 
 <template>
-  <view :class="xj.stdPageClass">
-    <view class="col gap6" style="padding: 20px 4px">
-      <text class="t-title">怎么称呼您？</text>
-      <text class="c2">称呼用于问候和顾问联系；出生年份用于测评题目和方案</text>
+  <view :class="[...xj.stdPageClass, 'washed']">
+    <view class="page-head" style="background: none">
+      <view class="ph-deco i-tabler-user-heart" />
+      <text class="ph-title">怎么称呼您？</text>
+      <text class="ph-sub">称呼用于问候和顾问联系；出生年份用于测评题目和方案</text>
+      <view class="ph-meta">
+        <view><XIcon name="clock" :size="14" />30 秒填完</view>
+        <view><XIcon name="lock" :size="14" />仅您和顾问可见</view>
+      </view>
     </view>
-    <view class="card stack">
-      <text class="t-md">称呼</text>
+    <view class="card raised stack">
+      <text class="t-md semi">称呼</text>
       <input v-model="salutation" class="input" placeholder="如：王女士、小李、Anna" maxlength="16">
-      <text class="t-md">出生年份</text>
+      <text class="t-md semi">出生年份</text>
       <picker mode="selector" :range="years" :value="yearIdx < 0 ? 30 : yearIdx" @change="(e) => (yearIdx = Number(e.detail.value))">
         <view class="input row-between"><text :class="{ c3: yearIdx < 0 }">{{ yearIdx < 0 ? '请选择' : `${years[yearIdx]} 年` }}</text><text class="c3">选择</text></view>
       </picker>
       <text class="t-sm c2">会影响测评题目和养护方案，请按实际选择</text>
-      <text class="t-md">性别</text>
-      <view class="row gap12">
-        <view class="option flex1" :class="{ on: gender === 'female' }" @click="gender = 'female'"><view class="dot" />女</view>
-        <view class="option flex1" :class="{ on: gender === 'male' }" @click="gender = 'male'"><view class="dot" />男</view>
+      <text class="t-md semi">性别</text>
+      <view class="choice-grid two">
+        <view class="choice" :class="{ on: gender === 'female' }" @click="gender = 'female'">
+          <view class="icon-box rose"><XIcon name="user-heart" /></view>
+          <text class="t-md">女士</text>
+        </view>
+        <view class="choice" :class="{ on: gender === 'male' }" @click="gender = 'male'">
+          <view class="icon-box sky"><XIcon name="user" /></view>
+          <text class="t-md">先生</text>
+        </view>
       </view>
     </view>
     <view class="stack mt24">

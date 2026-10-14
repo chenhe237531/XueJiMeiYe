@@ -50,26 +50,35 @@ function readAll() {
           <text class="t-lg">您需要知道的三件事</text>
           <view class="pill" @click="readThree"><XIcon name="volume" :size="18" /></view>
         </view>
-        <view class="col gap4">
-          <text class="t-sm semi c-care">做得不错</text>
-          <text class="t-lg" style="font-weight: 500">{{ r.three.good }}</text>
+        <view class="three row gap12">
+          <view class="icon-box care"><XIcon name="heart" /></view>
+          <view class="col gap4 flex1">
+            <text class="t-sm semi c-care">做得不错</text>
+            <text class="t-lg" style="font-weight: 500">{{ r.three.good }}</text>
+          </view>
         </view>
-        <view class="col gap4">
-          <text class="t-sm semi c-warn">需要留意</text>
-          <text class="t-lg" style="font-weight: 500">{{ r.three.attention }}</text>
+        <view class="three row gap12">
+          <view class="icon-box terra"><XIcon name="alert-triangle" /></view>
+          <view class="col gap4 flex1">
+            <text class="t-sm semi c-warn">需要留意</text>
+            <text class="t-lg" style="font-weight: 500">{{ r.three.attention }}</text>
+          </view>
         </view>
-        <view class="col gap4">
-          <text class="t-sm semi c-brand">下一步</text>
-          <text class="t-lg" style="font-weight: 500">{{ r.three.next }}</text>
+        <view class="three row gap12">
+          <view class="icon-box"><XIcon name="arrow-right" /></view>
+          <view class="col gap4 flex1">
+            <text class="t-sm semi c-brand">下一步</text>
+            <text class="t-lg" style="font-weight: 500">{{ r.three.next }}</text>
+          </view>
         </view>
       </view>
 
-      <view class="card col gap12">
+      <view class="card raised col gap12 index-card">
         <view class="col gap4">
           <text class="t-sm c2">六维年轻化指数</text>
           <view class="row gap8" style="align-items: baseline">
-            <text class="num bold" style="font-size: 50px; line-height: 1.1">{{ r.index }}</text>
-            <text v-if="r.prevIndex !== null" class="semi" :class="r.index >= r.prevIndex ? 'c-care' : 'c-warn'">{{ r.index >= r.prevIndex ? '+' : '' }}{{ r.index - r.prevIndex }}</text>
+            <text class="num bold index-n">{{ r.index }}</text>
+            <text v-if="r.prevIndex !== null" class="tag" :class="r.index >= r.prevIndex ? 'care' : 'warn'">较上次 {{ r.index >= r.prevIndex ? '+' : '' }}{{ r.index - r.prevIndex }}</text>
           </view>
           <view class="row gap12 t-xs c2">
             <view class="row gap4"><view class="lg brand" /><text>本次</text></view>
@@ -80,13 +89,15 @@ function readAll() {
         <view class="center"><XRadar :scores="scores" :prev="prevDims" :size="170" labels /></view>
       </view>
 
+      <view class="section-title"><text>六个维度</text></view>
       <view class="group">
-        <view v-for="d in r.dims" :key="d.code" class="cell">
-          <text class="t-md" style="width: 48px">{{ d.name }}</text>
-          <view class="col flex1">
-            <text class="t-sm c2">{{ d.note }}</text>
+        <view v-for="d in r.dims" :key="d.code" class="cell dim">
+          <view class="row-between">
+            <text class="t-md semi">{{ d.name }}</text>
+            <text class="tag" :class="d.tone === 'good' ? 'care' : d.tone === 'attention' ? 'warn' : 'gray'">{{ d.grade }} {{ d.score ?? '' }}</text>
           </view>
-          <text class="tag" :class="d.tone === 'good' ? 'care' : d.tone === 'attention' ? 'warn' : 'gray'">{{ d.grade }} {{ d.score ?? '' }}</text>
+          <view v-if="d.score !== null" class="bar"><view :class="d.tone" :style="{ width: `${Math.max(4, Math.min(100, d.score))}%` }" /></view>
+          <text class="t-sm c2">{{ d.note }}</text>
         </view>
       </view>
 
@@ -146,6 +157,14 @@ function readAll() {
 </template>
 
 <style scoped>
+.three { align-items: flex-start; }
+.index-card { background: radial-gradient(circle at 100% 0%, var(--brand-soft) 0, rgba(255, 255, 255, 0) 60%), var(--surface); }
+.index-n { font-size: 56px; line-height: 1.05; color: var(--brand-ink); }
+.dim { flex-direction: column; align-items: stretch; gap: 6px; padding: 12px 0; }
+.bar { height: 6px; border-radius: 3px; background: var(--placeholder); overflow: hidden; }
+.bar > view { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--brand-hi), var(--brand-dark)); }
+.bar > view.good { background: linear-gradient(90deg, #b3c69b, #6e7f5c); }
+.bar > view.attention { background: linear-gradient(90deg, #f3c97f, #c98a2e); }
 .lg { width: 14px; height: 2px; }
 .lg.brand { background: var(--brand); }
 .lg.dash { border-top: 2px dashed #9a8f95; height: 0; }

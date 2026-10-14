@@ -14,9 +14,9 @@ const wakeAt = ref('06:30')
 const minutes = ref(30)
 const cups = ref(6)
 const TYPES = [
-  { k: 'sleep', n: '睡眠', icon: 'moon' },
-  { k: 'exercise', n: '运动', icon: 'run' },
-  { k: 'water', n: '喝水', icon: 'droplet' },
+  { k: 'sleep', n: '睡眠', icon: 'moon', tone: 'plum' },
+  { k: 'exercise', n: '运动', icon: 'run', tone: 'terra' },
+  { k: 'water', n: '喝水', icon: 'droplet', tone: 'sky' },
 ]
 
 async function load() { d.value = await http.get('/app/checkins') }
@@ -33,13 +33,17 @@ async function submit(type: string) {
 <template>
   <view :class="xj.pageClass">
     <view class="stack" style="padding-top: 12px">
-      <view class="card row gap12">
-        <XIcon name="calendar-check" :size="36" color="var(--brand-ink)" />
-        <view class="col flex1"><text class="t-lg">已连续打卡 {{ d.streak }} 天</text><text class="t-sm c2">每次打卡 +2 积分，每天最多 6 分</text></view>
+      <view class="card raised streak row gap12">
+        <view class="col flex1 gap4">
+          <text class="t-sm c2">已连续打卡</text>
+          <view class="row gap4" style="align-items: baseline"><text class="streak-n num">{{ d.streak }}</text><text class="t-md c2">天</text></view>
+          <text class="t-xs c3">每次打卡 +2 积分，每天最多 6 分</text>
+        </view>
+        <view class="icon-box streak-ic"><XIcon name="calendar-check" :size="30" /></view>
       </view>
       <view v-for="t in TYPES" :key="t.k" class="card stack">
         <view class="row gap8">
-          <XIcon :name="t.icon" :size="24" color="var(--brand-ink)" />
+          <view class="icon-box" :class="t.tone"><XIcon :name="t.icon" /></view>
           <text class="t-lg flex1">{{ t.n }}</text>
           <text v-if="d.today.includes(t.k)" class="tag care">今天已打卡</text>
         </view>
@@ -57,6 +61,9 @@ async function submit(type: string) {
 </template>
 
 <style scoped>
-.chip { height: 40px; padding: 0 16px; border-radius: 20px; background: var(--bg); display: flex; align-items: center; }
-.chip.on { background: var(--brand); color: var(--on-brand); font-weight: 600; }
+.streak { padding: 16px; background: radial-gradient(circle at 100% 0%, var(--brand-soft) 0, rgba(255, 255, 255, 0) 60%), var(--surface); }
+.streak-n { font-size: 40px; font-weight: 700; line-height: 1; color: var(--brand-ink); }
+.icon-box.streak-ic { width: 56px; height: 56px; border-radius: 18px; }
+.chip { height: 40px; padding: 0 16px; border-radius: 20px; background: var(--surface); border: 1.5px solid var(--line-2); box-sizing: border-box; display: flex; align-items: center; }
+.chip.on { background: linear-gradient(160deg, var(--surface), var(--brand-soft)); border-color: var(--brand-dark); color: var(--brand-ink); font-weight: 700; }
 </style>

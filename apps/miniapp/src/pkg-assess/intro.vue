@@ -14,6 +14,11 @@ const hasC2 = ref(false)
 const c2 = ref<any>(null)
 const showFull = ref(true)
 /** 出生年份决定分支题、OSTA / SARC-F 和体检券类型；资料页跳过的用户在这里补一次 */
+const MODES = [
+  { value: 'self', name: '我自己填', sub: '字大，可语音作答', icon: 'user', tone: '' },
+  { value: 'staff_assisted', name: '顾问陪我填', sub: '生成 6 位陪填码', icon: 'headset', tone: 'sky' },
+  { value: 'family', name: '家人帮我填', sub: '仅限已绑定的家人', icon: 'users', tone: 'rose' },
+]
 const years = Array.from({ length: 70 }, (_, i) => new Date().getFullYear() - 18 - i)
 const yearIdx = ref(-1)
 const needYear = ref(false)
@@ -60,9 +65,15 @@ async function startNow() {
 
 <template>
   <view :class="[...xj.pageClass, 'has-footer', 'tall']">
-    <view class="col gap6" style="padding: 16px 0">
-      <text class="t-title">六维年轻化测评</text>
-      <text class="c2">约 8 分钟，可以分几次完成，每题自动保存</text>
+    <view class="page-head">
+      <view class="ph-deco i-tabler-hexagon" />
+      <text class="ph-title">六维年轻化测评</text>
+      <text class="ph-sub">可以分几次完成，每题自动保存</text>
+      <view class="ph-meta">
+        <view><XIcon name="clock" :size="14" />约 8 分钟</view>
+        <view><XIcon name="volume" :size="14" />可语音作答</view>
+        <view><XIcon name="coins" :size="14" />每关 +10 积分</view>
+      </view>
     </view>
     <view v-if="current" class="card hint row gap12" @click="resume">
       <XIcon name="history" :size="24" />
@@ -70,10 +81,11 @@ async function startNow() {
       <XIcon name="chevron-right" :size="20" />
     </view>
     <view class="stack mt12">
+      <view class="section-title" style="margin-top: 0"><text>测评包含</text></view>
       <view class="group">
-        <view class="cell"><XIcon name="shield-check" color="var(--care)" /><view class="col gap4 flex1"><text class="t-md">健康安全关</text><text class="t-sm c2">约 2 分钟，必答</text></view></view>
-        <view class="cell"><XIcon name="hexagon" color="var(--brand-ink)" /><view class="col gap4 flex1"><text class="t-md">六个维度</text><text class="t-sm c2">肌肤 · 体型 · 轮廓 · 体能 · 体态 · 心灵</text></view></view>
-        <view v-if="xj.me?.gender !== 'male'" class="cell"><XIcon name="lock" color="#5C5358" /><view class="col gap4 flex1"><text class="t-md">女性健康进阶关</text><text class="t-sm c2">涉及隐私，每题都可跳过</text></view></view>
+        <view class="cell"><view class="icon-box care"><XIcon name="shield-check" /></view><view class="col gap4 flex1"><text class="t-md">健康安全关</text><text class="t-sm c2">约 2 分钟，必答</text></view><text class="tag care">必答</text></view>
+        <view class="cell"><view class="icon-box"><XIcon name="hexagon" /></view><view class="col gap4 flex1"><text class="t-md">六个维度</text><text class="t-sm c2">肌肤 · 体型 · 轮廓 · 体能 · 体态 · 心灵</text></view></view>
+        <view v-if="xj.me?.gender !== 'male'" class="cell"><view class="icon-box plum"><XIcon name="lock" /></view><view class="col gap4 flex1"><text class="t-md">女性健康进阶关</text><text class="t-sm c2">涉及隐私，每题都可跳过</text></view><text class="tag gray">可选</text></view>
       </view>
 
       <view v-if="needYear" class="card stack">
@@ -95,16 +107,14 @@ async function startNow() {
         <view v-if="showFull && !hasC2" class="t-sm" style="color: #3f4a35">包括测评答案（含女性健康）、门店测量数据、打卡记录；保存到账号注销为止。不同意也可以继续使用其他功能。</view>
       </view>
 
-      <text class="t-sm c2 semi">选择填写方式</text>
-      <view class="group">
-        <view class="cell" @click="mode = 'self'">
-          <view class="radio" :class="{ on: mode === 'self' }" /><view class="col gap4 flex1"><text class="t-md">我自己填</text><text class="t-sm c2">字大，可以语音作答</text></view>
-        </view>
-        <view class="cell" @click="mode = 'staff_assisted'">
-          <view class="radio" :class="{ on: mode === 'staff_assisted' }" /><view class="col gap4 flex1"><text class="t-md">顾问陪我填</text><text class="t-sm c2">生成 6 位陪填码</text></view>
-        </view>
-        <view class="cell" @click="mode = 'family'">
-          <view class="radio" :class="{ on: mode === 'family' }" /><view class="col gap4 flex1"><text class="t-md">家人帮我填</text><text class="t-sm c2">仅限已绑定的家人</text></view>
+      <view class="section-title"><text>选择填写方式</text></view>
+      <view class="choice-grid">
+        <view v-for="o in MODES" :key="o.value" class="choice" :class="{ on: mode === o.value }" @click="mode = o.value">
+          <view class="icon-box" :class="o.tone"><XIcon :name="o.icon" /></view>
+          <view class="col gap4">
+            <text class="t-md">{{ o.name }}</text>
+            <text class="t-xs c2">{{ o.sub }}</text>
+          </view>
         </view>
       </view>
     </view>
@@ -115,7 +125,3 @@ async function startNow() {
   </view>
 </template>
 
-<style scoped>
-.radio { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #c9bec4; box-sizing: border-box; }
-.radio.on { border: 7px solid var(--brand); }
-</style>
