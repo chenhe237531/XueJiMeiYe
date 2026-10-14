@@ -486,7 +486,7 @@ export class AppController {
   @Get('messages')
   @Aud('app')
   async messages(@CurrentUser() u: CustomerUser) {
-    const list = await this.prisma.message.findMany({ where: { customerId: u.id }, orderBy: { id: 'desc' }, take: 50 })
+    const list = await this.prisma.message.findMany({ where: { customerId: u.id }, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: 50 })
     await this.prisma.message.updateMany({ where: { customerId: u.id, read: false }, data: { read: true } })
     return list.map(m => ({ ...m, at: fmt(m.createdAt) }))
   }
@@ -517,7 +517,8 @@ export class AppController {
     const list = await this.prisma.checkin.findMany({ where: { customerId: u.id }, orderBy: { date: 'desc' }, take: 60 })
     const days = [...new Set(list.map(c => c.date))]
     let streak = 0
-    let d = dayjs()
+    // 今天还没打卡时从昨天往前数，连续天数不会在白天被清零
+    let d = days.includes(today()) ? dayjs() : dayjs().subtract(1, 'day')
     while (days.includes(d.format('YYYY-MM-DD'))) { streak++; d = d.subtract(1, 'day') }
     return { today: list.filter(c => c.date === today()).map(c => c.type), streak, recent: list.slice(0, 20).map(c => ({ type: c.type, date: c.date, data: c.data })) }
   }

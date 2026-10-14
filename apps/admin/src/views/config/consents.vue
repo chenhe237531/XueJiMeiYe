@@ -17,7 +17,7 @@ onMounted(async () => { list.value = await get("/admin/consent-texts"); });
       <el-table-column label="要点"><template #default="{ row }"><div v-for="s in row.summary" :key="s" class="text-xs">· {{ s }}</div></template></el-table-column>
       <el-table-column prop="granted" label="同意" width="70" />
       <el-table-column prop="rejected" label="拒绝" width="70" />
-      <el-table-column prop="status" label="状态" width="90" />
+      <el-table-column label="状态" width="90"><template #default="{ row }">{{ ({ published: "已发布", draft: "草稿", archived: "已停用" } as any)[row.status] || row.status }}</template></el-table-column>
     </el-table>
   </el-card>
 </template>

@@ -9,6 +9,7 @@ import { EngineService } from './engine.service'
 import { WorkflowService } from './workflow.service'
 
 const SOURCE_NAMES: Record<string, string> = { HOSPITAL: '医院出具', STORE: '门店测量', SELF: '本人记录' }
+const STORE_RECORD_NAMES: Record<string, string> = { plan: '门店方案', service: '门店服务' }
 
 /** 健康档案、门店测量与报告（4.10、5.3 P-02 ~ P-19、9.9） */
 @Injectable()
@@ -61,7 +62,9 @@ export class ArchiveService {
   }
 
   recordView(r: any) {
-    return { id: r.id, type: r.recordType, title: r.title, summary: r.summary, source: r.sourceLabel, sourceName: SOURCE_NAMES[r.sourceLabel], date: fmt(r.occurredAt, 'YYYY-MM-DD'), refTable: r.refTable, refId: r.refId }
+    // 门店来源里只有测量才叫"门店测量"，方案、服务按类型标注
+    const sourceName = r.sourceLabel === 'STORE' && STORE_RECORD_NAMES[r.recordType] ? STORE_RECORD_NAMES[r.recordType] : SOURCE_NAMES[r.sourceLabel]
+    return { id: r.id, type: r.recordType, title: r.title, summary: r.summary, source: r.sourceLabel, sourceName, date: fmt(r.occurredAt, 'YYYY-MM-DD'), refTable: r.refTable, refId: r.refId }
   }
 
   async records(customerId: number, type?: string) {
@@ -138,7 +141,7 @@ export class ArchiveService {
     const results = metrics.map((x) => {
       const d = defs.find(y => y.code === x.code)!
       const status = d.refHigh !== null && x.value > d.refHigh! ? 'high' : d.refLow !== null && x.value < d.refLow! ? 'low' : 'normal'
-      return { code: x.code, name: x.name, value: x.value, unit: x.unit, ref: d.refLow !== null || d.refHigh !== null ? `${d.refLow ?? ''}-${d.refHigh ?? ''}` : '', refSource: d.refSource, status, direction: d.direction }
+      return { code: x.code, name: x.name, value: x.value, unit: x.unit, ref: refText(d.refLow, d.refHigh), refSource: d.refSource, status, direction: d.direction }
     })
     const compare = results.map((x) => {
       const p = prevMetrics.find(y => y.code === x.code)
@@ -195,4 +198,12 @@ export class ArchiveService {
     if (!out?.items?.length) return base
     return base.map(b => ({ ...b, ...(out.items.find((i: any) => i.metric === b.metric)?.text ? { text: out.items.find((i: any) => i.metric === b.metric).text, ai: true } : {}) }))
   }
+}
+
+/** 参考范围文字：只有下限写"≥ 35"，只有上限写"≤ 139"，两端都有写"90–139" */
+function refText(low: number | null, high: number | null) {
+  if (low !== null && high !== null) return `${low}–${high}`
+  if (low !== null) return `≥ ${low}`
+  if (high !== null) return `≤ ${high}`
+  return ''
 }

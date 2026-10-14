@@ -8,6 +8,7 @@ const list = ref<any[]>([]);
 const dlg = ref(false);
 const form = ref<any>({});
 const json = ref<any>({});
+const ENTRY: Record<string, string> = { page: "图文页", form: "意向表单", miniprogram: "跳转小程序", builtin: "内置功能" };
 const CAT: Record<string, string> = { builtin: "内置", travel: "文旅", mall: "商城", medical: "医疗", benefit: "权益", interactive: "互动", activity: "活动" };
 const COMP: Record<string, string> = { draft: "草稿", pending_review: "待审核", approved: "已通过", rejected: "已驳回" };
 const h5Base = location.port === "8848" ? "http://localhost:9000/" : "/h5/";
@@ -62,7 +63,7 @@ async function uploadCover(opt: any) {
       <el-table-column prop="code" label="编码" width="190" />
       <el-table-column prop="name" label="名称" min-width="170" />
       <el-table-column label="类别" width="70"><template #default="{ row }">{{ CAT[row.category] }}</template></el-table-column>
-      <el-table-column prop="entryType" label="入口" width="100" />
+      <el-table-column label="入口" width="100"><template #default="{ row }">{{ ENTRY[row.entryType] || row.entryType }}</template></el-table-column>
       <el-table-column label="可见等级" width="110"><template #default="{ row }"><el-tag v-for="t in row.visibleTiers" :key="t" size="small" class="mr-1">{{ t }}</el-tag></template></el-table-column>
       <el-table-column label="健康提示" width="80"><template #default="{ row }">{{ (row.healthRules || []).length || '—' }}</template></el-table-column>
       <el-table-column prop="partner" label="合作方" width="160" show-overflow-tooltip />
@@ -87,7 +88,7 @@ async function uploadCover(opt: any) {
           <el-col :span="12"><el-form-item label="编码"><el-input v-model="form.code" :disabled="!!form.id" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="名称"><el-input v-model="form.name" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="类别"><el-select v-model="form.category"><el-option v-for="(n, k) in CAT" :key="k" :label="n" :value="k" /></el-select></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="入口类型"><el-select v-model="form.entryType"><el-option v-for="t in ['page','form','miniprogram','builtin']" :key="t" :label="t" :value="t" /></el-select></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="入口类型"><el-select v-model="form.entryType"><el-option v-for="t in ['page','form','miniprogram','builtin']" :key="t" :label="ENTRY[t]" :value="t" /></el-select></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="图标"><el-input v-model="form.icon" placeholder="Tabler 图标名，如 beach" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="排序"><el-input-number v-model="form.sort" /></el-form-item></el-col>
           <el-col :span="24"><el-form-item label="摘要"><el-input v-model="form.summary" /></el-form-item></el-col>

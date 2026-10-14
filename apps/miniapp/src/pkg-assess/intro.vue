@@ -33,7 +33,7 @@ async function startNow() {
 </script>
 
 <template>
-  <view :class="[...xj.pageClass, 'has-footer']">
+  <view :class="[...xj.pageClass, 'has-footer', 'tall']">
     <view class="col gap6" style="padding: 16px 0">
       <text class="t-title">六维年轻化测评</text>
       <text class="c2">约 8 分钟，可以分几次完成，每题自动保存</text>
@@ -45,9 +45,9 @@ async function startNow() {
     </view>
     <view class="stack mt12">
       <view class="group">
-        <view class="cell"><XIcon name="shield-check" color="var(--care)" /><text class="flex1 t-md">健康安全关</text><text class="t-sm c2">约 2 分钟，必答</text></view>
-        <view class="cell"><XIcon name="hexagon" color="var(--brand-ink)" /><text class="flex1 t-md">六个维度</text><text class="t-sm c2">肌肤 体型 轮廓 体能 体态 心灵</text></view>
-        <view v-if="xj.me?.gender !== 'male'" class="cell"><XIcon name="lock" color="#5C5358" /><text class="flex1 t-md">女性健康进阶关</text><text class="t-sm c2">涉及隐私，可跳过</text></view>
+        <view class="cell"><XIcon name="shield-check" color="var(--care)" /><view class="col gap4 flex1"><text class="t-md">健康安全关</text><text class="t-sm c2">约 2 分钟，必答</text></view></view>
+        <view class="cell"><XIcon name="hexagon" color="var(--brand-ink)" /><view class="col gap4 flex1"><text class="t-md">六个维度</text><text class="t-sm c2">肌肤 · 体型 · 轮廓 · 体能 · 体态 · 心灵</text></view></view>
+        <view v-if="xj.me?.gender !== 'male'" class="cell"><XIcon name="lock" color="#5C5358" /><view class="col gap4 flex1"><text class="t-md">女性健康进阶关</text><text class="t-sm c2">涉及隐私，每题都可跳过</text></view></view>
       </view>
 
       <view class="card care stack">
@@ -64,13 +64,13 @@ async function startNow() {
       <text class="t-sm c2 semi">选择填写方式</text>
       <view class="group">
         <view class="cell" @click="mode = 'self'">
-          <view class="radio" :class="{ on: mode === 'self' }" /><text class="flex1 t-md">我自己填</text><text class="t-sm c2">字大，可以语音作答</text>
+          <view class="radio" :class="{ on: mode === 'self' }" /><view class="col gap4 flex1"><text class="t-md">我自己填</text><text class="t-sm c2">字大，可以语音作答</text></view>
         </view>
         <view class="cell" @click="mode = 'staff_assisted'">
-          <view class="radio" :class="{ on: mode === 'staff_assisted' }" /><text class="flex1 t-md">顾问陪我填</text><text class="t-sm c2">生成 6 位陪填码</text>
+          <view class="radio" :class="{ on: mode === 'staff_assisted' }" /><view class="col gap4 flex1"><text class="t-md">顾问陪我填</text><text class="t-sm c2">生成 6 位陪填码</text></view>
         </view>
         <view class="cell" @click="mode = 'family'">
-          <view class="radio" :class="{ on: mode === 'family' }" /><text class="flex1 t-md">家人帮我填</text><text class="t-sm c2">仅限已绑定的家人</text>
+          <view class="radio" :class="{ on: mode === 'family' }" /><view class="col gap4 flex1"><text class="t-md">家人帮我填</text><text class="t-sm c2">仅限已绑定的家人</text></view>
         </view>
       </view>
     </view>
@@ -82,6 +82,6 @@ async function startNow() {
 </template>
 
 <style scoped>
-.radio { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #c9bec4; box-sizing: border-box; }
+.radio { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #c9bec4; box-sizing: border-box; }
 .radio.on { border: 7px solid var(--brand); }
 </style>

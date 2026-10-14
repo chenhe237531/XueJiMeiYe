@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { DEMO_SHOW_EVENTS, invalidateHiddenDemo } from '../common/demo-scope'
 import { PrismaService } from '../common/prisma.service'
 import { addHours } from '../common/util'
 
@@ -24,6 +25,11 @@ export class WorkflowService {
 
   async event(customerId: number | null, event: string, props?: any) {
     await this.prisma.eventLog.create({ data: { customerId: customerId || undefined, event, props } }).catch(() => {})
+    // 演示副本：访客做了需要员工跟进的事，副本才出现在后台
+    if (customerId && DEMO_SHOW_EVENTS.has(event)) {
+      const r = await this.prisma.customer.updateMany({ where: { id: customerId, demoOf: { not: null }, demoShown: false }, data: { demoShown: true } })
+      if (r.count) invalidateHiddenDemo()
+    }
   }
 
   async message(customerId: number, title: string, content: string, link?: string) {

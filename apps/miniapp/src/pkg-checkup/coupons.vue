@@ -34,7 +34,7 @@ onShow(async () => {
           <view class="right col gap4">
             <XIcon name="qrcode" :size="44" color="#1E191C" />
             <text class="t-xs c2">到店出示</text>
-            <text class="t-xs num semi">{{ c.couponNo }}</text>
+            <text class="t-xs num semi coupon-no">{{ c.couponNo }}</text>
           </view>
         </view>
         <text class="t-sm" style="color: var(--care-dark)">{{ c.promise }}</text>
@@ -59,4 +59,6 @@ onShow(async () => {
 .ticket .left { flex: 1; background: var(--care); color: #fff; border-radius: 20px 0 0 20px; padding: 16px; justify-content: center; }
 .ticket .right { width: 112px; background: #fff; border-radius: 0 20px 20px 0; align-items: center; justify-content: center; border-left: 2px dashed #c8d4bc; }
 .ticket.dim { opacity: 0.55; }
+.ticket .left { min-width: 0; }
+.coupon-no { max-width: 100%; padding: 0 6px; box-sizing: border-box; font-size: 12px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 </style>

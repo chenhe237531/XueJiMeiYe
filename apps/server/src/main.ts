@@ -5,12 +5,15 @@ import { NestFactory } from '@nestjs/core'
 import type { NestExpressApplication } from '@nestjs/platform-express'
 import express from 'express'
 import { AppModule } from './app.module'
+import { staffView } from './common/demo-scope'
 import { AllExceptionsFilter, ResponseInterceptor } from './common/response'
 import { UPLOAD_DIR } from './common/upload-dir'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true })
   app.setGlobalPrefix('api/v1')
+  // 员工端接口（管理端、医院端）标记请求上下文，列表与统计不显示未启用的演示副本
+  app.use((req: any, _res: any, next: () => void) => staffView.run(/^\/api\/v1\/(admin|hospital)\//.test(req.path || req.url), next))
   app.useGlobalInterceptors(new ResponseInterceptor())
   app.useGlobalFilters(new AllExceptionsFilter())
   app.useBodyParser('json', { limit: '10mb' })

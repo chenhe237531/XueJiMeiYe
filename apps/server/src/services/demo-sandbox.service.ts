@@ -1,6 +1,7 @@
 import { Injectable, type OnModuleInit } from '@nestjs/common'
 import { randomBytes } from 'node:crypto'
 import { demoTemplateIds } from '../common/auth'
+import { invalidateHiddenDemo } from '../common/demo-scope'
 import { PrismaService } from '../common/prisma.service'
 import { genNo } from '../common/util'
 
@@ -18,6 +19,8 @@ type Baseline = Record<Table, number>
 
 const BASELINE_KEY = 'demo_baseline'
 const suffix = () => randomBytes(3).toString('hex')
+/** 与正式券码同一格式（TJ + 8 位数字），券面不会因为副本变长 */
+const couponNo = () => `TJ${String(Math.floor(Math.random() * 1e8)).padStart(8, '0')}`
 /** Json 可空字段不能直接写 null，去掉 null 让 Prisma 用默认值 */
 const clean = (o: Record<string, any>) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== null))
 
@@ -148,7 +151,7 @@ export class DemoSandboxService implements OnModuleInit {
       const P = await copy('plan', own, r => (miss(A, r.assessmentId) ? null : { ...cust(r), planNo: genNo('PL'), assessmentId: ref(A, r.assessmentId) }))
       const CP = await copy('coupon', own, r => (miss(A, r.sourceAssessmentId)
         ? null
-        : { ...cust(r), couponNo: `${r.couponNo}${suffix()}`.toUpperCase(), sourceAssessmentId: ref(A, r.sourceAssessmentId) }))
+        : { ...cust(r), couponNo: couponNo(), sourceAssessmentId: ref(A, r.sourceAssessmentId) }))
       const RF = await copy('referral', own, r => (miss(CP, r.couponId)
         ? null
         : { ...cust(r), referralNo: genNo('RF'), couponId: ref(CP, r.couponId), consentC3Id: ref(consent, r.consentC3Id), consentC4Id: ref(consent, r.consentC4Id) }))
@@ -182,5 +185,6 @@ export class DemoSandboxService implements OnModuleInit {
         ? null
         : { ...r, elderId: C.get(r.elderId), familyId: ref(C, r.familyId), token: `${r.token}-${suffix()}` }))
     }, { timeout: 60_000, maxWait: 30_000 })
+    invalidateHiddenDemo() // 新副本默认对员工隐藏，立即生效
   }
 }

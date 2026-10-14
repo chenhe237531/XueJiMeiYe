@@ -105,7 +105,7 @@ const CONSENT_NAMES: Record<string, string> = { C1: "用户协议与隐私政策
           <el-alert v-if="!d.canViewHealth" type="warning" :closable="false" title="完整内容仅健康顾问可见。您可以查看风险等级和方案包（见概览）。" />
           <template v-else-if="health">
             <el-alert type="success" :closable="false" title="已记录本次健康数据查看（health.view）" class="mb-3" />
-            <div class="mb-2"><b>有效健康标签：</b><el-tag v-for="t in health.tags" :key="t.code" class="mr-1 mb-1" :type="t.source === 'hospital' ? 'success' : 'info'">{{ t.name }}（{{ t.source }}）</el-tag></div>
+            <div class="mb-2"><b>有效健康标签：</b><el-tag v-for="t in health.tags" :key="t.code" class="mr-1 mb-1" :type="t.source === 'hospital' ? 'success' : 'info'">{{ t.name }}（{{ ({ assessment: '测评', hospital: '医院', staff: '员工', measurement: '门店测量' } as any)[t.source] || t.source }}）</el-tag></div>
             <el-table :data="health.assessments" size="small" class="mb-4">
               <el-table-column prop="id" label="#" width="60" />
               <el-table-column prop="completedAt" label="完成时间" width="150" />

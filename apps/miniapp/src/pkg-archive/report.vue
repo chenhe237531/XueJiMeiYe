@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { go, SOURCE_STYLE, speak, toast } from '@/xj/utils'
+import { go, refText, speak, srcStyle, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '报告详情' } })
 
@@ -29,7 +29,7 @@ function readAll() {
       <view class="col gap6">
         <view class="row gap8 wrap">
           <text class="t-title">{{ r.title }}</text>
-          <text class="tag" :style="{ background: SOURCE_STYLE[r.sourceLabel].bg, color: SOURCE_STYLE[r.sourceLabel].fg }">{{ r.sourceName }}</text>
+          <text class="tag" :style="{ background: srcStyle(r.sourceLabel).bg, color: srcStyle(r.sourceLabel).fg }">{{ r.sourceName }}</text>
         </view>
         <text v-if="r.type === 'measurement'" class="t-sm c2">{{ c.basic?.date }}，{{ c.basic?.store }}，{{ c.basic?.device }}，操作人 {{ c.basic?.operator }}</text>
         <text v-else class="t-sm c2">{{ r.date }} · {{ c.hospital }} · {{ c.doctor }}</text>
@@ -48,7 +48,7 @@ function readAll() {
               </view>
             </view>
             <view class="col" style="align-items: flex-end">
-              <text class="t-xs c3">{{ m.ref ? `参考 ${m.ref} ${m.unit}` : '暂无参考范围' }}</text>
+              <text class="t-xs c3">{{ m.ref ? `参考 ${refText(m.ref)} ${m.unit}` : '暂无参考范围' }}</text>
               <text class="t-sm semi" :class="TREND[c.compare.find((x) => x.code === m.code)?.trend || 'first'].cls">
                 {{ c.compare.find((x) => x.code === m.code)?.prev !== null && c.compare.find((x) => x.code === m.code)?.prev !== undefined ? `上次 ${c.compare.find((x) => x.code === m.code).prev}，` : '' }}{{ TREND[c.compare.find((x) => x.code === m.code)?.trend || 'first'].t }}
               </text>
@@ -62,12 +62,12 @@ function readAll() {
           <text v-if="c.meaning?.some((m) => m.ai)" class="ai-note">由 AI 辅助撰写，经规则校验</text>
         </view>
         <view class="group">
-          <view class="cell">
-            <view class="col flex1">
+          <view class="cell col" style="align-items: stretch">
+            <view class="row-between">
               <text class="t-sm c2">门店建议</text>
-              <text class="t-md">{{ (c.storeAdvice || []).join('、') }}</text>
+              <text class="t-sm link" @click="go('/pkg-plan/detail')">查看方案</text>
             </view>
-            <text class="t-sm c2" @click="go('/pkg-plan/detail')">查看方案</text>
+            <view class="row gap6 wrap mt8"><text v-for="a in c.storeAdvice || []" :key="a" class="tag advice-tag">{{ a }}</text></view>
           </view>
           <view class="cell">
             <view class="col flex1">
@@ -103,9 +103,9 @@ function readAll() {
     </view>
     <view v-if="r" class="footer-bar">
       <view class="row gap12">
-        <view class="btn plain flex1" @click="readAll"><XIcon name="volume" />朗读</view>
-        <view class="btn plain flex1" @click="toast('PDF 生成后可保存到手机（演示）')"><XIcon name="download" />PDF</view>
-        <view class="btn flex1" @click="go('/pkg-family/list')">分享给家人</view>
+        <view class="btn plain icon-btn" @click="readAll"><XIcon name="volume" /></view>
+        <view class="btn plain icon-btn" @click="toast('PDF 生成后可保存到手机（演示）')"><XIcon name="download" /></view>
+        <view class="btn flex1" @click="go('/pkg-family/list')"><XIcon name="share" />分享给家人</view>
       </view>
     </view>
   </view>
@@ -114,4 +114,5 @@ function readAll() {
 <style scoped>
 .metric { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
 .metric.first { border-top: 0; padding-top: 0; }
+.advice-tag { max-width: 100%; height: auto; padding-top: 4px; padding-bottom: 4px; white-space: normal; line-height: 1.4; box-sizing: border-box; }
 </style>

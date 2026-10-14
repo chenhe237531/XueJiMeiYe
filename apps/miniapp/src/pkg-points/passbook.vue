@@ -51,7 +51,10 @@ async function redeem(it: any) {
 </template>
 
 <style scoped>
-.book { background: linear-gradient(160deg, #ffe14d, #ffc300); color: var(--on-brand); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 4px; }
+.book { position: relative; overflow: hidden; background: linear-gradient(135deg, #e3cdb0 0%, #c9a063 48%, #a8824d 100%); color: var(--on-brand); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 10px 24px -12px rgba(168, 130, 77, 0.5); }
+/* 存折纸纹：右上柔光 + 底部细线，和"我的"页存折卡同一套金色 */
+.book::after { content: ''; position: absolute; right: -28px; top: -36px; width: 130px; height: 130px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); pointer-events: none; }
+.book::before { content: ''; position: absolute; left: 18px; right: 18px; bottom: 44px; border-top: 1px dashed rgba(43, 38, 34, 0.18); }
 .mini { height: 32px; padding: 0 14px; border-radius: 16px; background: #efeaec; color: #786e74; display: flex; align-items: center; font-size: 13px; margin-left: 8px; }
 .mini.on { background: var(--brand); color: var(--on-brand); }
 .lrow { display: flex; gap: 8px; padding: 8px 0; border-top: 1px dashed var(--line-2); font-size: var(--fs-sm); }

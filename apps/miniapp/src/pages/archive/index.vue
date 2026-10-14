@@ -4,7 +4,7 @@ import XIcon from '@/components/XIcon.vue'
 import XNav from '@/components/XNav.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { go, lineSvg, SOURCE_STYLE } from '@/xj/utils'
+import { go, lineSvg, SOURCE_STYLE, srcStyle } from '@/xj/utils'
 
 definePage({ style: { navigationStyle: 'custom', navigationBarTitleText: '档案' } })
 
@@ -72,7 +72,7 @@ onShow(async () => {
             <XIcon v-if="m.arrow !== 'flat'" :name="m.arrow === 'up' ? 'arrow-up' : 'arrow-down'" :size="16" :color="m.better === null ? '#786E74' : m.better ? 'var(--care)' : '#7A4A08'" />
           </view>
           <view class="row gap6 t-xs c2">
-            <text class="tag" :style="{ background: SOURCE_STYLE[m.source].bg, color: SOURCE_STYLE[m.source].fg }">{{ m.sourceName }}</text>
+            <text class="tag" :style="{ background: srcStyle(m.source).bg, color: srcStyle(m.source).fg }">{{ m.sourceName }}</text>
             <text style="white-space: nowrap">{{ m.date }}</text>
           </view>
         </view>
@@ -112,7 +112,7 @@ onShow(async () => {
         <view v-for="r in d.records" :key="r.id" class="cell" @click="openRecord(r)">
           <text class="t-sm c2 num" style="width: 52px">{{ r.date.slice(5).replace('-', '/') }}</text>
           <text class="flex1 t-body">{{ r.title }}</text>
-          <text class="t-xs semi" :style="{ color: SOURCE_STYLE[r.source].fg }">{{ r.sourceName }}</text>
+          <text class="t-xs semi" :style="{ color: srcStyle(r.source).fg }">{{ r.sourceName }}</text>
         </view>
       </view>
     </view>

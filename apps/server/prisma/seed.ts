@@ -355,7 +355,11 @@ async function main() {
   await mirror.send(wang.id, ss.sessionId, '小镜，今天粤曲班老师夸我唱得好')
   await mirror.send(wang.id, ss.sessionId, '读我的报告')
   for (let d = 1; d <= 6; d++) await prisma.checkin.create({ data: { customerId: wang.id, type: 'sleep', date: dayjs().subtract(d, 'day').format('YYYY-MM-DD'), data: { sleepAt: '22:30', wakeAt: '06:10', wakeTimes: between(1, 3) } } })
-  for (let d = 1; d <= 6; d++) await wf.addPoints(wang.id, 2, 'checkin', '打卡：睡眠')
+  for (let d = 6; d >= 1; d--) {
+    await wf.addPoints(wang.id, 2, 'checkin', '打卡：睡眠')
+    const last = await prisma.pointsLedger.findFirst({ where: { customerId: wang.id }, orderBy: { id: 'desc' } })
+    await prisma.pointsLedger.update({ where: { id: last!.id }, data: { createdAt: dayjs().subtract(d, 'day').hour(7).minute(10).toDate() } })
+  }
   await prisma.customer.update({ where: { id: wang.id }, data: { lastVisitAt: dayjs().subtract(3, 'day').toDate() } })
   log('wang done', wangA2)
 

@@ -115,6 +115,8 @@ model Customer {
   demoOf          Int?
   /// 演示副本归属的设备标识
   demoDevice      String?
+  /// 演示副本是否出现在管理端：访客开始测评、预约、提交意向等之后才显示，避免后台被成倍的副本数据淹没
+  demoShown       Boolean   @default(false)
   lastVisitAt     DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt

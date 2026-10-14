@@ -64,6 +64,7 @@ export class CheckupService {
   }
 
   async slots(hospitalId: number, packageCode: string) {
+    if (!hospitalId || !packageCode) throw Err.bad('缺少医院或套餐')
     const start = dayjs().add(1, 'day')
     const list = await this.prisma.checkupSlot.findMany({ where: { hospitalId, packageCode, date: { gte: start.format('YYYY-MM-DD') } }, orderBy: { date: 'asc' }, take: 21 })
     return list.map(s => ({ date: s.date, week: '日一二三四五六'[dayjs(s.date).day()], capacity: s.capacity, remaining: Math.max(0, s.capacity - s.booked), status: s.status }))

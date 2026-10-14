@@ -15,11 +15,14 @@ const result = ref<any>(null)
 const showOdds = ref(false)
 
 const step = computed(() => 360 / (d.value?.prizes?.length || 6))
-const items = computed(() => (d.value?.prizes || []).map((p: any, i: number) => ({ ...p, angle: i * step.value + step.value / 2 })))
+const PRIZE_ICON: Record<string, string> = { points: 'coins', lead: 'gift', none: 'mood-smile' }
+const items = computed(() => (d.value?.prizes || []).map((p: any, i: number) => ({ ...p, angle: i * step.value + step.value / 2, icon: PRIZE_ICON[p.type] || 'gift' })))
+/** 扇区底色：品牌浅色与白交替，扇区之间留 1° 细缝 */
 const conic = computed(() => {
-  const colors = ['#f7ede0', '#e3cdb0']
+  const colors = ['var(--brand-soft)', 'var(--surface)']
   const n = d.value?.prizes?.length || 6
-  return `conic-gradient(${Array.from({ length: n }, (_, i) => `${colors[i % 2]} ${i * step.value}deg ${(i + 1) * step.value}deg`).join(', ')})`
+  const s = step.value
+  return `conic-gradient(${Array.from({ length: n }, (_, i) => `var(--brand-line) ${i * s}deg ${i * s + 0.8}deg, ${colors[i % 2]} ${i * s + 0.8}deg ${(i + 1) * s}deg`).join(', ')})`
 })
 
 async function load() {
@@ -53,11 +56,15 @@ async function spin(usePoints: boolean) {
   <view v-if="d" :class="xj.pageClass">
     <view class="card stack" style="align-items: center; padding-bottom: 20px">
       <view class="wheel-wrap">
-        <view class="pointer">▼</view>
+        <view class="pointer" />
         <view class="wheel" :style="{ background: conic, transform: `rotate(${angle}deg)` }">
-          <view v-for="p in items" :key="p.label" class="wheel-item" :style="{ transform: `rotate(${p.angle}deg) translateY(-84px)` }">
-            <text class="wheel-label">{{ p.label }}</text>
+          <view v-for="p in items" :key="p.label" class="wheel-item" :style="{ transform: `rotate(${p.angle}deg)` }">
+            <XIcon :name="p.icon" :size="20" :color="p.type === 'none' ? 'var(--ink-3)' : 'var(--brand-ink)'" />
+            <text class="wheel-label" :class="{ muted: p.type === 'none' }">{{ p.label }}</text>
           </view>
+        </view>
+        <view class="hub" :class="{ busy: spinning }" @click="d.freeLeft > 0 ? spin(false) : d.paidLeft > 0 ? spin(true) : null">
+          <text>{{ spinning ? '…' : '抽' }}</text>
         </view>
       </view>
 
@@ -91,11 +98,16 @@ async function spin(usePoints: boolean) {
 </template>
 
 <style scoped lang="scss">
-.wheel-wrap { position: relative; width: 260px; height: 260px; margin-top: 18px; }
-.wheel { width: 260px; height: 260px; border-radius: 50%; position: relative; border: 8px solid var(--brand); box-sizing: border-box; box-shadow: 0 14px 30px -14px rgba(168, 130, 77, 0.6); transition: transform 4s cubic-bezier(0.18, 0.75, 0.22, 1); }
-.wheel-item { position: absolute; left: 50%; top: 50%; width: 70px; margin-left: -35px; height: 0; display: flex; justify-content: center; transform-origin: center 0; }
-.wheel-label { font-size: 12px; font-weight: 600; color: var(--brand-ink); white-space: nowrap; text-align: center; }
-.pointer { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 26px; color: var(--price); z-index: 2; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); }
+.wheel-wrap { position: relative; width: 280px; height: 280px; margin-top: 18px; padding: 10px; border-radius: 50%; box-sizing: border-box; background: radial-gradient(circle at 30% 25%, var(--brand-line), var(--brand-dark)); box-shadow: 0 18px 36px -18px rgba(107, 78, 46, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.5); }
+.wheel { width: 260px; height: 260px; border-radius: 50%; position: relative; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6); transition: transform 4s cubic-bezier(0.18, 0.75, 0.22, 1); }
+/* 每个奖品从圆心沿半径排开：图标在外圈、文字朝圆心，读起来顺着扇区方向 */
+.wheel-item { position: absolute; left: 50%; top: 0; width: 64px; height: 50%; margin-left: -32px; display: flex; flex-direction: column; align-items: center; padding-top: 18px; gap: 4px; box-sizing: border-box; transform-origin: 50% 100%; }
+.wheel-label { font-size: 12px; font-weight: 700; color: var(--brand-ink); text-align: center; line-height: 1.25; max-width: 56px; }
+.wheel-label.muted { color: var(--ink-3); font-weight: 600; }
+.pointer { position: absolute; top: -6px; left: 50%; z-index: 3; width: 0; height: 0; margin-left: -12px; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 22px solid var(--price); filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.18)); }
+.hub { position: absolute; left: 50%; top: 50%; z-index: 2; width: 68px; height: 68px; margin: -34px 0 0 -34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--brand); color: var(--on-brand); font-size: 22px; font-weight: 800; border: 4px solid var(--surface); box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.35); transition: transform 0.15s; }
+.hub:active { transform: scale(0.94); }
+.hub.busy { opacity: 0.85; }
 .result { margin-top: 14px; padding: 14px; border-radius: var(--r-inner); background: var(--brand-soft); width: 100%; box-sizing: border-box; text-align: center; }
 .btn.off { opacity: 0.55; }
 </style>
