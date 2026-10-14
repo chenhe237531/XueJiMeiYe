@@ -3,13 +3,15 @@ import { computed, ref } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { go, speak } from '@/xj/utils'
+import { go, speak, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '我的方案' } })
 
 const xj = useXj()
 const d = ref<any>(null)
 const history = ref<any[]>([])
+/** 今天已勾选的日常小事（存为 plan 类型打卡，首次勾选给打卡积分） */
+const doneToday = ref<string[]>([])
 const c = computed(() => d.value?.plan?.content || {})
 const sk = computed(() => d.value?.plan?.skeleton || {})
 const WHEN: Record<string, string> = { H1: '1 小时内', D1: '明天', after_return: '回传后' }
@@ -18,7 +20,31 @@ const whenText = (w: string) => WHEN[w] || (w.startsWith('W') ? `第 ${w.slice(1
 onShow(async () => {
   d.value = await http.get('/app/plans/current')
   history.value = await http.get('/app/plans', undefined, { silent: true }).catch(() => [])
+  const ck: any = await http.get('/app/checkins', undefined, { silent: true }).catch(() => null)
+  doneToday.value = ck?.today?.includes('plan') ? (ck.recent.find((x: any) => x.type === 'plan')?.data?.done || []) : []
 })
+
+let saving = false
+async function toggleLife(l: string) {
+  if (saving) return
+  saving = true
+  const prev = doneToday.value
+  const done = prev.includes(l) ? prev.filter(x => x !== l) : [...prev, l]
+  doneToday.value = done
+  const total = c.value.lifestyle?.length || 0
+  try {
+    const res: any = await http.post('/app/checkins', { type: 'plan', data: { done, summary: `完成方案日常 ${done.length}/${total} 项` } }, { silent: true })
+    if (res?.points) toast(`今天的方案打卡 +${res.points} 积分`)
+    else if (done.length === total && !prev.includes(l)) toast('今天的日常小事全部完成啦')
+  }
+  catch {
+    doneToday.value = prev
+    toast('没保存上，请再点一次')
+  }
+  finally {
+    saving = false
+  }
+}
 
 function read() {
   speak(`${c.value.title}。${c.value.summary}${c.value.medicalIntro || ''}${(c.value.medicalItems || []).map((m: any) => `${m.name}，${m.why}`).join('。')}。门店安排：${(c.value.storeItems || []).map((s: any) => `${s.name}，${s.freq}`).join('；')}。`)
@@ -73,9 +99,15 @@ function read() {
       </view>
 
       <view v-if="c.lifestyle?.length" class="stack">
-        <text class="t-sm c2 semi">日常小事</text>
+        <view class="row-between">
+          <text class="t-sm c2 semi">日常小事 · 今天完成 {{ doneToday.filter((x) => c.lifestyle.includes(x)).length }}/{{ c.lifestyle.length }}</text>
+          <text class="t-xs c3">做到了就点一下</text>
+        </view>
         <view class="row gap8 wrap">
-          <text v-for="l in c.lifestyle" :key="l" class="life">{{ l }}</text>
+          <view v-for="l in c.lifestyle" :key="l" class="life" :class="{ on: doneToday.includes(l) }" @click="toggleLife(l)">
+            <XIcon :name="doneToday.includes(l) ? 'circle-check' : 'circle'" :size="18" />
+            <text>{{ l }}</text>
+          </view>
         </view>
       </view>
 
@@ -104,7 +136,8 @@ function read() {
 <style scoped>
 .item { padding-top: 10px; border-top: 1px solid var(--line); }
 .item:first-of-type { border-top: 0; }
-.life { padding: 8px 14px; border-radius: 20px; background: #fff; font-size: var(--fs-sm); }
+.life { display: flex; align-items: center; gap: 6px; min-height: 40px; box-sizing: border-box; padding: 8px 14px; border-radius: 20px; background: #fff; border: 1px solid transparent; font-size: var(--fs-sm); }
+.life.on { background: var(--care-soft); border-color: var(--care); color: var(--care-dark); }
 .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .step { display: flex; flex-direction: column; gap: 4px; }
 .sdot { width: 14px; height: 14px; border-radius: 8px; border: 2px solid #d3c8ce; background: #fff; }

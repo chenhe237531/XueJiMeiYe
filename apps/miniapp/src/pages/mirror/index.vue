@@ -4,7 +4,7 @@ import XIcon from '@/components/XIcon.vue'
 import XNav from '@/components/XNav.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { call, createRecognizer, go, speak, toast } from '@/xj/utils'
+import { call, createRecognizer, go, speak, toast, voiceSupported } from '@/xj/utils'
 
 definePage({ style: { navigationStyle: 'custom', navigationBarTitleText: '魔镜' } })
 
@@ -17,6 +17,7 @@ const sending = ref(false)
 const listening = ref(false)
 const scrollTo = ref('')
 const askMemory = ref(false)
+const canVoice = voiceSupported()
 let recognizer: any = null
 
 async function start() {
@@ -25,7 +26,7 @@ async function start() {
   if (!session.value) return
   msgs.value = [...session.value.history.slice(-8), { role: 'assistant', content: session.value.persona.opening }]
   askMemory.value = session.value.askMemoryConsent
-  keyboard.value = !xj.elderMode
+  keyboard.value = !xj.elderMode || !canVoice
   scroll()
 }
 
@@ -59,7 +60,8 @@ async function send(text: string, inputMethod = 'text', quickTopic?: string) {
       }
       scroll()
     }, 30)
-    if (res.restHint) toast(res.restHint)
+    if (res.limitHint) toast(res.limitHint)
+    else if (res.restHint) toast(res.restHint)
   }
   catch {
     msgs.value[msgs.value.length - 1] = { role: 'assistant', content: '我现在有点忙，稍后再聊' }
@@ -178,7 +180,7 @@ onShow(() => {
           </view>
         </scroll-view>
         <view class="row gap12">
-          <view class="kbd" @click="keyboard = !keyboard">
+          <view v-if="canVoice" class="kbd" @click="keyboard = !keyboard">
             <XIcon :name="keyboard ? 'microphone' : 'keyboard'" :size="24" />
           </view>
           <template v-if="keyboard">

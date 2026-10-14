@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { back, go, themeHex } from '@/xj/utils'
+import { back, go, themeHex, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '六维测评' } })
 
@@ -12,17 +12,43 @@ const mode = ref('self')
 const current = ref<any>(null)
 const hasC2 = ref(false)
 const c2 = ref<any>(null)
-const showFull = ref(false)
+const showFull = ref(true)
+/** 出生年份决定分支题、OSTA / SARC-F 和体检券类型；资料页跳过的用户在这里补一次 */
+const years = Array.from({ length: 70 }, (_, i) => new Date().getFullYear() - 18 - i)
+const yearIdx = ref(-1)
+const needYear = ref(false)
 
 onShow(async () => {
   if (!xj.loggedIn) return go('/pkg-auth/login')
+  if (!xj.me) await xj.loadMe()
+  needYear.value = !xj.me?.birthYear
   current.value = await http.get('/app/assessments/current', undefined, { silent: true }).catch(() => null)
   const list: any[] = await http.get('/app/consents', undefined, { silent: true }).catch(() => [])
   c2.value = list.find(x => x.type === 'C2')
   hasC2.value = !!c2.value?.granted
 })
 
+async function ensureYear() {
+  if (!needYear.value) return true
+  if (yearIdx.value < 0) {
+    toast('请先选择出生年份')
+    return false
+  }
+  const res: any = await http.patch('/app/me', { birthYear: years[yearIdx.value] }, { loading: '保存中' })
+  await xj.loadMe()
+  needYear.value = false
+  if (res?.elderAuto) {
+    await new Promise(r => uni.showModal({ title: '已为您开启乐龄模式', content: '字更大、颜色更柔和。可以在"我的 - 设置"里随时切换。', showCancel: false, confirmText: '好的', confirmColor: themeHex().ink, complete: r }))
+  }
+  return true
+}
+
+async function resume() {
+  if (await ensureYear()) go('/pkg-assess/map')
+}
+
 async function startNow() {
+  if (!(await ensureYear())) return
   if (!hasC2.value) await http.post('/app/consents', { type: 'C2', granted: true })
   const a: any = await http.post('/app/assessments', { mode: mode.value }, { loading: '准备题目' })
   if (a?.assistCode) {
@@ -38,7 +64,7 @@ async function startNow() {
       <text class="t-title">六维年轻化测评</text>
       <text class="c2">约 8 分钟，可以分几次完成，每题自动保存</text>
     </view>
-    <view v-if="current" class="card hint row gap12" @click="go('/pkg-assess/map')">
+    <view v-if="current" class="card hint row gap12" @click="resume">
       <XIcon name="history" :size="24" />
       <view class="col flex1"><text class="t-md">上次的测评还没做完</text><text class="t-sm">已完成 {{ current.doneCount }}/{{ current.totalLevels }} 关，点这里继续</text></view>
       <XIcon name="chevron-right" :size="20" />
@@ -50,6 +76,14 @@ async function startNow() {
         <view v-if="xj.me?.gender !== 'male'" class="cell"><XIcon name="lock" color="#5C5358" /><view class="col gap4 flex1"><text class="t-md">女性健康进阶关</text><text class="t-sm c2">涉及隐私，每题都可跳过</text></view></view>
       </view>
 
+      <view v-if="needYear" class="card stack">
+        <text class="t-md">您的出生年份</text>
+        <text class="t-sm c2">年龄会影响题目和方案，只需选一次</text>
+        <picker mode="selector" :range="years" :value="yearIdx < 0 ? 30 : yearIdx" @change="(e) => (yearIdx = Number(e.detail.value))">
+          <view class="input row-between"><text :class="{ c3: yearIdx < 0 }">{{ yearIdx < 0 ? '请选择' : `${years[yearIdx]} 年` }}</text><text class="c3">选择</text></view>
+        </picker>
+      </view>
+
       <view class="card care stack">
         <view class="row gap8"><XIcon name="shield-check" color="var(--care-dark)" /><text class="t-md bold" style="color: var(--care-dark)">健康信息处理，单独同意</text></view>
         <view class="col gap6 t-body" style="color: #3f4a35">
@@ -57,7 +91,7 @@ async function startNow() {
           <view class="row gap8"><XIcon name="check" :size="18" color="var(--care)" /><text>只有您和授权的健康顾问能看到</text></view>
           <view class="row gap8"><XIcon name="check" :size="18" color="var(--care)" /><text>随时可以在“我的”里撤回</text></view>
         </view>
-        <text class="t-sm semi" style="color: var(--care)" @click="showFull = !showFull">{{ hasC2 ? `已于 ${c2?.at} 同意` : '查看完整说明' }}</text>
+        <text class="t-sm semi" style="color: var(--care)" @click="showFull = !showFull">{{ hasC2 ? `已于 ${c2?.at} 同意` : showFull ? '收起完整说明' : '查看完整说明' }}</text>
         <view v-if="showFull && !hasC2" class="t-sm" style="color: #3f4a35">包括测评答案（含女性健康）、门店测量数据、打卡记录；保存到账号注销为止。不同意也可以继续使用其他功能。</view>
       </view>
 

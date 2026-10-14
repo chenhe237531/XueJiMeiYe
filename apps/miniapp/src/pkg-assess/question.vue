@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { createRecognizer, go, speak, stopSpeak, themeHex, toast } from '@/xj/utils'
+import { createRecognizer, go, speak, stopSpeak, themeHex, toast, voiceSupported } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '答题' } })
 
@@ -16,6 +16,17 @@ const answers = ref<Record<string, any>>({})
 const idx = ref(0)
 const listening = ref(false)
 const numInput = ref('')
+const overall = ref<any>(null)
+/** 语音作答：乐龄模式或 50 岁以上都显示；当前环境不支持识别时不显示 */
+const showVoice = computed(() => voiceSupported() && !!q.value?.options?.length && (xj.elderMode || (xj.me?.age ?? 0) >= 50))
+let voiceMiss = 0
+/** 全部必答关的已答 / 总题数（本关按页面上的实时答案算） */
+const overallText = computed(() => {
+  const o = overall.value
+  if (!o) return ''
+  const here = questions.value.filter(x => answers.value[x.code]).length
+  return `全部 ${o.otherAnswered + here}/${o.otherTotal + questions.value.length} 题`
+})
 
 const q = computed(() => questions.value[idx.value])
 /** 关卡标题：维度名补"关"字（健康安全关、女性健康进阶关本身已带） */
@@ -27,6 +38,7 @@ const sliderVal = ref(0)
 async function load(keepCode?: string) {
   const r: any = await http.get(`/app/assessments/${id.value}/levels/${level.value}`)
   levelInfo.value = r.level
+  overall.value = r.overall
   questions.value = r.questions
   answers.value = r.answers || {}
   uni.setNavigationBarTitle({ title: levelTitle.value })
@@ -151,10 +163,28 @@ function openTest() {
   go(`/pkg-assess/${q.value.type === 'counter' ? 'test-chair' : 'test-balance'}?id=${id.value}&code=${q.value.code}&ref=${q.value.config?.ref || ''}`)
 }
 
+const ORDINALS = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
+/** 语音匹配：选项原文包含 / 被包含，或"第一个""选项二""2"这类序号说法 */
+function matchOption(text: string) {
+  const opts = q.value.options || []
+  const t = text.replace(/[。，,.！!？?\s]/g, '')
+  if (!t) return null
+  const byLabel = opts.find((o: any) => t.includes(o.label) || o.label.includes(t))
+  if (byLabel) return byLabel
+  const m = t.match(/^(?:第|选项|选)?([一二三四五六七八九十]|\d{1,2})(?:个|项|条)?$/)
+  if (!m) return null
+  const n = /\d/.test(m[1]) ? Number(m[1]) : ORDINALS.indexOf(m[1]) + 1
+  return opts[n - 1] || null
+}
+
 function voice() {
   const r = createRecognizer(async (text) => {
-    const opt = (q.value.options || []).find((o: any) => text.includes(o.label) || o.label.includes(text.replace(/[。，,.\s]/g, '')))
-    if (!opt) return toast(`听到"${text}"，没有对上选项，请再说一次或直接点选`)
+    const opt = matchOption(text)
+    if (!opt) {
+      voiceMiss++
+      return toast(voiceMiss >= 2 ? `没听清"${text}"。可以直接点选答案，或说"第一个""第二个"` : `听到"${text}"，没有对上选项，请再说一次`)
+    }
+    voiceMiss = 0
     toast(`您选的是：${opt.label}`)
     if (q.value.type === 'multi') pick(opt)
     else {
@@ -172,7 +202,10 @@ function voice() {
   <view :class="[...xj.pageClass, 'has-footer']">
     <view v-if="q" class="stack" style="padding-top: 12px">
       <view class="col gap8">
-        <text class="c2 t-body">第 {{ idx + 1 }} 题，共 {{ questions.length }} 题</text>
+        <view class="row-between">
+          <text class="c2 t-body">{{ overall ? `第 ${overall.levelNo}/${overall.levelCount} 关 · ` : '' }}第 {{ idx + 1 }} 题，共 {{ questions.length }} 题</text>
+          <text v-if="overallText" class="c3 t-sm">{{ overallText }}</text>
+        </view>
         <view class="progress"><view :style="{ width: `${((idx + 1) / questions.length) * 100}%` }" /></view>
       </view>
       <text class="q-title">{{ q.title }}</text>
@@ -220,18 +253,18 @@ function voice() {
     </view>
 
     <view v-if="q" class="footer-bar">
-      <view v-if="xj.elderMode && q.options?.length" class="btn" :class="{ listening }" @click="voice">
+      <view v-if="showVoice" class="btn" :class="{ listening }" @click="voice">
         <XIcon name="microphone" :size="24" />
         <text>{{ listening ? '正在听…' : '说出答案' }}</text>
       </view>
-      <view v-if="q.type === 'multi' || q.type === 'slider' || q.type === 'number' || (['counter', 'timer'].includes(q.type) && answers[q.code])" class="btn" :class="{ ghost: xj.elderMode && q.options?.length }" @click="nextQ">
+      <view v-if="q.type === 'multi' || q.type === 'slider' || q.type === 'number' || (['counter', 'timer'].includes(q.type) && answers[q.code])" class="btn" :class="{ ghost: showVoice }" @click="nextQ">
         {{ idx === questions.length - 1 ? '完成本关' : '下一题' }}
       </view>
-      <view v-else-if="answers[q.code] && idx === questions.length - 1" class="btn" :class="{ ghost: xj.elderMode }" @click="finishLevel">完成本关</view>
-      <view class="row-between t-body" style="padding: 4px 8px; color: #3b3337">
-        <text :style="{ opacity: idx > 0 ? 1 : 0.3 }" @click="prev">上一题</text>
-        <text v-if="answers[q.code] && idx < questions.length - 1 && !['multi', 'slider', 'number', 'counter', 'timer'].includes(q.type)" @click="idx++">下一题</text>
-        <text v-if="!q.required" @click="skip">跳过</text>
+      <view v-else-if="answers[q.code] && idx === questions.length - 1" class="btn" :class="{ ghost: showVoice }" @click="finishLevel">完成本关</view>
+      <view class="nav-row t-body">
+        <view class="nav-btn" :class="{ off: idx === 0 }" @click="prev"><XIcon name="chevron-left" :size="18" />上一题</view>
+        <view v-if="answers[q.code] && idx < questions.length - 1 && !['multi', 'slider', 'number', 'counter', 'timer'].includes(q.type)" class="nav-btn" @click="idx++">下一题<XIcon name="chevron-right" :size="18" /></view>
+        <view v-if="!q.required" class="nav-btn skip" @click="skip">跳过</view>
       </view>
     </view>
   </view>
@@ -241,4 +274,10 @@ function voice() {
 .q-title { font-size: var(--fs-title); font-weight: 700; line-height: 1.35; }
 .step { width: 48px; height: 48px; border-radius: 24px; background: var(--brand-soft); color: var(--brand-ink); display: flex; align-items: center; justify-content: center; }
 .btn.listening { background: var(--brand-dark); }
+/* 底部"上一题 / 下一题 / 跳过"：至少 44px 触控区，乐龄 52px；"跳过"靠右与"下一题"隔开，减少误触 */
+.nav-row { display: flex; align-items: center; gap: 12px; color: #3b3337; }
+.nav-btn { min-height: 44px; min-width: 88px; padding: 0 14px; box-sizing: border-box; border-radius: 22px; background: var(--surface); border: 1px solid #e0d8dc; display: flex; align-items: center; justify-content: center; gap: 2px; }
+.nav-btn.off { opacity: 0.35; }
+.nav-btn.skip { margin-left: auto; background: transparent; border-color: transparent; color: var(--ink-2); }
+.elder .nav-btn { min-height: 52px; border-radius: 26px; }
 </style>

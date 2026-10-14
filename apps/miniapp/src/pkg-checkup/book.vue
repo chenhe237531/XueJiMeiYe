@@ -58,9 +58,9 @@ async function submit() {
       </view>
 
       <view v-if="mode === 'coupon'" class="stack">
-        <view class="row-between"><text class="t-lg">选择体检日期</text><text class="t-sm c2">号源由医院实时提供</text></view>
+        <view class="row-between"><text class="t-lg">选择体检日期</text><text class="t-sm c2">近 3 周号源，医院实时提供</text></view>
         <view class="days">
-          <view v-for="s in slots.slice(0, 14)" :key="s.date" class="day" :class="{ on: date === s.date, full: !s.remaining }" @click="s.remaining ? (date = s.date) : toast('这一天约满了')">
+          <view v-for="s in slots" :key="s.date" class="day" :class="{ on: date === s.date, full: !s.remaining }" @click="s.remaining ? (date = s.date) : toast('这一天约满了')">
             <text class="t-xs">周{{ s.week }}</text>
             <text class="t-lg num">{{ Number(s.date.slice(8)) }}</text>
             <text class="t-xs" :class="date === s.date ? '' : s.remaining <= 2 ? 'c-warn' : 'c-care'">{{ s.remaining ? `余 ${s.remaining}` : '约满' }}</text>

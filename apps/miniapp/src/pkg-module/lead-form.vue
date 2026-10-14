@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
-import { back, themeHex, toast } from '@/xj/utils'
+import { afterSubmit, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '提交意向' } })
 
@@ -34,8 +34,7 @@ async function submit() {
     if (f.type === 'phone' && !empty && !/^1\d{10}$/.test(String(form.value[f.key]))) return toast('请填写 11 位手机号')
   }
   const res: any = await http.post('/app/leads', { moduleCode: m.value.code, form: form.value, ackNotices: uni.getStorageSync('xj_ack') || [] }, { loading: '提交中' })
-  await new Promise(r => uni.showModal({ title: '已提交', content: `顾问会在 ${res.slaHours} 小时内联系您。`, showCancel: false, confirmText: '好的', confirmColor: themeHex().ink, complete: r }))
-  back()
+  afterSubmit(`顾问会在 ${res.slaHours} 小时内联系您。`)
 }
 </script>
 

@@ -102,9 +102,16 @@ export class MirrorService {
     const persona = await this.persona()
     const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0)
     const todayTurns = await this.prisma.mirrorMessage.count({ where: { customerId, role: 'user', createdAt: { gte: startOfDay } } })
-    if (todayTurns >= (persona?.dailyLimit || 100)) {
-      return { reply: '今天我们聊了很多啦，明天再来找我好吗？早点休息。', risk: null, limited: true }
+    const dailyLimit = persona?.dailyLimit || 100
+    if (todayTurns >= dailyLimit) {
+      return {
+        reply: '今天我们聊了很多啦，明天再来找我好吗？早点休息。有事想找人说，可以联系您的顾问。',
+        risk: null, limited: true, safetyCard: { hotline: false, items: [{ label: '联系我的顾问', action: 'advisor' }] },
+      }
     }
+    // 接近上限时提前预告，不在聊到一半时突然截断
+    const remaining = dailyLimit - todayTurns - 1
+    const limitHint = [10, 5, 1].includes(remaining) ? `今天还能再和小镜聊 ${remaining} 轮，明天又可以接着聊` : null
     const customer = await this.prisma.customer.findUnique({ where: { id: customerId } })
     const history = await this.prisma.mirrorMessage.findMany({ where: { sessionId }, orderBy: { id: 'desc' }, take: 20 })
     const recent = history.reverse()
@@ -147,7 +154,7 @@ export class MirrorService {
 
     const session = await this.prisma.mirrorSession.findUnique({ where: { id: sessionId } })
     const minutes = (Date.now() - session!.startedAt.getTime()) / 60000
-    return { reply, risk: risk ? { level: risk.level, category: risk.category } : null, safetyCard, restHint: minutes > 30 ? '聊了好一会儿了，起来走走、喝口水吧' : null }
+    return { reply, risk: risk ? { level: risk.level, category: risk.category } : null, safetyCard, restHint: minutes > 30 ? '聊了好一会儿了，起来走走、喝口水吧' : null, limitHint }
   }
 
   private async context(customer: any) {
