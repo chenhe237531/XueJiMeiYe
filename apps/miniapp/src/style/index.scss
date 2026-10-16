@@ -485,21 +485,31 @@ page {
   overflow: hidden;
 }
 
-/* 列表行首图标：与 .ic-chip 同一套渐变彩色图标块（内页与首页 / 我的统一），gray 表示未开始 / 锁定 */
+/* 列表行首图标：与 .ic-chip 同一套渐变彩色图标块（内页与首页 / 我的统一），gray 表示未开始 / 锁定。
+   尺寸 / 圆角 / 内图形统一取自图形底座的共享变量（--gd-size-* / --gd-r-* / --gd-ratio-icon，声明在 graphics.scss），
+   与 XGraphic 的 chip sm / md / lg 同源，避免「两套底座尺寸」；乐龄下变量自动变 34 / 46 / 56，页面无需单独处理。
+   兜底值（var 第二参数）与 graphics.scss 默认皮肤逐项一致，变量缺失时渲染结果不变（XJ-104，D13）。 */
 .icon-box {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: var(--gd-size-md, 38px);
+  height: var(--gd-size-md, 38px);
+  border-radius: var(--gd-r-md, 13px);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 22px;
+  font-size: calc(var(--gd-size-md, 38px) * var(--gd-ratio-icon, 0.5));
   color: #fff;
   background: linear-gradient(145deg, #e9cf9f 0%, #c9a063 100%);
   box-shadow: 0 6px 14px -7px rgba(168, 130, 77, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
-.elder .icon-box { width: 46px; height: 46px; border-radius: 14px; font-size: 26px; background: linear-gradient(145deg, #7fa48a 0%, #3f6b4f 100%); box-shadow: 0 6px 14px -7px rgba(63, 107, 79, 0.5); }
+.elder .icon-box {
+  width: var(--gd-size-md, 46px);
+  height: var(--gd-size-md, 46px);
+  border-radius: var(--gd-r-md, 15px);
+  font-size: calc(var(--gd-size-md, 46px) * var(--gd-ratio-icon, 0.5));
+  background: linear-gradient(145deg, #7fa48a 0%, #3f6b4f 100%);
+  box-shadow: 0 6px 14px -7px rgba(63, 107, 79, 0.5);
+}
 .icon-box.care, .icon-box.green, .elder .icon-box.care, .elder .icon-box.green { background: linear-gradient(145deg, #b3c69b 0%, #6e7f5c 100%); box-shadow: 0 6px 14px -7px rgba(102, 120, 78, 0.55); }
 .icon-box.gray, .elder .icon-box.gray { background: linear-gradient(145deg, #e6e0d8 0%, #b5aca2 100%); box-shadow: none; }
 .icon-box.terra, .elder .icon-box.terra { background: linear-gradient(145deg, #ecc9ab 0%, #b0805c 100%); box-shadow: 0 6px 14px -7px rgba(176, 128, 92, 0.55); }
@@ -513,22 +523,41 @@ page {
 }
 
 /* ───── 彩色图标块（参考商业小程序的多色入口图标）：渐变底 + 白色图标，按模块色彩识别（issue #4 辅助色） ───── */
+/* 尺寸 / 圆角 / 内图形同样复用图形底座变量（lg = 46px / 内图形 23px，sm = 28px / 14px），与 .icon-box、
+   XGraphic 的 chip 三档同源（XJ-104，D13）。底色仍为深渐变底：D14 的「深底 → 浅底」要求与 XJ-602 的
+   图标枚举固定同批上线（枚举未固定时会返回未收录图标名 → 浅底上白图标不可见），故本批不动底色。 */
 .ic-chip {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: var(--gd-size-lg, 46px);
+  height: var(--gd-size-lg, 46px);
+  border-radius: var(--gd-r-lg, 16px);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   color: #fff;
-  font-size: 24px;
+  font-size: calc(var(--gd-size-lg, 46px) * var(--gd-ratio-icon, 0.5));
   background: linear-gradient(145deg, #e9cf9f 0%, #c9a063 100%);
   box-shadow: 0 6px 14px -6px rgba(168, 130, 77, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
-.ic-chip.sm { width: 32px; height: 32px; border-radius: 10px; font-size: 18px; box-shadow: 0 4px 10px -5px rgba(60, 48, 34, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
-.elder .ic-chip { width: 52px; height: 52px; border-radius: 16px; font-size: 28px; }
-.elder .ic-chip.sm { width: 38px; height: 38px; border-radius: 12px; font-size: 22px; }
+.ic-chip.sm {
+  width: var(--gd-size-sm, 28px);
+  height: var(--gd-size-sm, 28px);
+  border-radius: var(--gd-r-sm, 10px);
+  font-size: calc(var(--gd-size-sm, 28px) * var(--gd-ratio-icon, 0.5));
+  box-shadow: 0 4px 10px -5px rgba(60, 48, 34, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.elder .ic-chip {
+  width: var(--gd-size-lg, 56px);
+  height: var(--gd-size-lg, 56px);
+  border-radius: var(--gd-r-lg, 18px);
+  font-size: calc(var(--gd-size-lg, 56px) * var(--gd-ratio-icon, 0.5));
+}
+.elder .ic-chip.sm {
+  width: var(--gd-size-sm, 34px);
+  height: var(--gd-size-sm, 34px);
+  border-radius: var(--gd-r-sm, 12px);
+  font-size: calc(var(--gd-size-sm, 34px) * var(--gd-ratio-icon, 0.5));
+}
 .ic-chip.care, .ic-chip.green { background: linear-gradient(145deg, #b3c69b 0%, #6e7f5c 100%); box-shadow: 0 6px 14px -6px rgba(102, 120, 78, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
 .ic-chip.rose { background: linear-gradient(145deg, #f2c0c7 0%, #c97a88 100%); box-shadow: 0 6px 14px -6px rgba(201, 122, 136, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
 .ic-chip.sky { background: linear-gradient(145deg, #bcd0e3 0%, #6f8cab 100%); box-shadow: 0 6px 14px -6px rgba(111, 140, 171, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
