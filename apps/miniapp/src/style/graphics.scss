@@ -1,0 +1,351 @@
+/**
+ * 雪姬美业 · 彩色图形底座与合成动图（见 docs/09）
+ *
+ * 本文件只做两件事：
+ *   1. 定义**变量**（默认 / 乐龄 / 夜色 / 三级动效档位）；
+ *   2. 定义**通用合成动图类**（单类、无后代选择器）。
+ * 组件的结构样式（.xg-chip / .xbadge 等）放在各自组件的 scoped 里——因为小程序端
+ * scoped 会编译成「类 + data-v」组合，组件内可靠；而全局文件里若写后代选择器，
+ * 跨自定义组件边界的表现不可靠（微信官方提示）。
+ *
+ * 变量为什么挂在 page / .xj 上：
+ *   变量是继承属性，会跨小程序自定义组件边界继承（本项目组件已大量依赖来自 app.wxss
+ *   的 var(--brand) / var(--ink)，可证）。把皮肤差异表达为变量，组件内部只读变量，
+ *   就能做到「改一处皮肤、全站图形跟随」，且不必在组件里写任何 .elder / .night 选择器。
+ *
+ * 动图为什么全部用 CSS 合成、不引外部动图资源：
+ *   小程序不支持 <svg> 标签；CSS background-image 内联的 SVG **不会播放** SMIL/CSS 动画；
+ *   Lottie 需要额外运行时（lottie-miniprogram）且许可需逐条核对。CSS 合成动图零资源体积、
+ *   零许可风险、可被三级动效档位统一降级。详见 docs/09。
+ */
+
+/* ═══════════════════════════════════════════════════
+   一、变量：默认皮肤
+   ═══════════════════════════════════════════════════ */
+page,
+.xj {
+  /* ── 图形底座尺寸：与 index.scss 的图标底座规范 28 / 38 / 46 对齐 ── */
+  --gd-size-sm: 28px;
+  --gd-size-md: 38px;
+  --gd-size-lg: 46px;
+  /* 底座内图形占比：图形自带留白，0.68 视觉上最接近"撑满"，
+     但不会顶到描边（emoji 图形四周还有约 8% 的透明边距） */
+  --gd-ratio: 0.68;
+  /* 单色图标（tabler 图标字体）占底座的比例：图标字形本身无留白，字面尺寸即视觉尺寸，
+     故取 0.5 —— 三档内图形 = 14 / 19 / 23px。index.scss 的 .icon-box / .ic-chip
+     与 XGraphic 共用本组尺寸变量，避免出现第二套底座尺寸来源（XJ-104，D13）。 */
+  --gd-ratio-icon: 0.5;
+  --gd-r-sm: 10px;
+  --gd-r-md: 13px;
+  --gd-r-lg: 16px;
+  /* ── 底座底色：浅色底 + 细描边 + 内高光，与现有深渐变底 .icon-box 形成两套形态 ──
+     色调名与 index.scss 的 .icon-box / .ic-chip 保持一致（plain / gold / care / terra /
+     rose / sky / plum），这样从「深底白图标」切到「浅底彩图」时语义映射是 1:1 的。 */
+  --gd-bg: #ffffff;
+  --gd-bg-plain: #ffffff;
+  --gd-bg-gold: linear-gradient(150deg, #fefaf3 0%, #f5e5c9 100%);
+  --gd-bg-care: linear-gradient(150deg, #f5f9f0 0%, #e4edda 100%);
+  --gd-bg-terra: linear-gradient(150deg, #fdf5ee 0%, #f4e1d2 100%);
+  --gd-bg-rose: linear-gradient(150deg, #fdf1f3 0%, #f7dfe3 100%);
+  --gd-bg-sky: linear-gradient(150deg, #f0f6fa 0%, #dce9f3 100%);
+  --gd-bg-plum: linear-gradient(150deg, #f5f2fa 0%, #e7e0f3 100%);
+  --gd-line: rgba(60, 48, 34, 0.07);
+  --gd-shadow: 0 2px 6px -3px rgba(60, 48, 34, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+  /* ── 徽章 ── */
+  /* 徽章盘径三档（比图形底座大，因为要容纳描边、光晕与环形进度） */
+  --xb-sz-sm: 48px;
+  --xb-sz-md: 58px;
+  --xb-sz-lg: 70px;
+  /* 盘内图形占比：徽章留白更多，视觉上才有"徽章感" */
+  --xb-icon-ratio: 0.54;
+  --xb-disc: linear-gradient(150deg, #fef8ee 0%, #f1ddba 100%);
+  --xb-ring: rgba(201, 160, 99, 0.45);
+  --xb-shadow: 0 4px 14px -8px rgba(60, 48, 34, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --xb-locked-bg: #f4f0ea;
+  --xb-locked-ink: #b6ada3;
+  --xb-locked-line: #ded7cd;
+  --xb-label: var(--ink-2, #5c544d);
+  --xb-label-locked: var(--ink-3, #8d8479);
+  --xb-halo: rgba(210, 180, 122, 0.5);
+  --xb-halo-0: rgba(210, 180, 122, 0);
+  --xb-bar: #e8e0d5;
+  --xb-bar-fill: linear-gradient(90deg, #dcc190 0%, #c9a063 100%);
+
+  /* ── 合成动图的"强度开关"：档位与乐龄把它归零，动画自然静止 ── */
+  --gd-bob: 3px;
+  --gd-bob-dur: 2400ms;
+  --gd-spin-dur: 2400ms;
+  --gd-pulse-max: 1.06;
+  --gd-pulse-dur: 1800ms;
+  --gd-shine-dur: 2200ms;
+  --gd-halo-max: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════
+   二、变量：乐龄「养生绿」
+   —— 底座与图形一并放大（乐龄热区与字号要求），动图全部关闭
+   ═══════════════════════════════════════════════════ */
+.xj.elder {
+  --gd-size-sm: 34px;
+  --gd-size-md: 46px;
+  --gd-size-lg: 56px;
+  --gd-r-sm: 12px;
+  --gd-r-md: 15px;
+  --gd-r-lg: 18px;
+  --gd-bg-gold: linear-gradient(150deg, #ffffff 0%, #eef4e9 100%);
+  --gd-bg-care: linear-gradient(150deg, #ffffff 0%, #e6efdc 100%);
+  --gd-line: rgba(47, 82, 56, 0.1);
+  --gd-shadow: 0 2px 8px -3px rgba(47, 82, 56, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+  /* 乐龄：徽章盘径同步放大，保证热区与可辨识度 */
+  --xb-sz-sm: 56px;
+  --xb-sz-md: 68px;
+  --xb-sz-lg: 80px;
+
+  --xb-disc: linear-gradient(150deg, #ffffff 0%, #edf3e7 100%);
+  --xb-ring: rgba(63, 107, 79, 0.32);
+  --xb-shadow: 0 4px 14px -8px rgba(47, 82, 56, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --xb-locked-ink: #a9a29a;
+  --xb-label: var(--ink, #2b2622);
+  --xb-halo: rgba(63, 107, 79, 0.4);
+  --xb-halo-0: rgba(63, 107, 79, 0);
+  --xb-bar-fill: linear-gradient(90deg, #7fa48a 0%, #3f6b4f 100%);
+
+  /* 乐龄：动图静态呈现（纵深克制，且健康产品不做焦虑驱动） */
+  --gd-bob: 0px;
+  --gd-pulse-max: 1;
+  --gd-halo-max: 1;
+  --gd-spin-dur: 1ms;
+  --gd-shine-dur: 1ms;
+}
+
+/* ═══════════════════════════════════════════════════
+   三、变量：臻享「夜色金」
+   —— 深底需要提高图形对比：底座改为半透明金，描边提亮
+   ═══════════════════════════════════════════════════ */
+.xj.night {
+  --gd-bg: rgba(255, 255, 255, 0.08);
+  --gd-bg-plain: rgba(255, 255, 255, 0.08);
+  --gd-bg-gold: linear-gradient(150deg, rgba(210, 180, 122, 0.3) 0%, rgba(210, 180, 122, 0.1) 100%);
+  --gd-bg-care: linear-gradient(150deg, rgba(110, 127, 92, 0.32) 0%, rgba(110, 127, 92, 0.12) 100%);
+  --gd-bg-terra: linear-gradient(150deg, rgba(176, 128, 92, 0.3) 0%, rgba(176, 128, 92, 0.1) 100%);
+  --gd-bg-rose: linear-gradient(150deg, rgba(201, 122, 136, 0.3) 0%, rgba(201, 122, 136, 0.1) 100%);
+  --gd-bg-sky: linear-gradient(150deg, rgba(111, 140, 171, 0.3) 0%, rgba(111, 140, 171, 0.1) 100%);
+  --gd-bg-plum: linear-gradient(150deg, rgba(140, 116, 171, 0.3) 0%, rgba(140, 116, 171, 0.1) 100%);
+  --gd-line: rgba(210, 180, 122, 0.2);
+  --gd-shadow: 0 2px 10px -4px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  --xb-disc: linear-gradient(150deg, rgba(210, 180, 122, 0.32) 0%, rgba(210, 180, 122, 0.08) 100%);
+  --xb-ring: rgba(210, 180, 122, 0.5);
+  --xb-shadow: 0 4px 16px -8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --xb-locked-bg: rgba(255, 255, 255, 0.06);
+  --xb-locked-ink: rgba(240, 231, 214, 0.42);
+  --xb-locked-line: rgba(210, 180, 122, 0.18);
+  --xb-label: rgba(240, 231, 214, 0.8);
+  --xb-label-locked: rgba(240, 231, 214, 0.45);
+  --xb-bar: rgba(255, 255, 255, 0.12);
+  --xb-bar-fill: linear-gradient(90deg, #e0c391 0%, #d2b47a 100%);
+}
+
+/* ═══════════════════════════════════════════════════
+   四、变量：三级动效档位
+   —— 循环类动图（浮动 / 旋转 / 脉冲 / 扫光 / 光晕）在轻效与关闭档位一律静止。
+      轻效档位是"低端机 / 省流"，继续跑无限循环动画是主要的掉帧来源；
+      而装饰性循环动画本就不承载信息，静止不影响可用性。
+      一次性入场与按压反馈仍由 motion.scss 按时长变量表达差异。
+   ═══════════════════════════════════════════════════ */
+.mo-lite,
+.mo-off {
+  --gd-bob: 0px;
+  --gd-pulse-max: 1;
+  --gd-halo-max: 1;
+  --gd-spin-dur: 1ms;
+  --gd-shine-dur: 1ms;
+}
+
+/* ═══════════════════════════════════════════════════
+   五、关键帧
+   ═══════════════════════════════════════════════════ */
+
+/* 轻微上下浮动：用于"进行中 / 待办未完成"的引导注意 */
+@keyframes xj-gd-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(var(--gd-bob, 3px) * -1));
+  }
+}
+/* 匀速旋转：加载环、进行中光环 */
+@keyframes xj-gd-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* 呼吸缩放：在线态、待领取 */
+@keyframes xj-gd-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(var(--gd-pulse-max, 1.06));
+  }
+}
+/* 弹入：一次性，用于"新解锁" */
+@keyframes xj-gd-pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  55% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+/* 扫光：一次性，用于"可领取" */
+@keyframes xj-gd-shine {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+/* 上浮消退：一次性，用于"+5 积分"这类浮字 */
+@keyframes xj-gd-float-up {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-28px);
+    opacity: 0;
+  }
+}
+/* 光晕扩散：一次性，用于庆祝 */
+@keyframes xj-gd-halo {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(var(--gd-halo-max, 1.5));
+    opacity: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   六、图形底座（配合 XGraphic 的 chip 用法）
+   —— 全部写成「类 + 类」组合，不用后代选择器，因此放在全局文件里也可靠
+   ═══════════════════════════════════════════════════ */
+.xg-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  background: var(--gd-bg-plain, #ffffff);
+  border: 1px solid var(--gd-line, rgba(60, 48, 34, 0.07));
+  box-shadow: var(--gd-shadow, 0 2px 6px -3px rgba(60, 48, 34, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8));
+}
+
+.xg-chip.xg-sm {
+  width: var(--gd-size-sm, 28px);
+  height: var(--gd-size-sm, 28px);
+  border-radius: var(--gd-r-sm, 10px);
+}
+.xg-chip.xg-md {
+  width: var(--gd-size-md, 38px);
+  height: var(--gd-size-md, 38px);
+  border-radius: var(--gd-r-md, 13px);
+}
+.xg-chip.xg-lg {
+  width: var(--gd-size-lg, 46px);
+  height: var(--gd-size-lg, 46px);
+  border-radius: var(--gd-r-lg, 16px);
+}
+
+.xg-chip.xg-tone-gold {
+  background: var(--gd-bg-gold);
+}
+.xg-chip.xg-tone-care {
+  background: var(--gd-bg-care);
+}
+.xg-chip.xg-tone-terra {
+  background: var(--gd-bg-terra);
+}
+.xg-chip.xg-tone-rose {
+  background: var(--gd-bg-rose);
+}
+.xg-chip.xg-tone-sky {
+  background: var(--gd-bg-sky);
+}
+.xg-chip.xg-tone-plum {
+  background: var(--gd-bg-plum);
+}
+
+/* ═══════════════════════════════════════════════════
+   七、通用动图类（单类，无后代选择器）
+   —— 直接挂在任意元素上即可；乐龄与轻效/关闭档位下自动静止
+   ═══════════════════════════════════════════════════ */
+
+/* 循环类 */
+.gd-bob {
+  animation: xj-gd-bob var(--gd-bob-dur, 2400ms) var(--mo-ease, cubic-bezier(0.2, 0, 0, 1)) infinite;
+}
+.gd-spin {
+  animation: xj-gd-spin var(--gd-spin-dur, 2400ms) linear infinite;
+}
+.gd-pulse {
+  animation: xj-gd-pulse var(--gd-pulse-dur, 1800ms) var(--mo-ease, cubic-bezier(0.2, 0, 0, 1)) infinite;
+}
+
+/* 一次性类 */
+.gd-pop {
+  animation: xj-gd-pop var(--mo-emph, 420ms) var(--mo-ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+}
+.gd-float-up {
+  animation: xj-gd-float-up 1400ms var(--mo-ease-out, cubic-bezier(0.3, 0, 1, 1)) both;
+}
+.gd-halo {
+  animation: xj-gd-halo 900ms var(--mo-ease-out, cubic-bezier(0.3, 0, 1, 1)) both;
+}
+
+/* 扫光：需要一个带背景的元素，用 background-size 拉开再平移 */
+.gd-shine {
+  background-image: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 34%,
+    rgba(255, 255, 255, 0.62) 50%,
+    rgba(255, 255, 255, 0) 66%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: xj-gd-shine var(--gd-shine-dur, 2200ms) var(--mo-ease, cubic-bezier(0.2, 0, 0, 1)) infinite;
+}
+
+/* ── 兜底：档位未通过变量继承生效时（引擎异常），用后代选择器锁死循环动画 ──
+   只针对循环类，一次性动图保留（它们本就瞬时结束）。 */
+.mo-lite .gd-bob,
+.mo-lite .gd-spin,
+.mo-lite .gd-pulse,
+.mo-lite .gd-shine,
+.mo-off .gd-bob,
+.mo-off .gd-spin,
+.mo-off .gd-pulse,
+.mo-off .gd-shine {
+  animation: none !important;
+}
