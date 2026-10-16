@@ -27,9 +27,15 @@ const promos = (it: any) => (it.priceNote ? String(it.priceNote).split('，').fi
 const sales = (it: any) => String(it.salesNote || '').split(' · ').find(x => x.startsWith('年售')) || ''
 const badges = (it: any) => String(it.salesNote || '').split(' · ').filter(x => x && !x.startsWith('年售'))
 
-function book(item?: any) {
+/** 项目卡片：像美团团购一样在线购买，支付后再预约到店（而不是单纯预约） */
+function buy(item: any) {
   if (!xj.loggedIn) return go('/pkg-auth/login')
-  if (item) uni.setStorageSync('xj_lead_prefill', { project: item.shortName || item.name })
+  go(`/pkg-module/buy?code=${item.code}`)
+}
+
+/** 底部"预约到店"：暂不选购具体项目，留意向由顾问电话确认 */
+function book() {
+  if (!xj.loggedIn) return go('/pkg-auth/login')
   go('/pkg-module/lead-form?code=store_services')
 }
 
@@ -104,7 +110,7 @@ function copyAddr() {
             <view v-for="t in tabs" :key="t.key" class="tab" :class="{ on: cat === t.key }" @click="cat = t.key">{{ t.title }}<text class="tab-n">{{ t.n }}</text></view>
           </view>
         </scroll-view>
-        <view v-for="it in items" :key="it.code" class="deal" @click="book(it)">
+        <view v-for="it in items" :key="it.code" class="deal" @click="buy(it)">
           <view class="thumb" :class="it.category === 'body' ? 'body' : 'face'">
             <XIcon :name="it.category === 'body' ? 'massage' : 'sparkles'" :size="xj.elderMode ? 38 : 34" />
             <text v-if="it.durationMin" class="thumb-label">{{ it.durationMin }} 分钟</text>
@@ -121,12 +127,12 @@ function copyAddr() {
                 <view class="price"><text class="yen">¥</text><text class="amt">{{ it.groupPrice }}</text></view>
                 <text v-if="it.priceRef" class="price-orig">¥{{ it.priceRef }}</text>
               </view>
-              <view class="mini">预约</view>
+              <view class="mini">购买</view>
             </view>
           </view>
         </view>
       </view>
-      <text class="t-xs c3 note">{{ d.priceNote }} 团购可在美团 App 搜索门店名称购买；到店付款，平台不在线收款。</text>
+      <text class="t-xs c3 note">{{ d.priceNote }} 在线购买后到店预约使用；未核销可随时取消，已支付款项原路退回。</text>
     </template>
 
     <view class="footer-bar">

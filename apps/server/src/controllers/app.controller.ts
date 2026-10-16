@@ -703,6 +703,86 @@ export class AppController {
     }
   }
 
+  /** 门店项目订单状态（先买后约，参考美团团购券）：unpaid → paid → booked → used；未核销前可取消 */
+  private orderView(o: any) {
+    const STATUS: Record<string, string> = { unpaid: '待支付', paid: '已购买，待预约', booked: '已预约', used: '已完成', cancelled: '已取消' }
+    return {
+      id: o.id, orderNo: o.orderNo, projectName: o.projectName, projectCode: o.projectCode, amount: o.amount, origPrice: o.origPrice,
+      status: o.status, statusName: STATUS[o.status] || o.status, refunded: o.refunded,
+      paidAt: fmt(o.paidAt, 'M月D日 HH:mm'), bookDate: o.bookDate, bookNote: o.bookNote, usedAt: fmt(o.usedAt, 'YYYY-MM-DD'), createdAt: fmt(o.createdAt, 'M月D日 HH:mm'),
+    }
+  }
+
+  /** 我的项目订单（券） */
+  @Get('store/orders')
+  @Aud('app')
+  async myOrders(@CurrentUser() u: CustomerUser) {
+    const list = await this.prisma.projectOrder.findMany({ where: { customerId: u.id }, orderBy: { id: 'desc' }, take: 50 })
+    return list.map(o => this.orderView(o))
+  }
+
+  /** 下单：选择项目 → 生成待支付订单（价格为公开团购价，对所有客户一致） */
+  @Post('store/orders')
+  @Aud('app')
+  async createOrder(@CurrentUser() u: CustomerUser, @Body() body: { projectCode: string }) {
+    const p = await this.prisma.project.findUnique({ where: { code: body.projectCode } })
+    if (!p || p.status !== 'active' || !p.onMeituan) throw Err.notFound('项目不存在或已下架')
+    if (p.groupPrice == null) throw Err.conflict('该项目暂不支持在线购买')
+    const c = await this.prisma.customer.findUnique({ where: { id: u.id } })
+    const o = await this.prisma.projectOrder.create({
+      data: { orderNo: genNo('PO'), customerId: u.id, storeId: c?.storeId, projectId: p.id, projectCode: p.code, projectName: p.shortName || p.name, amount: p.groupPrice, origPrice: p.priceRef },
+    })
+    await this.wf.event(u.id, 'project_order_create', { projectCode: p.code, orderNo: o.orderNo })
+    return { id: o.id, orderNo: o.orderNo, amount: o.amount, projectName: o.projectName }
+  }
+
+  /** 支付（MVP 模拟微信支付：真实接入时在此调起微信支付下单，支付回调里改状态） */
+  @Post('store/orders/:id/pay')
+  @Aud('app')
+  async payOrder(@CurrentUser() u: CustomerUser, @Param('id', ParseIntPipe) id: number) {
+    const o = await this.prisma.projectOrder.findUnique({ where: { id } })
+    if (!o || o.customerId !== u.id) throw Err.notFound('订单不存在')
+    if (o.status !== 'unpaid') throw Err.conflict('订单当前不需要支付')
+    const c = await this.prisma.customer.findUnique({ where: { id: u.id } })
+    await this.prisma.projectOrder.update({ where: { id }, data: { status: 'paid', payMethod: 'mock', paidAt: new Date() } })
+    await this.wf.event(u.id, 'project_order_paid', { projectCode: o.projectCode, orderNo: o.orderNo, amount: o.amount })
+    await this.wf.message(u.id, '购买成功', `「${o.projectName}」已购买，¥${o.amount}。接下来挑个方便的日子预约到店即可。`, '/pkg-module/orders')
+    await this.wf.createTask({ staffId: c?.advisorId, customerId: u.id, type: 'project_order', refTable: 'project_order', refId: o.id, title: `${c?.salutation}在线购买了「${o.projectName}」（¥${o.amount}），可跟进协助预约`, hours: 24 })
+    return { ok: true }
+  }
+
+  /** 预约到店日期（paid 可约，booked 可改期） */
+  @Post('store/orders/:id/book')
+  @Aud('app')
+  async bookOrder(@CurrentUser() u: CustomerUser, @Param('id', ParseIntPipe) id: number, @Body() body: { date: string, note?: string }) {
+    const o = await this.prisma.projectOrder.findUnique({ where: { id } })
+    if (!o || o.customerId !== u.id) throw Err.notFound('订单不存在')
+    if (!['paid', 'booked'].includes(o.status)) throw Err.conflict(o.status === 'unpaid' ? '请先完成支付' : '当前状态不能预约')
+    const date = String(body.date || '')
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < today()) throw Err.bad('请选择今天或之后的日期')
+    const rebook = o.status === 'booked'
+    await this.prisma.projectOrder.update({ where: { id }, data: { status: 'booked', bookDate: date, bookNote: body.note || null, bookAt: new Date() } })
+    const c = await this.prisma.customer.findUnique({ where: { id: u.id } })
+    await this.wf.event(u.id, 'project_order_book', { projectCode: o.projectCode, date, rebook })
+    await this.wf.message(u.id, rebook ? '预约已改期' : '预约成功', `「${o.projectName}」已预约 ${date} 到店，出示订单号 ${o.orderNo} 即可。`, '/pkg-module/orders')
+    await this.wf.createTask({ staffId: c?.advisorId, customerId: u.id, type: 'project_order', refTable: 'project_order', refId: o.id, title: `${c?.salutation}预约了 ${date} 到店做「${o.projectName}」，请安排接待`, hours: 24 })
+    return { ok: true, rebooked: rebook }
+  }
+
+  /** 取消订单：未支付直接取消；已支付未核销取消即全额退款（MVP 模拟原路退回） */
+  @Post('store/orders/:id/cancel')
+  @Aud('app')
+  async cancelOrder(@CurrentUser() u: CustomerUser, @Param('id', ParseIntPipe) id: number) {
+    const o = await this.prisma.projectOrder.findUnique({ where: { id } })
+    if (!o || o.customerId !== u.id) throw Err.notFound('订单不存在')
+    if (!['unpaid', 'paid', 'booked'].includes(o.status)) throw Err.conflict('当前状态不能取消')
+    const refunded = o.status !== 'unpaid'
+    await this.prisma.projectOrder.update({ where: { id }, data: { status: 'cancelled', refunded, cancelAt: new Date() } })
+    await this.wf.event(u.id, 'project_order_cancel', { orderNo: o.orderNo, refunded })
+    await this.wf.message(u.id, '订单已取消', refunded ? `「${o.projectName}」订单已取消，¥${o.amount} 将按原支付方式退回。` : `「${o.projectName}」订单已取消。`, '/pkg-module/orders')
+    return { ok: true, refunded }
+  }
+
   @Get('about')
   async about() {
     const hospitals = await this.prisma.hospital.findMany({ where: { status: 'active' } })
