@@ -712,6 +712,45 @@ model Checkin {
   @@unique([customerId, type, date])
 }
 
+// ───────────── 互动玩法：徽章 / 接力 / 集章（docs/07 §8，XJ-301） ─────────────
+
+/** 成就徽章（XJ-301）：解锁条件由既有数据推导（XJ-303），本表只存点亮结果与进度 */
+model UserBadge {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  badgeCode  String
+  progress   Int      @default(0) // 未解锁时的当前进度（如 19/30），解锁后等于目标值
+  unlockedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@unique([customerId, badgeCode])
+}
+
+/** 健康接力棒（XJ-301）：仅限已绑定家人（D3），同一对用户每天最多一条（0 点重置） */
+model FamilyRelay {
+  id         Int      @id @default(autoincrement())
+  customerId Int // 接棒人
+  peerId     Int // 对端家人
+  date       String // YYYY-MM-DD
+  passedAt   DateTime @default(now())
+
+  @@unique([customerId, peerId, date])
+  @@index([peerId, date])
+}
+
+/** 门店集章册（XJ-301）：一店一月一枚；按 N 家门店设计，不做单店硬编码（D7） */
+model StoreStamp {
+  id             Int      @id @default(autoincrement())
+  customerId     Int
+  storeId        Int
+  month          String // YYYY-MM，与唯一约束共同保证一店一月一枚
+  stampedAt      DateTime @default(now())
+  operatorStaffId Int?
+
+  @@unique([customerId, storeId, month])
+  @@index([customerId])
+}
+
 model QuizQuestion {
   id        Int    @id @default(autoincrement())
   title     String

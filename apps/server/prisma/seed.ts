@@ -344,6 +344,21 @@ async function main() {
   const fl = await prisma.familyLink.create({ data: { elderId: wang.id, familyId: zhou.id, relation: 'daughter', permissions: ['view_report', 'receive_reminder', 'book_for'], token: 'demo-family-wang', status: 'active', expiresAt: dayjs().add(3, 'day').toDate() } })
   await wf.grantConsent(wang.id, 'C6', true, { family_id: zhou.id, permissions: fl.permissions })
   await wf.grantConsent(zhou.id, 'C1', true)
+  // 互动玩法演示数据（XJ-301）：部分解锁的徽章、一组接力记录、两枚印章，供前端联调
+  await prisma.userBadge.createMany({ data: [
+    { customerId: wang.id, badgeCode: 'keep_checkin_7', progress: 7, unlockedAt: dayjs().subtract(9, 'day').toDate() },
+    { customerId: wang.id, badgeCode: 'keep_checkin_30', progress: 19 },
+    { customerId: wang.id, badgeCode: 'explore_first_assessment', progress: 1, unlockedAt: dayjs('2026-06-15 16:00').toDate() },
+    { customerId: wang.id, badgeCode: 'explore_checkup_return', progress: 1, unlockedAt: dayjs('2026-10-08 17:00').toDate() },
+    { customerId: wang.id, badgeCode: 'share_family_bind', progress: 1, unlockedAt: dayjs().subtract(20, 'day').toDate() },
+  ] })
+  for (const d of [4, 3, 2, 1]) {
+    await prisma.familyRelay.create({ data: { customerId: d % 2 ? zhou.id : wang.id, peerId: d % 2 ? wang.id : zhou.id, date: dayjs().subtract(d, 'day').format('YYYY-MM-DD'), passedAt: dayjs().subtract(d, 'day').hour(20).minute(15).toDate() } })
+  }
+  await prisma.storeStamp.createMany({ data: [
+    { customerId: wang.id, storeId: stores[0].id, month: dayjs().format('YYYY-MM'), stampedAt: dayjs().subtract(5, 'day').toDate(), operatorStaffId: amin.id },
+    { customerId: wang.id, storeId: stores[1].id, month: dayjs().subtract(1, 'month').format('YYYY-MM'), stampedAt: dayjs().subtract(28, 'day').toDate(), operatorStaffId: amin.id },
+  ] })
   // 魔镜记忆与历史对话
   await prisma.mirrorMemory.createMany({ data: [
     { customerId: wang.id, category: '家人', text: '孙子小宝今年读三年级' },
