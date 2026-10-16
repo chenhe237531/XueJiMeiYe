@@ -60,6 +60,27 @@ page {
   --aux-sky-soft: #e9eff4;
   --aux-plum: #8c7aa6;
   --aux-plum-soft: #efecf5;
+
+  /* ── 状态语义色（issue XJ-102，docs/07 §6）：达标条 / 徽章 / 任务完成态 / 印章 / 周报封面 ──
+     ⚠️ 为什么三套皮肤必须各写一遍、且不能只依赖继承：
+        自定义属性在**声明它的元素**上就完成 var() 代入，之后以「值」的形式继承。
+        若只在 page 里写 --meter-ok: var(--care)，代入后继承下去的是默认皮肤的 #66784e；
+        切到 .xj.elder 后拿到的仍是这个值，而不是乐龄的 #5c7a52——这正是「切肤后不可读」的根因。
+        所以下面三处都写显式取值。（XJ-105 的 --mas-* 层同理，见 style/mascot.scss。） */
+  --meter-ok: var(--care, #66784e); /* 达标 */
+  /* 略偏：比 --star(#d99a2b) 暗一档。--star 在白底上只有 2.44:1，不满足验收标准要求的 3:1，
+     故本令牌不复用 --star，改用与 --star 同色族的深赭金 #a87010（--star 本身不动）。
+     它同时满足「浅底」与「深底」两种取景：白卡 4.21:1、默认页底 #faf7f2 3.94:1、乐龄页底 #f7f4ee 3.83:1。 */
+  --meter-near: #a87010;
+  --meter-low: var(--alert, #b3261e); /* 警示 */
+  --badge-bg: var(--brand-soft, #f7ede0); /* 徽章已解锁底 */
+  --badge-lock: var(--placeholder, #f0ebe3); /* 徽章未解锁底 */
+  --task-done: var(--care-soft, #e9eee2); /* 任务完成态底 */
+  --stamp-ink: var(--alert, #b3261e); /* 印章红 */
+  /* 周报封面：刻意**不随皮肤**（「报告 = 珍视」，固定夜色黑金）。三套皮肤写同值，见 AC#3。 */
+  --report-bg: #1c1712;
+  --report-ink: #d2b47a;
+
   background: #faf7f2;
   color: #2b2622;
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
@@ -120,6 +141,21 @@ page {
   --gap: 16px;
   --pad: 16px;
   --card-pad: 16px;
+
+  /* ── 状态语义色（XJ-102）乐龄墨绿皮肤取值 ──
+     乐龄未重定义 --alert / --placeholder，沿用默认值即可满足对比度；
+     需要换的是与绿同族的达标色，以及与乐龄浅底相配的软底。 */
+  --meter-ok: var(--care, #5c7a52);
+  --meter-near: #a87010; /* 与默认皮肤同值：白卡 4.21:1 / 乐龄页底 3.83:1 */
+  --meter-low: var(--alert, #b3261e);
+  --badge-bg: var(--brand-soft, #edf3ea);
+  --badge-lock: var(--placeholder, #f0ebe3);
+  --task-done: var(--care-soft, #ebf1e6);
+  --stamp-ink: var(--alert, #b3261e);
+  /* 周报封面：不随皮肤，与默认皮肤同值 */
+  --report-bg: #1c1712;
+  --report-ink: #d2b47a;
+
   line-height: 1.7;
 }
 
@@ -164,6 +200,27 @@ page {
   --price-ink: #e8a0a9;
   --price-soft: rgba(224, 138, 148, 0.1);
   --price-line: rgba(224, 138, 148, 0.4);
+
+  /* ── 状态语义色（XJ-102）夜色金皮肤的**亮度补偿** ──
+     暖黑底（#1c1712 / 卡片 #262019）上，默认皮肤的 --alert(#b3261e) 只有 2.5:1、
+     --star 不足 3:1，直接沿用会不可读。故红 / 黄两族各提亮一档（实测 ≥5:1）；
+     浅色软底（--brand-soft / --placeholder 已在 `.xj.night` 重定义为半透明金与暖黑）沿用即可。
+     附注（不属本次改动范围）：`.xj.night` 未重定义 --alert / --star 本身，因此夜色皮肤下
+     直接消费 --alert 的既有位置对比度仅约 2.5:1，建议后续单独开卡处理。 */
+  --meter-ok: #8fbf7a; /* 达标：提亮一档的鼠尾草绿 */
+  --meter-near: #eab254; /* 略偏：提亮一档的琥珀 */
+  --meter-low: #e5736a; /* 警示：提亮一档的朱红 */
+  --badge-bg: var(--brand-soft, rgba(210, 180, 122, 0.14));
+  /* 未解锁底：与图形底座的夜色锁态同族（graphics.scss --xb-locked-bg: rgba(255,255,255,.06)），
+     两个子系统对「未解锁」的说法保持一致。深底上浅色填充本来就难拉开差距——
+     真正区分已/未解锁的是**描边形态**（实线金环 vs 虚线灰环）与线稿图标，不是填充色。 */
+  --badge-lock: rgba(255, 255, 255, 0.06);
+  /* 完成态底：跟随图形底座夜色下的健康语义色族（graphics.scss --gd-bg-care .12~.32） */
+  --task-done: rgba(110, 127, 92, 0.24);
+  --stamp-ink: #e5736a; /* 印章红与警示红同族，夜色下统一提亮 */
+  /* 周报封面：不随皮肤，与另两套皮肤同值（AC#3） */
+  --report-bg: #1c1712;
+  --report-ink: #d2b47a;
 }
 
 .num {
