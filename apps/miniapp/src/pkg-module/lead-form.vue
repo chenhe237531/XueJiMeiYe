@@ -69,7 +69,7 @@ async function submit() {
           <input v-else v-model="form[f.key]" class="input" :type="f.type === 'phone' ? 'number' : 'text'" :placeholder="f.type === 'phone' ? (xj.me?.phone ? `留空则联系 ${xj.me.phone}` : '联系手机号') : '请填写'">
         </view>
       </view>
-      <text class="t-xs c3">{{ m?.code === 'store_services' ? '提交后由门店顾问电话确认时间；到店后按团购价或门店报价付款，平台不在线收款。' : '提交后由顾问联系您，第三方服务由有资质的合作方提供，平台不在线收款。' }}</text>
+      <text class="t-xs c3">{{ m?.code === 'store_services' ? '提交后由门店顾问电话确认时间；也可以在门店项目页直接在线购买，先买后约更省心。' : '提交后由顾问联系您，第三方服务由有资质的合作方提供，平台不在线收款。' }}</text>
     </view>
     <view class="footer-bar"><view class="btn" @click="submit">提交意向</view></view>
   </view>

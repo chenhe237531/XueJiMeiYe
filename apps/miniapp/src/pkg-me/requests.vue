@@ -10,17 +10,22 @@ definePage({ style: { navigationBarTitleText: '我的预约与意向' } })
 const xj = useXj()
 const leads = ref<any[]>([])
 const refs = ref<any[]>([])
+const orders = ref<any[]>([])
 const loaded = ref(false)
 /** 意向进度三步：已提交 → 顾问已联系 → 已完成 */
 const STEP: Record<string, number> = { new: 0, contacted: 1, negotiating: 1, won: 2, lost: 2 }
+/** 在线订单（先买后约）标签色调 */
+const O_TONE: Record<string, string> = { unpaid: 'warn', paid: 'gold', booked: 'care', used: 'gray', cancelled: 'gray' }
 
 onShow(async () => {
-  const [l, r] = await Promise.all([
+  const [l, r, o] = await Promise.all([
     http.get('/app/leads', undefined, { silent: true }).catch(() => []),
     http.get('/app/referrals', undefined, { silent: true }).catch(() => []),
+    http.get('/app/store/orders', undefined, { silent: true }).catch(() => []),
   ])
   leads.value = l as any[]
   refs.value = r as any[]
+  orders.value = o as any[]
   loaded.value = true
 })
 </script>
@@ -39,6 +44,19 @@ onShow(async () => {
           <text class="tag care">{{ r.statusName }}</text>
         </view>
         <view v-if="loaded && !refs.length" class="empty">还没有体检预约。完成测评领取体检券后即可预约</view>
+      </view>
+
+      <view class="section-title"><text>门店项目订单</text><text class="more" @click="go('/pkg-module/orders')">全部</text></view>
+      <view class="group">
+        <view v-for="o in orders.slice(0, 3)" :key="o.id" class="cell" @click="go('/pkg-module/orders')">
+          <view class="icon-box" :class="o.status === 'booked' ? 'care' : ['used', 'cancelled'].includes(o.status) ? 'gray' : ''"><XIcon name="ticket" /></view>
+          <view class="col flex1">
+            <text class="t-md">{{ o.projectName }}</text>
+            <text class="t-sm c2">{{ o.status === 'booked' ? `已预约 ${o.bookDate} 到店` : o.statusName }}</text>
+          </view>
+          <text class="tag" :class="O_TONE[o.status]">{{ o.statusName }}</text>
+        </view>
+        <view v-if="loaded && !orders.length" class="empty" style="padding: 14px">在线购买的项目会显示在这里，先买后约更省心</view>
       </view>
 
       <view class="section-title"><text>门店项目与服务意向</text></view>
