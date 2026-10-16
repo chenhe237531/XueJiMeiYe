@@ -95,6 +95,7 @@
     "upload:mp": "node ./scripts/upload-weixin.js",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint",
+    "lint:changed": "bash ../../scripts/ci-check.sh --lint-only",
     "lint:fix": "eslint --fix",
     "test": "vitest",
     "test:run": "vitest run"
