@@ -1,0 +1,191 @@
+/**
+ * 雪姬美业 · 小镜形象（XMascot）的皮肤变量层（见 docs/07 §2、docs/08 §5.6）
+ *
+ * 本文件只做两件事：
+ *   1. 定义**继承变量**（默认柔金 / 乐龄墨绿 / 臻享夜色金 / 三级动效档位）；
+ *   2. 定义**色调类**（.xm-tone-*，单类、无后代选择器）供「家人头像」复用同一套几何换主色。
+ * 组件的结构样式放在 XMascot.vue 的 scoped 里——理由同 graphics.scss：
+ *   小程序自定义组件默认样式隔离，全局文件里的**后代选择器**跨组件边界不可靠
+ *   （微信官方提示「组件和引用组件的页面中使用后代选择器在一些极端情况下会有非预期的表现」）；
+ *   而**自定义属性是继承属性**，可以稳定穿透组件边界（本项目组件已大量依赖来自 app.wxss 的
+ *   var(--brand) / var(--ink)，可证）。因此把皮肤差异表达成变量、组件内部只读变量，
+ *   就做到了「改一处皮肤、全站小镜跟着换色」，组件里不需要出现任何 .elder / .night 选择器。
+ *
+ * 为什么小镜用 CSS 合成而非位图/插画（决议 D19）：
+ *   零包体积增量、零许可风险、三套皮肤自动换色；插画需外部排期且无法随皮肤变化。
+ *   注意小程序不支持 <svg> 标签，因此形象全部由 border-radius + linear-gradient + 绝对定位合成。
+ *
+ * 变量命名：--mas-*（mascot）。
+ */
+
+/* ═══════════════════════════════════════════════════
+   一、变量：默认皮肤「柔金轻奢」
+   —— 金色渐变圆底 + 深棕墨五官，与 --brand / --brand-ink 同源
+   ═══════════════════════════════════════════════════ */
+page,
+.xj {
+  /* 镜身：135° 米金渐变，模拟金属镜面由亮到暗的过渡 */
+  --mas-bg: linear-gradient(135deg, #f7ede0 0%, #dcbd88 55%, #c9a063 100%);
+  /* 镜圈（容器描边）与五官墨色：走品牌令牌，默认皮肤下即柔金 + 深棕墨 */
+  --mas-ring: var(--brand, #c9a063);
+  --mas-ink: var(--brand-ink, #6b4e2e);
+  /* 镜面高光：左上方斜置（rotate -20deg）的白色椭圆 */
+  --mas-gloss: rgba(255, 255, 255, 0.72);
+  /* 腮红：固定玫瑰淡粉，三皮肤通用（金/绿/暗金底上都可读） */
+  --mas-blush: rgba(200, 138, 148, 0.5);
+  /* 立体感：外投影 + 顶部内高光，让圆盘像一枚凸起的镜面 */
+  --mas-shadow: 0 5px 12px -5px rgba(168, 130, 77, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  /* 在线绿点：色素取健康语义色 --care */
+  --mas-dot: var(--care, #66784e);
+  --mas-dot-ring: var(--surface, #ffffff);
+  /* 声波条 */
+  --mas-wave: var(--brand-ink, #6b4e2e);
+  /* 描边宽度兜底：正常由组件按 size 写入 --mas-stroke（32→1.5 / 48→2 / 72→2.5 / 88→3） */
+  --mas-stroke: 2px;
+
+  /* ── 乐龄：五官放大系数。1 为标准，1.15 为乐龄（规格：五官放大 15%） ── */
+  --mas-feature: 1;
+
+  /* ── 动效 ──
+     --mas-spin-dur：「思考中」的外圈旋转属**状态指示**，按 docs/07 §7 的规定在乐龄与关闭档位下
+       **保留**，因此它不在任何档位里被归零。
+     --mas-wave-play：「说话中」的声波条属**装饰性循环**，轻效 / 关闭 / 乐龄下置为 paused。
+       为什么不用 graphics.scss 里那套「时长归零」（--gd-spin-dur: 1ms）：
+       1ms 的无限动画并非静止，而是每秒跑 1000 个循环——既仍在逐帧产生合成工作，
+       截图 / 采样也会落到随机相位（实测采样到 scaleY 0.459 的缩小帧）。
+       置为 paused 才是真静止，且停在关键帧起点（满高状态），视觉上是「三根条自然立着」。
+     两个变量都靠自定义属性继承穿透组件边界，不依赖后代选择器。 */
+  --mas-spin-dur: 1000ms;
+  --mas-wave-dur: 900ms;
+  --mas-wave-play: running;
+}
+
+/* ═══════════════════════════════════════════════════
+   二、变量：乐龄「养生绿」
+   —— 墨绿渐变镜身 + 墨绿描边，描边加粗到 3px（--mas-stroke-elder），五官整体放大 15%
+   ═══════════════════════════════════════════════════ */
+.xj.elder {
+  --mas-bg: linear-gradient(135deg, #edf3ea 0%, #7fa48a 55%, #3f6b4f 100%);
+  --mas-ring: var(--brand, #3f6b4f);
+  /* 墨绿底上用更深的墨绿做五官，而不是沿用深棕（深棕配绿会显脏） */
+  --mas-ink: #1f3a28;
+  --mas-gloss: rgba(255, 255, 255, 0.78);
+  --mas-shadow: 0 5px 14px -5px rgba(47, 82, 56, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  --mas-dot: var(--care, #5c7a52);
+  --mas-wave: #1f3a28;
+
+  /* 乐龄：描边固定 3px，与尺寸阶梯的分档描边解耦——
+     组件侧写的是 var(--mas-stroke-elder, var(--mas-stroke, 2px))，
+     --mas-stroke-elder 一旦继承到，就压过组件按 size 写入的 --mas-stroke。 */
+  --mas-stroke-elder: 3px;
+  /* 乐龄：五官整体放大 15%（组件对五官组施加 scale，位置关系自动保持） */
+  --mas-feature: 1.15;
+
+  /* 乐龄：装饰性循环一律静止（真静止，见 --mas-wave-play 的说明）；思考中的旋转是状态指示，保留 */
+  --mas-wave-play: paused;
+}
+
+/* ═══════════════════════════════════════════════════
+   三、变量：臻享「夜色金」
+   —— 暖黑镜身 + 暗金描边与五官；深底上高光与腮红都要收一档，否则会「糊」在身上
+   ═══════════════════════════════════════════════════ */
+.xj.night {
+  --mas-bg: linear-gradient(135deg, #3d3228 0%, #2a231c 100%);
+  --mas-ring: #d2b47a;
+  --mas-ink: #d2b47a;
+  /* 深底上平铺的白色椭圆会读成一块灰斑，改用径向渐变柔化；浅色皮肤仍按规格用纯色椭圆 */
+  --mas-gloss: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0) 100%);
+  /* 规格未定义夜色腮红：改用暗金淡晕，避免玫瑰粉在暖黑底上跳脱、也避免破坏统一的金调 */
+  --mas-blush: rgba(210, 180, 122, 0.24);
+  --mas-shadow: inset 0 0 0 1px rgba(210, 180, 122, 0.25);
+  /* 在线绿点在暖黑底上取更亮的一档，否则 #66784e 会糊进背景 */
+  --mas-dot: #86a86a;
+  /* 深底上白圈会过抢，退一档到 90% 白 */
+  --mas-dot-ring: rgba(255, 255, 255, 0.9);
+  --mas-wave: #d2b47a;
+}
+
+/* ═══════════════════════════════════════════════════
+   四、变量：三级动效档位
+   —— 只停「装饰性循环」（声波条）；思考中的旋转属状态指示，按规格在关闭档位下保留。
+   ═══════════════════════════════════════════════════ */
+.mo-lite,
+.mo-off {
+  --mas-wave-play: paused;
+}
+
+/* ═══════════════════════════════════════════════════
+   五、色调类：家人头像 / 多角色复用同一套几何，只换主色
+   —— 色名与 index.scss 的 .icon-box / .ic-chip / .xg-tone-* 保持一致，映射 1:1。
+      全部写成单类选择器，且直接落在组件根节点上（元素级声明优先于继承的皮肤变量），
+      因此「显式指定 tone」= 放弃皮肤跟随，正是家人头像想要的语义。
+      六个色调块声明在 xm-is-night 之前，故 state="night" 的夜间配色优先。
+   ═══════════════════════════════════════════════════ */
+.xm-tone-gold {
+  --mas-bg: linear-gradient(135deg, #f7ede0 0%, #dcbd88 55%, #c9a063 100%);
+  --mas-ring: #c9a063;
+  --mas-ink: #6b4e2e;
+  --mas-wave: #6b4e2e;
+  --mas-shadow: 0 5px 12px -5px rgba(168, 130, 77, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.xm-tone-care {
+  --mas-bg: linear-gradient(135deg, #f2f7ed 0%, #b8cfa4 55%, #8aa871 100%);
+  --mas-ring: #6e7f5c;
+  --mas-ink: #3d4c2c;
+  --mas-wave: #3d4c2c;
+  --mas-shadow: 0 5px 12px -5px rgba(110, 127, 92, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.xm-tone-terra {
+  --mas-bg: linear-gradient(135deg, #faf2ea 0%, #dcc0a4 55%, #bf9772 100%);
+  --mas-ring: #b08968;
+  --mas-ink: #6b4a30;
+  --mas-wave: #6b4a30;
+  --mas-shadow: 0 5px 12px -5px rgba(176, 137, 104, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.xm-tone-rose {
+  --mas-bg: linear-gradient(135deg, #fdf2f4 0%, #e8c3c9 55%, #d59aa4 100%);
+  --mas-ring: #c88a94;
+  --mas-ink: #7a3f49;
+  --mas-wave: #7a3f49;
+  --mas-shadow: 0 5px 12px -5px rgba(200, 138, 148, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.xm-tone-sky {
+  --mas-bg: linear-gradient(135deg, #f1f7fb 0%, #c2d6e5 55%, #96b1c6 100%);
+  --mas-ring: #7a93ac;
+  --mas-ink: #3d556b;
+  --mas-wave: #3d556b;
+  --mas-shadow: 0 5px 12px -5px rgba(122, 147, 172, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.xm-tone-plum {
+  --mas-bg: linear-gradient(135deg, #f6f3fa 0%, #d1c6e1 55%, #ab99c4 100%);
+  --mas-ring: #8c7aa6;
+  --mas-ink: #4f4266;
+  --mas-wave: #4f4266;
+  --mas-shadow: 0 5px 12px -5px rgba(140, 122, 166, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* ═══════════════════════════════════════════════════
+   六、状态 "night" 的夜间配色
+   —— 与 .xj.night 皮肤同值：state="night" 用于「拿不到皮肤 class 但需要夜间呈现」的场景
+      （例如气泡里独立渲染的小镜），也用于离线态。与 .xj.night 保持一致才不会出现两种夜金。
+   —— 优先级说明：state="night" 是**元素级**声明，一定压过继承来的皮肤变量；即乐龄页上
+      传 state="night" 也会得到暖黑金。这与项目既有口径一致（index.scss / graphics.scss /
+      本文件中 .xj.night 都声明在 .xj.elder 之后，A 级用户的「夜晚 + 乐龄」本就以夜色为准），
+      因此不额外做「皮肤反向覆盖状态」的特例；在乐龄页面直接不要传 state="night" 即可。
+   ═══════════════════════════════════════════════════ */
+.xm-is-night {
+  --mas-bg: linear-gradient(135deg, #3d3228 0%, #2a231c 100%);
+  --mas-ring: #d2b47a;
+  --mas-ink: #d2b47a;
+  --mas-gloss: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0) 100%);
+  --mas-blush: rgba(210, 180, 122, 0.24);
+  --mas-shadow: inset 0 0 0 1px rgba(210, 180, 122, 0.25);
+  --mas-dot: #86a86a;
+  --mas-dot-ring: rgba(255, 255, 255, 0.9);
+  --mas-wave: #d2b47a;
+}
