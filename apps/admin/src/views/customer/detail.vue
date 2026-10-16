@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { ElMessageBox } from "element-plus";
 import { get, patch, post, RISK_TYPE } from "@/api/xj";
 import { message } from "@/utils/message";
 import { currentUser } from "@/api/user";
@@ -56,6 +57,14 @@ async function assign(advisorId: number) {
 async function regenerate() {
   await post("/admin/plans/regenerate", { customerId: id });
   message("已重新生成方案，进入待审核", { type: "success" });
+  load();
+}
+/** 项目订单核销：客户到店出示订单号，确认后完成 */
+const ORDER_TAG: Record<string, string> = { unpaid: "warning", paid: "primary", booked: "success", used: "success", cancelled: "info" };
+async function useOrder(row: any) {
+  await ElMessageBox.confirm(`确认「${row.projectName}」（${row.orderNo}）到店核销？核销后订单完成并写入服务档案。`, "核销订单");
+  await post(`/admin/project-orders/${row.id}/use`);
+  message("已核销完成", { type: "success" });
   load();
 }
 const CONSENT_NAMES: Record<string, string> = { C1: "用户协议与隐私政策", C2: "健康信息处理", C3: "向合作医院提供信息", C4: "医院回传结果", C5: "人脸 / 身体照片", C6: "家人查看", C7: "个性化推荐", C8: "向境外机构提供信息", C9: "魔镜记忆" };
@@ -192,6 +201,27 @@ const CONSENT_NAMES: Record<string, string> = { C1: "用户协议与隐私政策
             <el-table-column prop="status" label="状态" />
             <el-table-column prop="issuedAt" label="发放" />
           </el-table>
+        </el-tab-pane>
+
+        <el-tab-pane label="项目订单" name="projectOrders">
+          <el-table :data="d.projectOrders" size="small">
+            <el-table-column prop="orderNo" label="订单号" width="170" />
+            <el-table-column prop="projectName" label="项目" />
+            <el-table-column label="实付" width="90"><template #default="{ row }">¥{{ row.amount }}</template></el-table-column>
+            <el-table-column prop="bookDate" label="预约到店" width="110">
+              <template #default="{ row }">{{ row.bookDate || "—" }}</template>
+            </el-table-column>
+            <el-table-column label="状态" width="130">
+              <template #default="{ row }"><el-tag :type="(ORDER_TAG[row.status] || 'info') as any" size="small">{{ row.statusName }}</el-tag></template>
+            </el-table-column>
+            <el-table-column prop="createdAt" label="下单时间" width="150" />
+            <el-table-column label="操作" width="90">
+              <template #default="{ row }">
+                <el-button v-if="['paid', 'booked'].includes(row.status)" size="small" type="primary" plain @click="useOrder(row)">核销</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div v-if="!d.projectOrders?.length" class="text-gray-400 text-sm mt-3">还没有门店项目在线订单</div>
         </el-tab-pane>
 
         <el-tab-pane label="线索" name="leads">

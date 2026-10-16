@@ -652,6 +652,30 @@ model LeadFollowup {
   createdAt DateTime @default(now())
 }
 
+// ───────────── 门店项目订单（先买后约，参考美团团购券） ─────────────
+
+model ProjectOrder {
+  id          Int       @id @default(autoincrement())
+  orderNo     String    @unique
+  customerId  Int
+  storeId     Int?
+  projectId   Int
+  projectCode String
+  projectName String
+  amount      Float // 实付（MVP 与团购价一致）
+  origPrice   Float? // 门市价快照
+  status      String    @default("unpaid") // unpaid / paid / booked / used / cancelled
+  payMethod   String? // MVP 模拟支付：mock
+  paidAt      DateTime?
+  bookDate    String? // 预约到店日期 YYYY-MM-DD
+  bookNote    String?
+  bookAt      DateTime?
+  usedAt      DateTime?
+  refunded    Boolean   @default(false) // 已支付后取消 = 已退款
+  cancelAt    DateTime?
+  createdAt   DateTime  @default(now())
+}
+
 // ───────────── 积分与互动 ─────────────
 
 model PointsLedger {

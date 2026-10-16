@@ -240,6 +240,7 @@ export class AdminController {
     const consents = await this.prisma.consentRecord.findMany({ where: { customerId: id }, orderBy: { id: 'desc' } })
     const followups = await this.prisma.followup.findMany({ where: { customerId: id }, orderBy: { id: 'desc' } })
     const coupons = await this.prisma.coupon.findMany({ where: { customerId: id }, orderBy: { id: 'desc' } })
+    const projectOrders = await this.prisma.projectOrder.findMany({ where: { customerId: id }, orderBy: { id: 'desc' } })
     const canHealth = ['health_advisor', 'super_admin'].includes(u.role)
     return {
       base: {
@@ -260,6 +261,11 @@ export class AdminController {
       consents: consents.map(r => ({ type: r.type, version: r.textVersion, granted: r.granted, channel: r.channel, scope: r.scope, grantedAt: fmt(r.grantedAt), revokedAt: fmt(r.revokedAt) })),
       followups: followups.map(f => ({ ...f, createdAt: fmt(f.createdAt) })),
       coupons: coupons.map(x => ({ id: x.id, couponNo: x.couponNo, type: x.type, status: COUPON_STATUS[x.status], issuedAt: fmt(x.issuedAt, 'YYYY-MM-DD') })),
+      projectOrders: projectOrders.map(o => ({
+        id: o.id, orderNo: o.orderNo, projectName: o.projectName, amount: o.amount, status: o.status,
+        statusName: ({ unpaid: '待支付', paid: '已购买，待预约', booked: '已预约', used: '已完成', cancelled: '已取消' } as any)[o.status] || o.status,
+        refunded: o.refunded, bookDate: o.bookDate, bookNote: o.bookNote, paidAt: fmt(o.paidAt), usedAt: fmt(o.usedAt, 'YYYY-MM-DD'), createdAt: fmt(o.createdAt),
+      })),
     }
   }
 
@@ -536,6 +542,26 @@ export class AdminController {
     const r = await this.prisma.referral.findUnique({ where: { id } })
     const timeline = [...((r?.timeline as any[]) || []), { at: fmt(new Date()), text: `${u.name}催办` }]
     await this.prisma.referral.update({ where: { id }, data: { timeline } })
+    return { ok: true }
+  }
+
+  // ───────── 门店项目订单（先买后约） ─────────
+
+  /** 项目订单核销：客户到店出示订单号，员工确认后完成（paid / booked → used），写入服务档案 */
+  @Post('project-orders/:id/use')
+  async useOrder(@CurrentUser() u: StaffUser, @Param('id', ParseIntPipe) id: number) {
+    const o = await this.prisma.projectOrder.findUnique({ where: { id } })
+    if (!o) throw Err.notFound('订单不存在')
+    if (!['paid', 'booked'].includes(o.status)) throw Err.conflict(o.status === 'unpaid' ? '订单未支付' : '当前状态不能核销')
+    const c = await this.prisma.customer.findUnique({ where: { id: o.customerId } })
+    const scope = scopeWhere(u) as any
+    if ((scope.advisorId && c?.advisorId !== scope.advisorId) || (scope.storeId && c?.storeId !== scope.storeId)) throw Err.forbidden('不在您的数据范围内')
+    await this.prisma.projectOrder.update({ where: { id }, data: { status: 'used', usedAt: new Date() } })
+    await this.prisma.customer.update({ where: { id: o.customerId }, data: { lastVisitAt: new Date() } })
+    await this.wf.addRecord({ customerId: o.customerId, recordType: 'service', sourceLabel: 'STORE', title: `到店完成「${o.projectName}」`, summary: `在线订单 ${o.orderNo} 核销${o.bookDate ? `（预约 ${o.bookDate}）` : ''}`, refTable: 'project_order', refId: o.id, storeId: c?.storeId })
+    await this.wf.message(o.customerId, '服务已完成', `「${o.projectName}」已完成，感谢到店。`, '/pkg-module/orders')
+    await this.wf.audit(this.actor(u), 'project_order.use', { type: 'project_order', id, customerId: o.customerId })
+    await this.wf.event(o.customerId, 'project_order_used', { orderNo: o.orderNo })
     return { ok: true }
   }
 
