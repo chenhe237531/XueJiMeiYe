@@ -39,15 +39,15 @@
       "updatedAt": "2026-10-16T23:27:25.986Z"
     },
     "XJ-301": {
-      "status": "in_review",
-      "assignee": "be",
-      "updatedAt": "2026-10-16T23:54:51.775Z",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "updatedAt": "2026-10-17T01:20:05.440Z",
       "note": "分支 feat/XJ-301-prisma-tables（67a80de claim → 2725e4a 实现 → 2493e22 交付记录），按用户要求暂不推送。验收全过：db:reset 两次跑通（UserBadge=5/FamilyRelay=4/StoreStamp=2 行可读写）；三组唯一约束重复写入实测被拒 P2002（badgeCode 对 / peerId+date 对 / storeId+month 对，同店异月与同月异店可写）；schema +39/-0、seed +15/-0 零删改。StoreStamp 加 month 列承载一店一月一枚；FamilyRelay 补 (peerId,date) 反查索引；seed 徽章 code 为临时演示值，正式 24 枚目录由 XJ-303 定。注意：改 schema 后先 prisma:generate 再跑 seed（db push 带 --skip-generate）。"
     },
     "XJ-302": {
-      "status": "in_review",
-      "assignee": "be",
-      "updatedAt": "2026-10-16T23:56:21.461Z",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "updatedAt": "2026-10-17T01:20:05.964Z",
       "note": "分支 feat/XJ-302-checkin-weekly-verdict（7f58bf8 claim → afc3f28 实现），按用户要求暂不推送。checkins 增 streakDays/monthSignedDates（旧字段保留）；新增 GET /app/archive/weekly?week=YYYY-MM-DD（周一为周起点，week 传该周任意一天，上期传上周边界日期）；verdict/targetPct 与六维算法同源（verdictOf 复用 dimGrade），overview/INDEX trend/weekly 同一指标结论一致；指标 trend 为近 8 次达标率。实测全过：nest build 零错；起服务 curl 验证王阿姨 09-20 当周（index 68/delta +22/三件事）、本周空数据兜底、新用户全空结构、非法 week 400、无 token 401。完整响应示例见 issues/XJ-302.md 交付记录（git 历史）与 XJ-401/XJ-405 消费说明。"
     },
     "XJ-207": {
@@ -72,6 +72,21 @@
       "status": "done",
       "assignee": "hourly-agent",
       "updatedAt": "2026-10-17T01:18:25.560Z"
+    },
+    "XJ-303": {
+      "status": "done",
+      "assignee": "hourly-agent",
+      "updatedAt": "2026-10-17T01:20:06.396Z"
+    },
+    "XJ-305": {
+      "status": "done",
+      "assignee": "hourly-agent",
+      "updatedAt": "2026-10-17T01:20:06.842Z"
+    },
+    "XJ-401": {
+      "status": "done",
+      "assignee": "hourly-agent",
+      "updatedAt": "2026-10-17T01:20:07.222Z"
     }
   }
 }
