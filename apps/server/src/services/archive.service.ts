@@ -3,13 +3,28 @@ import dayjs from 'dayjs'
 import { PrismaService } from '../common/prisma.service'
 import { Err } from '../common/response'
 import { fmt } from '../common/util'
-import { evaluateRedFlags, evaluateRiskSignals, buildFacts, ageOf } from '../engine'
+import { evaluateRedFlags, evaluateRiskSignals, buildFacts, ageOf, dimGrade, DIMENSIONS, DIM_NAMES } from '../engine'
 import { AiService } from './ai.service'
 import { EngineService } from './engine.service'
 import { WorkflowService } from './workflow.service'
 
 const SOURCE_NAMES: Record<string, string> = { HOSPITAL: '医院出具', STORE: '门店测量', SELF: '本人记录' }
 const STORE_RECORD_NAMES: Record<string, string> = { plan: '门店方案', service: '门店服务' }
+
+/** D20 结论口径：与六维算法同源（dimGrade 同一阈值），档案 / 趋势 / 周报三处共用，同一指标结论一致 */
+function verdictOf(score: number | null | undefined, prev?: number | null): { verdict: string, targetPct: number | null } {
+  if (score == null) return { verdict: '暂无数据，完成测评后生成结论', targetPct: null }
+  const targetPct = Math.max(0, Math.min(100, Math.round(score)))
+  let cmp = ''
+  if (prev != null) cmp = score - prev > 1 ? '，比上期略高' : prev - score > 1 ? '，比上期略低' : '，与上期持平'
+  return { verdict: `${dimGrade(score).grade}，达标 ${targetPct}%${cmp}`, targetPct }
+}
+
+/** 周报口径：周一为一周起点 */
+function mondayOf(d: ReturnType<typeof dayjs>) {
+  const dow = d.day()
+  return (dow === 0 ? d.subtract(6, 'day') : d.subtract(dow - 1, 'day')).startOf('day')
+}
 
 /** 健康档案、门店测量与报告（4.10、5.3 P-02 ~ P-19、9.9） */
 @Injectable()
@@ -49,8 +64,12 @@ export class ArchiveService {
     })
     const records = await this.prisma.record.findMany({ where: { customerId, visible: true }, orderBy: { occurredAt: 'desc' }, take: 5 })
     const hospitalReports = await this.prisma.report.count({ where: { customerId, type: 'hospital' } })
+    // D20：指数结论与周报 / 趋势同源（verdictOf 同一实现）
+    const idxVerdict = verdictOf(last?.indexScore ?? null, assessments[assessments.length - 2]?.indexScore ?? null)
     return {
       index: last?.indexScore ?? null,
+      verdict: idxVerdict.verdict,
+      targetPct: idxVerdict.targetPct,
       indexTrend: assessments.map(a => ({ date: fmt(a.completedAt, 'M/D'), value: a.indexScore })),
       dims: last?.dimensionScores || null,
       lastAssessedAt: last ? fmt(last.completedAt, 'YYYY-MM-DD') : null,
@@ -78,7 +97,9 @@ export class ArchiveService {
     const defs = await this.metricDefs()
     if (code === 'INDEX') {
       const list = await this.prisma.assessment.findMany({ where: { customerId, status: 'completed', completedAt: { gte: since } }, orderBy: { completedAt: 'asc' } })
-      return { code, name: '六维年轻化指数', unit: '', points: list.map(a => ({ date: fmt(a.completedAt, 'M/D'), value: a.indexScore, source: 'SELF' })) }
+      const points = list.map(a => ({ date: fmt(a.completedAt, 'M/D'), value: a.indexScore, source: 'SELF' }))
+      const v = verdictOf(points[points.length - 1]?.value ?? null, points[points.length - 2]?.value ?? null)
+      return { code, name: '六维年轻化指数', unit: '', points, verdict: v.verdict, targetPct: v.targetPct }
     }
     const ms = await this.prisma.measurement.findMany({ where: { customerId, measuredAt: { gte: since } }, orderBy: { measuredAt: 'asc' } })
     const points: any[] = []
@@ -87,7 +108,80 @@ export class ArchiveService {
       if (x) points.push({ date: fmt(m.measuredAt, 'M/D'), value: x.value, source: x.source || (m.method === 'hospital' ? 'HOSPITAL' : 'STORE') })
     }
     const d = defs.get(code)
-    return { code, name: d?.name || code, unit: d?.unit || '', refLow: d?.refLow, refHigh: d?.refHigh, points }
+    // D20：指标结论 = 近 8 次达标率（按 direction 判定是否在参考范围）；无参考范围 / 无数据时不出数字结论
+    const recent = points.slice(-8)
+    let verdict = '暂无测量数据，录入门店测量后生成结论'
+    let targetPct: number | null = null
+    const inTarget = (v: number) => d?.direction === 'higher_better' ? (d.refLow == null || v >= d.refLow)
+      : d?.direction === 'lower_better' ? (d.refHigh == null || v <= d.refHigh)
+        : (d.refLow == null || v >= d.refLow) && (d.refHigh == null || v <= d.refHigh)
+    if (recent.length && d && (d.refLow != null || d.refHigh != null)) {
+      const hit = recent.filter(p => inTarget(p.value)).length
+      targetPct = Math.round((hit / recent.length) * 100)
+      verdict = `近 ${recent.length} 次测量 ${hit} 次达标，达标率 ${targetPct}%`
+    }
+    else if (recent.length) verdict = '暂无参考范围，仅展示变化趋势'
+    return { code, name: d?.name || code, unit: d?.unit || '', refLow: d?.refLow, refHigh: d?.refHigh, points, verdict, targetPct }
+  }
+
+  /** 六维周报（XJ-302，docs/07 §3.5）：周聚合 + 三件事 + 六维环比；不新建表，复用测评数据。D5：本期仅站内展示，不做推送 */
+  async weekly(customerId: number, week?: string) {
+    if (week !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(week)) throw Err.bad('week 参数格式应为 YYYY-MM-DD')
+    const base = week ? dayjs(week) : dayjs()
+    const weekStart = mondayOf(base)
+    const weekEnd = weekStart.add(6, 'day').endOf('day')
+
+    const all = await this.prisma.assessment.findMany({ where: { customerId, status: 'completed' }, orderBy: { completedAt: 'asc' } })
+    const inWeek = all.filter(a => a.completedAt && a.completedAt >= weekStart.toDate() && a.completedAt <= weekEnd.toDate())
+    const cur = inWeek[inWeek.length - 1] ?? null
+    const before = all.filter(a => a.completedAt && a.completedAt < weekStart.toDate())
+    const prev = before[before.length - 1] ?? null
+
+    const scores: Record<string, number> = (cur?.dimensionScores as any) || {}
+    const prevScores: Record<string, number> = (prev?.dimensionScores as any) || {}
+    const dims = DIMENSIONS.map((code) => {
+      const score = scores[code] ?? null
+      const p = prevScores[code] ?? null
+      const v = verdictOf(score, p)
+      return { code, name: DIM_NAMES[code], score, prev: p, delta: score != null && p != null ? score - p : null, targetPct: v.targetPct, verdict: v.verdict }
+    })
+
+    const idx = verdictOf(cur?.indexScore ?? null, prev?.indexScore ?? null)
+    return {
+      weekStart: weekStart.format('YYYY-MM-DD'),
+      weekEnd: weekStart.add(6, 'day').format('YYYY-MM-DD'),
+      /** 第 N 期：以首次完成测评的那一周为第 1 期 */
+      issue: all.length ? Math.max(1, weekStart.diff(mondayOf(dayjs(all[0].completedAt!)), 'week') + 1) : 1,
+      index: {
+        value: cur?.indexScore ?? null,
+        prev: prev?.indexScore ?? null,
+        delta: cur?.indexScore != null && prev?.indexScore != null ? cur.indexScore - prev.indexScore : null,
+        targetPct: idx.targetPct,
+        verdict: idx.verdict,
+      },
+      riskLevel: cur?.riskLevel || null,
+      dims,
+      three: await this.weeklyThree(customerId, cur, dims),
+    }
+  }
+
+  /** 周报「三件事」：口径与测评结果页一致（优 ≥ 80 / 关注 < 60 / 红旗优先），复用 three 结构 */
+  private async weeklyThree(customerId: number, a: any, dims: { score: number | null, name: string }[]) {
+    if (!a) return { good: '完成一次六维测评后，这里会展示本周亮点', attention: '暂时没有需要特别注意的', next: '先完成一次六维测评，生成第一份周报' }
+    const good = dims.filter(d => (d.score ?? 0) >= 80).map(d => d.name)
+    const attention = dims.filter(d => d.score !== null && d.score < 60).map(d => d.name)
+    const rules = await this.prisma.rule.findMany({ where: { code: { in: (a.hitRules as string[]) || [] } } })
+    const red = rules.filter(r => r.kind === 'red_flag')
+    const risk = rules.filter(r => r.kind === 'risk_signal' && !(r.action as any)?.interest)
+    const coupon = await this.prisma.coupon.findFirst({ where: { customerId, sourceAssessmentId: a.id } })
+    const next = ['L2', 'L3'].includes(a.riskLevel || 'L0')
+      ? '先去医院看一看，顾问会帮您预约'
+      : coupon ? '到店领取免费体检券' : '顾问会联系您确认养护方案'
+    return {
+      good: good.length ? `${good.join('、')}状态不错` : '每一项都在稳步变好',
+      attention: red.length ? red.map(r => r.conditionText).join('；') : risk.length ? risk.slice(0, 2).map(r => (r.action as any)?.reason).join('；') : attention.length ? `${attention.join('、')}需要多关注` : '暂时没有需要特别注意的',
+      next,
+    }
   }
 
   async metricCodes(customerId: number) {

@@ -543,7 +543,10 @@ export class AppController {
     // 今天还没打卡时从昨天往前数，连续天数不会在白天被清零
     let d = days.includes(today()) ? dayjs() : dayjs().subtract(1, 'day')
     while (days.includes(d.format('YYYY-MM-DD'))) { streak++; d = d.subtract(1, 'day') }
-    return { today: list.filter(c => c.date === today()).map(c => c.type), streak, recent: list.slice(0, 20).map(c => ({ type: c.type, date: c.date, data: c.data })) }
+    // XJ-302：签到日历月历网格需要的两个字段（streak 保留，前端旧用法不受影响）
+    const monthRows = await this.prisma.checkin.findMany({ where: { customerId: u.id, date: { startsWith: dayjs().format('YYYY-MM') } }, select: { date: true } })
+    const monthSignedDates = [...new Set(monthRows.map(r => r.date))].sort()
+    return { today: list.filter(c => c.date === today()).map(c => c.type), streak, streakDays: streak, monthSignedDates, recent: list.slice(0, 20).map(c => ({ type: c.type, date: c.date, data: c.data })) }
   }
 
   @Post('checkins')
@@ -864,6 +867,12 @@ export class AppHealthController {
   @Get('archive/overview')
   overview(@CurrentUser() u: CustomerUser) {
     return this.archive.overview(u.id)
+  }
+
+  /** 六维周报（XJ-302）：week 传该周任意一天（YYYY-MM-DD），不传默认本周；上一期传上周边界日期即可 */
+  @Get('archive/weekly')
+  weekly(@CurrentUser() u: CustomerUser, @Query('week') week?: string) {
+    return this.archive.weekly(u.id, week)
   }
 
   @Get('archive/records')
