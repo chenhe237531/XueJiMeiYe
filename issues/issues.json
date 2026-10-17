@@ -1,0 +1,1512 @@
+{
+  "generatedFrom": "scripts/gen-issues.mjs",
+  "statusLedger": "scripts/issue-status.json",
+  "total": 42,
+  "waves": {
+    "W0": "W0 · 决策门",
+    "W1": "W1 · 地基",
+    "W2": "W2 · 主 Tab 体验",
+    "W3": "W3 · 后端数据与服务",
+    "W4": "W4 · 互动玩法",
+    "W5": "W5 · 成长体系",
+    "W6": "W6 · 图形资源",
+    "W7": "W7 · 内部页面动态化",
+    "W8": "W8 · 质量验收"
+  },
+  "agents": {
+    "ds": "设计系统 Agent",
+    "fe": "前端页面 Agent",
+    "be": "后端服务 Agent",
+    "infra": "工程基建 Agent",
+    "qa": "质量验收 Agent",
+    "pm": "产品决策 Agent"
+  },
+  "issues": [
+    {
+      "id": "XJ-000",
+      "title": "决策门：21 项决议定稿（已完成）",
+      "wave": "W0",
+      "priority": "P0",
+      "size": "S",
+      "agent": "pm",
+      "status": "done",
+      "assignee": "pm-agent",
+      "note": "",
+      "deps": [],
+      "blocks": [],
+      "decisions": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8",
+        "D9",
+        "D10",
+        "D11",
+        "D12",
+        "D13",
+        "D14",
+        "D15",
+        "D16",
+        "D17",
+        "D18",
+        "D19",
+        "D20",
+        "D21"
+      ],
+      "filesOwn": [
+        "issues/DECISIONS.md",
+        "issues/issues.json"
+      ],
+      "filesRead": [
+        "docs/06_小程序视觉优化方案_v2.0（互动化改版提案）.md",
+        "docs/07_小程序互动化改版设计规格_v2.1.md",
+        "docs/08_小程序动效与视觉细节规范_v2.2.md",
+        "docs/09_小程序图形资源替换说明_v2.3.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-101",
+      "title": "工程基建：构建与校验脚本化、CI 入口",
+      "wave": "W1",
+      "priority": "P0",
+      "size": "S",
+      "agent": "infra",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "分支 feat/XJ-101-ci-check（7769c79）三段式 CI 入口落地。全量跑通：lint 13 改动文件零新增告警 / build 6~7s 成功 / 产物断言 4 项全过。负向测试：(a) 新增探针文件 no-var 被检出，exit=2；(b) 给 graphics 集合注入 currentColor 模拟 mask，重建后断言检出 47 处 mask，exit=4。AC#4 满足：提交仅含 package.json、apps/miniapp/package.json、scripts/ci-check.sh、scripts/lint-baseline.txt，未动任何业务代码。⚠️ 已查实的限制：assert 段断言的 .mo-*/.gd-* 与 i-graphics-* 来自动效/图形底座（src/style/motion.scss、graphics.scss），而该底座从未入库（git ls-tree main 的 src/style/ 只有 iconfont.css 与 index.scss），因此在纯 main + XJ-101 上该段必然为红——本轮通过是因为工作树里存在未提交的底座 WIP。",
+      "deps": [],
+      "blocks": [
+        "XJ-701",
+        "XJ-703",
+        "XJ-704",
+        "XJ-708"
+      ],
+      "decisions": [],
+      "filesOwn": [
+        "package.json",
+        "apps/miniapp/package.json",
+        "scripts/ci-check.sh"
+      ],
+      "filesRead": [
+        "apps/miniapp/uno.config.ts"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-102",
+      "title": "设计令牌扩展：达标语义色、徽章、任务完成态、印章、周报封面",
+      "wave": "W1",
+      "priority": "P0",
+      "size": "S",
+      "agent": "ds",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "",
+      "deps": [],
+      "blocks": [
+        "XJ-103",
+        "XJ-201",
+        "XJ-204",
+        "XJ-207",
+        "XJ-401",
+        "XJ-405",
+        "XJ-501"
+      ],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/style/index.scss"
+      ],
+      "filesRead": [
+        "docs/07_小程序互动化改版设计规格_v2.1.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-103",
+      "title": "视觉细节令牌落地：间距阶梯、圆角阶梯、阴影三层、渐变方向",
+      "wave": "W1",
+      "priority": "P1",
+      "size": "M",
+      "agent": "ds",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "",
+      "deps": [
+        "XJ-102"
+      ],
+      "blocks": [
+        "XJ-104",
+        "XJ-204",
+        "XJ-701",
+        "XJ-703",
+        "XJ-704",
+        "XJ-708"
+      ],
+      "decisions": [
+        "D11",
+        "D12"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/style/index.scss",
+        "apps/miniapp/src/style/visual.scss"
+      ],
+      "filesRead": [
+        "docs/08_小程序动效与视觉细节规范_v2.2.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-104",
+      "title": "图标与图形底座三档统一（28/38/46，乐龄 34/46/56）",
+      "wave": "W1",
+      "priority": "P1",
+      "size": "S",
+      "agent": "ds",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "",
+      "deps": [
+        "XJ-103"
+      ],
+      "blocks": [
+        "XJ-601",
+        "XJ-803"
+      ],
+      "decisions": [
+        "D13",
+        "D14"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/style/index.scss",
+        "apps/miniapp/src/style/graphics.scss"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/components/XGraphic.vue",
+        "apps/miniapp/src/components/XIcon.vue"
+      ],
+      "acCount": 3
+    },
+    {
+      "id": "XJ-105",
+      "title": "小镜 CSS 合成形象组件 XMascot",
+      "wave": "W1",
+      "priority": "P0",
+      "size": "M",
+      "agent": "ds",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "",
+      "deps": [],
+      "blocks": [
+        "XJ-201",
+        "XJ-205"
+      ],
+      "decisions": [
+        "D19"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/components/XMascot.vue",
+        "apps/miniapp/src/style/mascot.scss"
+      ],
+      "filesRead": [
+        "docs/07_小程序互动化改版设计规格_v2.1.md"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-106",
+      "title": "路由与分包预登记：5 个新页面占位",
+      "wave": "W1",
+      "priority": "P0",
+      "size": "S",
+      "agent": "fe",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "分支 feat/XJ-106-route-placeholder（ff612da claim → 8064e72 实现 → 2f9f7c8 交付记录）已建 5 个占位页并双端构建通过，等待合并。实测发现 src/pages.json 是 gitignore 的生成物，路由由各页 definePage() 承载，故原『pages.json 独占』规则已作废。",
+      "deps": [],
+      "blocks": [
+        "XJ-402",
+        "XJ-403",
+        "XJ-404",
+        "XJ-405",
+        "XJ-406",
+        "XJ-705"
+      ],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-family/relay.vue",
+        "apps/miniapp/src/pkg-me/achievements.vue",
+        "apps/miniapp/src/pkg-game/box.vue",
+        "apps/miniapp/src/pkg-archive/weekly.vue",
+        "apps/miniapp/src/pkg-module/stamps.vue"
+      ],
+      "filesRead": [
+        "docs/07_小程序互动化改版设计规格_v2.1.md",
+        "apps/miniapp/.gitignore"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-107",
+      "title": "收口卡：接管动效/图形/入口零归属文件，修复按压反馈",
+      "wave": "W1",
+      "priority": "P0",
+      "size": "S",
+      "agent": "ds",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "分支 feat/XJ-107-motion-ownership（eb20da1 claim → ca3b509 实现），本机无 gh，走本地分支合并。**这是 R1 收口卡**：6 个零归属底座文件首次入库，+683 −1，只动 files_own：style/motion.scss（新，246 行，入库前 eslint --fix 修掉 30 条 format/prettier 纯格式）、xj/motion.ts（新，178 行，零改动）、XGraphic.vue（新，73）、XBadge.vue（新，159）、XReveal.vue（新，25）、main.ts（+2 −1，追加 motion.scss 入口 import，入口顺序视觉→令牌→动效未乱）。验证全绿：eslint 6 文件 RC=0；关沙箱 uni build -p mp-weixin → DONE Build complete.；自写产物断言 11/11（解析 selector→declarations，非数次数）；负向对照（注释掉 motion 入口重建）11/11→3/11，还原后 main.ts sha256 逐字节一致 1207e598…；运行时探针（esbuild 打包真实 motion.ts + uni 桩）14/14，证明 off 档 useReveal 首帧即 true 且全程未创建 IntersectionObserver（乐龄不闪空白），full 档为 false（反证非空洞）；语义保全检查 motion.scss 源侧 17 类/15 变量/5 关键帧 100% 进 app.wxss，重排未丢声明。证据 .preview/XJ-107_selfcheck.txt。⚠️ 遗留给下一棒：① scripts/ci-check.sh 的 R3「定义存在」断言（xj-rise+--mo-ease / xj-gd-bob+--gd-bob）至今仍是**未提交 WIP**，该文件属 XJ-101（done）的 files_own，本卡按一个文件一个 Owner 未越权提交 → main 上仍是宽前缀旧断言，需 XJ-101 owner 入库或另开小卡；② 归属空洞只收口一半：xj/graphics.ts + src/icons/graphics/** + uno.config.ts 仍属 XJ-601 且未入库，已提交的 components/archive/DimCard.vue import @/xj/graphics → 在这三者入库前纯 main 仍无法构建；③ .xj.night 未重定义 --alert/--star（夜色约 2.5:1）仍待开卡。",
+      "deps": [],
+      "blocks": [],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/style/motion.scss",
+        "apps/miniapp/src/xj/motion.ts",
+        "apps/miniapp/src/components/XGraphic.vue",
+        "apps/miniapp/src/components/XBadge.vue",
+        "apps/miniapp/src/components/XReveal.vue",
+        "apps/miniapp/src/main.ts"
+      ],
+      "filesRead": [
+        "docs/08_小程序动效与视觉细节规范_v2.2.md",
+        "docs/09_小程序图形资源替换说明_v2.3.md",
+        "issues/OWNERSHIP.md"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-201",
+      "title": "首页：连续签到激活条 + 「今日 3 件事」任务卡 + 小镜入口",
+      "wave": "W2",
+      "priority": "P0",
+      "size": "L",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-102",
+        "XJ-105",
+        "XJ-305"
+      ],
+      "blocks": [
+        "XJ-202"
+      ],
+      "decisions": [
+        "D1",
+        "D8",
+        "D21"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/pages/index/index.vue",
+        "apps/miniapp/src/components/home/HomeRender.vue",
+        "apps/miniapp/src/components/home/HomeSignin.vue",
+        "apps/miniapp/src/components/home/HomeTasks.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/xj/motion.ts",
+        "apps/miniapp/src/components/XMascot.vue"
+      ],
+      "acCount": 6
+    },
+    {
+      "id": "XJ-202",
+      "title": "首页组件启用矩阵：访客 / C 悦享 / B 尊享 / A 臻享",
+      "wave": "W2",
+      "priority": "P1",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-201"
+      ],
+      "blocks": [
+        "XJ-203",
+        "XJ-803"
+      ],
+      "decisions": [
+        "D6"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/components/home/HomeRender.vue",
+        "apps/miniapp/src/components/home/HomeGate.vue"
+      ],
+      "filesRead": [
+        "docs/07_小程序互动化改版设计规格_v2.1.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-203",
+      "title": "乐龄版首页：墨绿大字号、家人入口前置、语音小镜条",
+      "wave": "W2",
+      "priority": "P1",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-202"
+      ],
+      "blocks": [
+        "XJ-801"
+      ],
+      "decisions": [
+        "D10",
+        "D21"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/components/home/HomeElder.vue",
+        "apps/miniapp/src/components/home/HomeRender.vue"
+      ],
+      "filesRead": [
+        "docs/07_小程序互动化改版设计规格_v2.1.md"
+      ],
+      "acCount": 6
+    },
+    {
+      "id": "XJ-204",
+      "title": "A 级臻享夜色金全站适配",
+      "wave": "W2",
+      "priority": "P2",
+      "size": "M",
+      "agent": "ds",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-102",
+        "XJ-103"
+      ],
+      "blocks": [
+        "XJ-802"
+      ],
+      "decisions": [
+        "D6"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/style/index.scss",
+        "apps/miniapp/src/xj/store.ts"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/App.ku.vue"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-205",
+      "title": "魔镜页人格化改造：小镜头像 + 状态 + 回复内行动卡",
+      "wave": "W2",
+      "priority": "P0",
+      "size": "M",
+      "agent": "fe",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "",
+      "deps": [
+        "XJ-105"
+      ],
+      "blocks": [],
+      "decisions": [
+        "D19"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/pages/mirror/index.vue",
+        "apps/miniapp/src/components/mirror/ActionCard.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/components/XMascot.vue",
+        "apps/miniapp/src/services/mirror*"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-206",
+      "title": "图表组件库：XIndexRing 指数环 + XTrendChart 可点按趋势曲线",
+      "wave": "W2",
+      "priority": "P0",
+      "size": "M",
+      "agent": "ds",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "分支 feat/XJ-206-chart-components（9d12df2 claim → f0b074a 实现），按用户要求暂不推送。XIndexRing：SVG data URI + rAF 推进（环生长 800ms / 数字滚动 600ms 缓出 1-(1-p)³，D8 合规），mo-off 直达终态，expose replay() 供滚动入场复用；XTrendChart：渐变面积 + rAF 重绘 dasharray 生长 800ms，数据点叠透明热区实现点按气泡（再点收起/切换不错位），refLow/refHigh 画参考区段。两组件零硬编码业务色（默认 themeHex().brand / 可 props 覆盖），不改 xj/utils.ts 既有导出，头注含用法示例（AC#1 自检方式）。ci-check 全绿（lint 2 文件零新增 / build 6s / 产物断言 4 项全过）。注：组件基于工作树动效底座（xj/motion.ts、style/motion.scss，WIP 未入库）编译，构建在含底座的工作树验证。XJ-207 消费两组件后将进 usingComponents 断言。",
+      "deps": [],
+      "blocks": [
+        "XJ-207",
+        "XJ-208"
+      ],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/components/chart/XIndexRing.vue",
+        "apps/miniapp/src/components/chart/XTrendChart.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/xj/utils.ts"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-207",
+      "title": "档案页数据可视化升级：指数环 + 趋势曲线 + 达标条 + 人话结论",
+      "wave": "W2",
+      "priority": "P0",
+      "size": "L",
+      "agent": "fe",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "分支 feat/XJ-207-archive-viz（基于 feat/XJ-206-chart-components 构建，合并顺序天然保持 206 → 207；--claim 因 206 未 done 被挡，台账手工登记 claimed → cb31ac9 实现 → 交付记录），按用户要求暂不推送。archive/index.vue 重写：XIndexRing 指数环（D8：countUp 仅 mo-full）+ XTrendChart 可点按趋势（chartW = windowWidth - 48）+ 新建 DimCard 六维达标卡（--meter-ok/near/low 令牌、mo-grow-x scaleX 生长、人话结论阈值与 engine.dimGrade 同源 优≥80/良≥60/需关注<60、useReveal 滚动入场只播一次）+ 形状对应骨架屏 240ms 交叉淡入（mo-off/乐龄关动画）；indexVerdict 读 D20 后端字段 d.verdict 未合并时兜底；保留指标卡/待办/医院报告入口/最近记录。ci-check 全绿（lint 2 文件零新增 / build 6s / 产物断言 4 项全过含 71 条 usingComponents）。",
+      "deps": [
+        "XJ-102",
+        "XJ-206"
+      ],
+      "blocks": [
+        "XJ-801"
+      ],
+      "decisions": [
+        "D8",
+        "D20"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/pages/archive/index.vue",
+        "apps/miniapp/src/components/archive/DimCard.vue"
+      ],
+      "filesRead": [
+        "docs/06_小程序视觉优化方案_v2.0（互动化改版提案）.md"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-208",
+      "title": "测评流程可视化：答题进度环 + 雷达生长 + 结果分维度卡片化",
+      "wave": "W2",
+      "priority": "P1",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-206"
+      ],
+      "blocks": [
+        "XJ-702"
+      ],
+      "decisions": [
+        "D17"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-assess/intro.vue",
+        "apps/miniapp/src/pkg-assess/map.vue",
+        "apps/miniapp/src/pkg-assess/question.vue",
+        "apps/miniapp/src/pkg-assess/result.vue",
+        "apps/miniapp/src/components/XRadar.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/components/chart/XIndexRing.vue"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-301",
+      "title": "Prisma 三张新表：UserBadge / FamilyRelay / StoreStamp",
+      "wave": "W3",
+      "priority": "P0",
+      "size": "M",
+      "agent": "be",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "分支 feat/XJ-301-prisma-tables（67a80de claim → 2725e4a 实现 → 2493e22 交付记录），按用户要求暂不推送。验收全过：db:reset 两次跑通（UserBadge=5/FamilyRelay=4/StoreStamp=2 行可读写）；三组唯一约束重复写入实测被拒 P2002（badgeCode 对 / peerId+date 对 / storeId+month 对，同店异月与同月异店可写）；schema +39/-0、seed +15/-0 零删改。StoreStamp 加 month 列承载一店一月一枚；FamilyRelay 补 (peerId,date) 反查索引；seed 徽章 code 为临时演示值，正式 24 枚目录由 XJ-303 定。注意：改 schema 后先 prisma:generate 再跑 seed（db push 带 --skip-generate）。",
+      "deps": [],
+      "blocks": [
+        "XJ-303",
+        "XJ-304"
+      ],
+      "decisions": [
+        "D2",
+        "D3",
+        "D7"
+      ],
+      "filesOwn": [
+        "apps/server/prisma/schema.prisma",
+        "apps/server/prisma/seed.ts"
+      ],
+      "filesRead": [
+        "docs/07_小程序互动化改版设计规格_v2.1.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-302",
+      "title": "后端：签到扩展字段 + 六维周报聚合接口 + 档案结论字段",
+      "wave": "W3",
+      "priority": "P0",
+      "size": "M",
+      "agent": "be",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "分支 feat/XJ-302-checkin-weekly-verdict（7f58bf8 claim → afc3f28 实现），按用户要求暂不推送。checkins 增 streakDays/monthSignedDates（旧字段保留）；新增 GET /app/archive/weekly?week=YYYY-MM-DD（周一为周起点，week 传该周任意一天，上期传上周边界日期）；verdict/targetPct 与六维算法同源（verdictOf 复用 dimGrade），overview/INDEX trend/weekly 同一指标结论一致；指标 trend 为近 8 次达标率。实测全过：nest build 零错；起服务 curl 验证王阿姨 09-20 当周（index 68/delta +22/三件事）、本周空数据兜底、新用户全空结构、非法 week 400、无 token 401。完整响应示例见 issues/XJ-302.md 交付记录（git 历史）与 XJ-401/XJ-405 消费说明。",
+      "deps": [],
+      "blocks": [
+        "XJ-303",
+        "XJ-304",
+        "XJ-305",
+        "XJ-401",
+        "XJ-405"
+      ],
+      "decisions": [
+        "D5",
+        "D20"
+      ],
+      "filesOwn": [
+        "apps/server/src/controllers/app.controller.ts",
+        "apps/server/src/services/archive.service.ts"
+      ],
+      "filesRead": [
+        "apps/server/prisma/schema.prisma"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-303",
+      "title": "后端：成就徽章接口 + /app/me 扩字段",
+      "wave": "W3",
+      "priority": "P0",
+      "size": "M",
+      "agent": "be",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "",
+      "deps": [
+        "XJ-301",
+        "XJ-302"
+      ],
+      "blocks": [
+        "XJ-403",
+        "XJ-501"
+      ],
+      "decisions": [
+        "D2"
+      ],
+      "filesOwn": [
+        "apps/server/src/controllers/app.controller.ts",
+        "apps/server/src/services/tier.service.ts"
+      ],
+      "filesRead": [
+        "apps/server/prisma/schema.prisma"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-304",
+      "title": "后端：接力棒 / 健康盲盒 / 门店集章册接口",
+      "wave": "W3",
+      "priority": "P1",
+      "size": "L",
+      "agent": "be",
+      "status": "claimed",
+      "assignee": "win-B",
+      "note": "",
+      "deps": [
+        "XJ-301",
+        "XJ-302"
+      ],
+      "blocks": [
+        "XJ-402",
+        "XJ-404",
+        "XJ-406"
+      ],
+      "decisions": [
+        "D3",
+        "D4",
+        "D7"
+      ],
+      "filesOwn": [
+        "apps/server/src/controllers/app.controller.ts",
+        "apps/server/src/controllers/game.controller.ts"
+      ],
+      "filesRead": [
+        "apps/server/prisma/schema.prisma",
+        "apps/server/src/common/game-config.ts"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-305",
+      "title": "后端：首页「今日 3 件事」动态生成",
+      "wave": "W3",
+      "priority": "P0",
+      "size": "M",
+      "agent": "be",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "",
+      "deps": [
+        "XJ-302"
+      ],
+      "blocks": [
+        "XJ-201"
+      ],
+      "decisions": [
+        "D1"
+      ],
+      "filesOwn": [
+        "apps/server/src/services/home.service.ts"
+      ],
+      "filesRead": [
+        "apps/server/src/controllers/app.controller.ts"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-401",
+      "title": "签到日历改造：月历网格 + 7 格奖励轨道 + 里程碑",
+      "wave": "W4",
+      "priority": "P0",
+      "size": "L",
+      "agent": "fe",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "",
+      "deps": [
+        "XJ-102",
+        "XJ-302"
+      ],
+      "blocks": [
+        "XJ-707",
+        "XJ-801"
+      ],
+      "decisions": [
+        "D8"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-points/checkin.vue",
+        "apps/miniapp/src/components/points/CalendarGrid.vue",
+        "apps/miniapp/src/components/points/RewardTrack.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/components/XGraphic.vue"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-402",
+      "title": "健康接力棒：与家人互接的健康打卡",
+      "wave": "W4",
+      "priority": "P1",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-106",
+        "XJ-304"
+      ],
+      "blocks": [],
+      "decisions": [
+        "D3"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-family/relay.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/components/XMascot.vue",
+        "apps/miniapp/src/pkg-family/list.vue"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-403",
+      "title": "成就徽章墙：3 组 24 枚 + 进度环 + 详情展开",
+      "wave": "W4",
+      "priority": "P1",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-106",
+        "XJ-303"
+      ],
+      "blocks": [
+        "XJ-801",
+        "XJ-802"
+      ],
+      "decisions": [
+        "D2",
+        "D18"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-me/achievements.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/components/XBadge.vue",
+        "apps/miniapp/src/components/chart/XIndexRing.vue"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-404",
+      "title": "健康盲盒：知识卡收藏玩法",
+      "wave": "W4",
+      "priority": "P2",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-106",
+        "XJ-304"
+      ],
+      "blocks": [],
+      "decisions": [
+        "D4"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-game/box.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/pkg-game/wheel.vue",
+        "apps/miniapp/src/components/XGraphic.vue"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-405",
+      "title": "六维周报：夜色黑金封面 + 六维环比 + 可分享",
+      "wave": "W4",
+      "priority": "P2",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-102",
+        "XJ-302",
+        "XJ-106"
+      ],
+      "blocks": [],
+      "decisions": [
+        "D5"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-archive/weekly.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/components/chart/XTrendChart.vue",
+        "apps/miniapp/src/pkg-archive/trend.vue"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-406",
+      "title": "门店集章册：印章收集形态（不做地图打点）",
+      "wave": "W4",
+      "priority": "P2",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-106",
+        "XJ-304"
+      ],
+      "blocks": [
+        "XJ-803"
+      ],
+      "decisions": [
+        "D7"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-module/stamps.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/components/XGraphic.vue"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-501",
+      "title": "「我的」页成长体系：等级进度条 + 徽章行 + 存折横幅 + 快完成了",
+      "wave": "W5",
+      "priority": "P1",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-102",
+        "XJ-303"
+      ],
+      "blocks": [
+        "XJ-706"
+      ],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/pages/me/index.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/components/XBadge.vue",
+        "apps/miniapp/src/pkg-me/tier.vue"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-601",
+      "title": "图形资源补齐：维度标识、封面占位、加载环、空状态",
+      "wave": "W6",
+      "priority": "P1",
+      "size": "M",
+      "agent": "ds",
+      "status": "done",
+      "assignee": "hourly-agent",
+      "note": "",
+      "deps": [
+        "XJ-104"
+      ],
+      "blocks": [
+        "XJ-602"
+      ],
+      "decisions": [
+        "D17"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/icons/graphics",
+        "apps/miniapp/src/xj/graphics.ts",
+        "apps/miniapp/src/uno.config.ts",
+        "apps/miniapp/src/style/graphics.scss",
+        "apps/miniapp/scripts/fetch-graphics.js",
+        "docs/09_小程序图形资源替换说明_v2.3.md"
+      ],
+      "filesRead": [
+        "docs/09_小程序图形资源替换说明_v2.3.md"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-602",
+      "title": "图标语义枚举固定 + 前端映射层（为 .ic-chip 彩色化铺路）",
+      "wave": "W6",
+      "priority": "P1",
+      "size": "S",
+      "agent": "be",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-601"
+      ],
+      "blocks": [],
+      "decisions": [
+        "D14",
+        "D15"
+      ],
+      "filesOwn": [
+        "apps/server/src/common/icon-enum.ts",
+        "apps/miniapp/src/xj/icon-map.ts"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/components/XGraphic.vue",
+        "apps/miniapp/src/components/XIcon.vue"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-603",
+      "title": "死资源清理与包体积回收",
+      "wave": "W6",
+      "priority": "P2",
+      "size": "S",
+      "agent": "ds",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [],
+      "blocks": [],
+      "decisions": [
+        "D16"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/static"
+      ],
+      "filesRead": [
+        "docs/09_小程序图形资源替换说明_v2.3.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-701",
+      "title": "档案模块 5 页动态化（trend / report / timeline / hospital）",
+      "wave": "W7",
+      "priority": "P2",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-101",
+        "XJ-103"
+      ],
+      "blocks": [],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-archive/trend.vue",
+        "apps/miniapp/src/pkg-archive/report.vue",
+        "apps/miniapp/src/pkg-archive/timeline.vue",
+        "apps/miniapp/src/pkg-archive/hospital.vue"
+      ],
+      "filesRead": [
+        "docs/08_小程序动效与视觉细节规范_v2.2.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-702",
+      "title": "测评模块动态化（intro / map / test-balance / test-chair）",
+      "wave": "W7",
+      "priority": "P2",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-208"
+      ],
+      "blocks": [],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-assess/intro.vue",
+        "apps/miniapp/src/pkg-assess/map.vue",
+        "apps/miniapp/src/pkg-assess/test-balance.vue",
+        "apps/miniapp/src/pkg-assess/test-chair.vue"
+      ],
+      "filesRead": [
+        "docs/08_小程序动效与视觉细节规范_v2.2.md"
+      ],
+      "acCount": 3
+    },
+    {
+      "id": "XJ-703",
+      "title": "方案与体检 3 页动态化（pkg-plan/detail、pkg-checkup/book、coupons）",
+      "wave": "W7",
+      "priority": "P2",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-101",
+        "XJ-103"
+      ],
+      "blocks": [],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-plan/detail.vue",
+        "apps/miniapp/src/pkg-checkup/book.vue",
+        "apps/miniapp/src/pkg-checkup/coupons.vue"
+      ],
+      "filesRead": [
+        "docs/08_小程序动效与视觉细节规范_v2.2.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-704",
+      "title": "门店与模块 8 页动态化",
+      "wave": "W7",
+      "priority": "P2",
+      "size": "L",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-101",
+        "XJ-103"
+      ],
+      "blocks": [],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-module/store.vue",
+        "apps/miniapp/src/pkg-module/detail.vue",
+        "apps/miniapp/src/pkg-module/book.vue",
+        "apps/miniapp/src/pkg-module/buy.vue",
+        "apps/miniapp/src/pkg-module/orders.vue",
+        "apps/miniapp/src/pkg-module/transport.vue",
+        "apps/miniapp/src/pkg-module/lead-form.vue",
+        "apps/miniapp/src/pkg-module/vip.vue"
+      ],
+      "filesRead": [
+        "docs/08_小程序动效与视觉细节规范_v2.2.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-705",
+      "title": "家人模块 3 页动态化（list / view / accept）",
+      "wave": "W7",
+      "priority": "P2",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-106"
+      ],
+      "blocks": [],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-family/list.vue",
+        "apps/miniapp/src/pkg-family/view.vue",
+        "apps/miniapp/src/pkg-family/accept.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/components/XMascot.vue",
+        "apps/miniapp/src/pkg-family/relay.vue"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-706",
+      "title": "「我的」模块 6 页动态化（tier / requests / messages / settings / advisor / memories）",
+      "wave": "W7",
+      "priority": "P2",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-501"
+      ],
+      "blocks": [],
+      "decisions": [
+        "D9"
+      ],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-me/tier.vue",
+        "apps/miniapp/src/pkg-me/requests.vue",
+        "apps/miniapp/src/pkg-me/messages.vue",
+        "apps/miniapp/src/pkg-me/settings.vue",
+        "apps/miniapp/src/pkg-me/advisor.vue",
+        "apps/miniapp/src/pkg-me/memories.vue"
+      ],
+      "filesRead": [
+        "apps/miniapp/src/pages/me/index.vue",
+        "docs/08_小程序动效与视觉细节规范_v2.2.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-707",
+      "title": "积分与游戏 6 页动态化（passbook + wheel / cards / quiz / tree / match3）",
+      "wave": "W7",
+      "priority": "P2",
+      "size": "L",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-401"
+      ],
+      "blocks": [],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-points/passbook.vue",
+        "apps/miniapp/src/pkg-game/wheel.vue",
+        "apps/miniapp/src/pkg-game/cards.vue",
+        "apps/miniapp/src/pkg-game/quiz.vue",
+        "apps/miniapp/src/pkg-game/tree.vue",
+        "apps/miniapp/src/pkg-game/match3.vue"
+      ],
+      "filesRead": [
+        "docs/08_小程序动效与视觉细节规范_v2.2.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-708",
+      "title": "认证 3 页 + 合规 3 页：认证补反馈、合规只提清晰度",
+      "wave": "W7",
+      "priority": "P3",
+      "size": "M",
+      "agent": "fe",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-101",
+        "XJ-103"
+      ],
+      "blocks": [],
+      "decisions": [],
+      "filesOwn": [
+        "apps/miniapp/src/pkg-auth/login.vue",
+        "apps/miniapp/src/pkg-auth/profile.vue",
+        "apps/miniapp/src/pkg-auth/consent.vue",
+        "apps/miniapp/src/pkg-me/privacy.vue",
+        "apps/miniapp/src/pkg-me/consents.vue",
+        "apps/miniapp/src/pkg-me/about.vue"
+      ],
+      "filesRead": [
+        "docs/08_小程序动效与视觉细节规范_v2.2.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-801",
+      "title": "真机性能验收：帧率 / 并发 / 入场耗时 / setData 次数",
+      "wave": "W8",
+      "priority": "P0",
+      "size": "M",
+      "agent": "qa",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-203",
+        "XJ-207",
+        "XJ-401",
+        "XJ-403"
+      ],
+      "blocks": [],
+      "decisions": [
+        "D8"
+      ],
+      "filesOwn": [
+        "docs/10_验收_性能_v1.0.md"
+      ],
+      "filesRead": [
+        "docs/08_小程序动效与视觉细节规范_v2.2.md"
+      ],
+      "acCount": 5
+    },
+    {
+      "id": "XJ-802",
+      "title": "无障碍与可读性走查：对比度 / 乐龄 / 减弱动效 / 触控热区",
+      "wave": "W8",
+      "priority": "P1",
+      "size": "M",
+      "agent": "qa",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-204",
+        "XJ-403"
+      ],
+      "blocks": [],
+      "decisions": [
+        "D10",
+        "D11"
+      ],
+      "filesOwn": [
+        "docs/10_验收_无障碍_v1.0.md"
+      ],
+      "filesRead": [
+        "docs/08_小程序动效与视觉细节规范_v2.2.md"
+      ],
+      "acCount": 4
+    },
+    {
+      "id": "XJ-803",
+      "title": "视觉回归走查：三皮肤 × 底座三档 × 徽章三态矩阵",
+      "wave": "W8",
+      "priority": "P1",
+      "size": "M",
+      "agent": "qa",
+      "status": "ready",
+      "assignee": null,
+      "note": "",
+      "deps": [
+        "XJ-104",
+        "XJ-202",
+        "XJ-406"
+      ],
+      "blocks": [],
+      "decisions": [
+        "D13",
+        "D14"
+      ],
+      "filesOwn": [
+        "docs/10_验收_视觉回归_v1.0.md"
+      ],
+      "filesRead": [
+        "docs/08_小程序动效与视觉细节规范_v2.2.md",
+        "docs/09_小程序图形资源替换说明_v2.3.md"
+      ],
+      "acCount": 4
+    }
+  ],
+  "progress": {
+    "ready": 24,
+    "claimed": 1,
+    "in_review": 0,
+    "done": 17,
+    "total": 42,
+    "nextClaimable": [
+      "XJ-201",
+      "XJ-208",
+      "XJ-204",
+      "XJ-403",
+      "XJ-405"
+    ]
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "question": "首页「今日 3 件事」由谁生成？",
+      "decision": "后端按当期六维短板 + 待办（体检券 / 测评 / 方案）动态生成；无个人数据时降级为「完成首次六维测评」。",
+      "why": "六维短板是首页唯一能驱动复测的抓手，固定文案上线两周即失效。",
+      "issues": [
+        "XJ-201",
+        "XJ-305"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D2",
+      "question": "徽章数量与命名是否够用？",
+      "decision": "定稿 24 枚（坚持 8 / 探索 8 / 分享 8），命名与解锁条件见 docs/07 §3；运营扩量只加数据行，不改结构。",
+      "why": "24 枚覆盖「每天能拿 / 主动探索 / 对外分享」三类动机，是首次上线的最小完整集。",
+      "issues": [
+        "XJ-301",
+        "XJ-303",
+        "XJ-403"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D3",
+      "question": "接力棒范围？未绑定家人时入口如何展示？",
+      "decision": "仅限已绑定家人；未绑定时展示引导去绑定的空状态，不展示接力内容。",
+      "why": "健康数据属敏感信息，跨家庭传递合规风险高；空状态本身也是家人绑定的转化入口。",
+      "issues": [
+        "XJ-301",
+        "XJ-304",
+        "XJ-402"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D4",
+      "question": "盲盒知识卡内容源？",
+      "decision": "内容团队供稿，AI 仅出草稿且必须过合规审核；页面固定标注「不构成医学建议」。",
+      "why": "知识卡是唯一会被用户当结论转发的内容，必须走人工审核；免责标注是健康类内容的合规底线。",
+      "issues": [
+        "XJ-304",
+        "XJ-404"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D5",
+      "question": "周报是否需要定时推送？",
+      "decision": "本期只做站内展示，不做订阅消息推送；推送需求另开 Issue，不并入本轮。",
+      "why": "订阅消息需用户逐次授权且模板审核周期不可控，会拖住周报上线。",
+      "issues": [
+        "XJ-302",
+        "XJ-405"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D6",
+      "question": "A 级夜色金是否全站强制？",
+      "decision": "默认全站切换夜色金，同时在「我的 → 设置」保留浅色可切换选项；用户显式选择优先于等级默认。",
+      "why": "夜色金是 A 级的身份感来源，但 45+ 用户在强光下阅读浅色更舒适，两者都要满足。",
+      "issues": [
+        "XJ-202",
+        "XJ-204"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D7",
+      "question": "门店集章册其余 5 家门店数据来源？",
+      "decision": "本期只上 1 家（五月花店），但数据结构与页面按 N 家设计，不做任何单店硬编码。",
+      "why": "数据结构一次做对，门店上线属运营节奏而非开发节奏，不应阻塞开发。",
+      "issues": [
+        "XJ-301",
+        "XJ-304",
+        "XJ-406"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D8",
+      "question": "首屏是否保留数字滚动？",
+      "decision": "保留，但压缩到 ≤600ms 完成；`mo-off` / `mo-lite` 档位与乐龄模式下直接显示最终值。",
+      "why": "数字滚动是首页「活起来」感最强的单点，600ms 内不影响秒开感。",
+      "issues": [
+        "XJ-201",
+        "XJ-207",
+        "XJ-401",
+        "XJ-801"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D9",
+      "question": "「省流模式」是否对用户可见？",
+      "decision": "在「我的 → 设置」放显式开关，默认值为「跟随设备自动判定」，用户可强制满效 / 轻效 / 关闭。",
+      "why": "低端机用户需要能自救；默认自动判定让多数人不必理解这个概念。",
+      "issues": [
+        "XJ-706"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D10",
+      "question": "乐龄模式是否完全不给动效覆盖入口？",
+      "decision": "强制 `mo-off`，不提供任何覆盖入口（含隐藏入口）。",
+      "why": "乐龄用户是眩晕与误触风险最高的人群，不给入口是产品责任，不是设计洁癖。",
+      "issues": [
+        "XJ-203",
+        "XJ-802"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D11",
+      "question": "`--mo-rise` 用 16px 还是 12px？",
+      "decision": "定为 16px。",
+      "why": "16px 在 375pt 宽下仍属克制范围但位移可感，12px 在小屏上几乎看不出入场；上线后若收到集中「太跳」反馈再降。",
+      "issues": [
+        "XJ-103",
+        "XJ-802"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D12",
+      "question": "阴影 e2 是否引入？",
+      "decision": "引入 e2，但仅用于悬停态与浮层，卡片默认仍为 e1。",
+      "why": "只在「元素脱离静态层」时加第三层，既建立纵深又不让页面显脏。",
+      "issues": [
+        "XJ-103"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D13",
+      "question": "图标底座是否统一三档？",
+      "decision": "统一为 28 / 38 / 46（乐龄 34 / 46 / 56），随视觉回归（XJ-803）一起测。",
+      "why": "现有 `.ic-chip`(44) 与 `.icon-box`(40) 的 4px 差异肉眼难辨，却是「不整齐」的主因；归一后与字号阶梯对齐。",
+      "issues": [
+        "XJ-104",
+        "XJ-803"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D14",
+      "question": "待办 / 菜单 `.ic-chip` 是否彩色化？",
+      "decision": "做，但必须与 D15 的枚举固定（XJ-602）**同批上线**：深底 → 浅底，随 XJ-803 视觉回归一起走查。",
+      "why": "枚举未固定时，后端返回未收录图标名会显示空白；两件事拆开上线必然出现一期空白图标。",
+      "issues": [
+        "XJ-104",
+        "XJ-602",
+        "XJ-803"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D15",
+      "question": "后端图标枚举能否固定？",
+      "decision": "固定一份 12 个语义枚举（如 `skin` / `body` / `mind` …），后端只返回枚举值，**不返回图标名**；前端维护枚举 → 图形映射层。",
+      "why": "图标名属表现层，后端返回图标名等于把视觉实现泄露进数据契约，换图就要改后端。",
+      "issues": [
+        "XJ-602"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D16",
+      "question": "`static/images/avatar.jpg`（57.4 KB 零引用）是否删除？",
+      "decision": "删除，并在 XJ-603 记录体积回收数据。",
+      "why": "全项目零引用（模板遗留），删掉正好抵消本轮彩色图形 59 KB 增量。",
+      "issues": [
+        "XJ-603"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D17",
+      "question": "档案页雷达图是否加维度图形？",
+      "decision": "加。图形只能作为兄弟节点叠加（小程序 SVG 内部不能嵌套外部图形），需微调雷达图留白布局。",
+      "why": "六维图形已在首页建立语义，档案页复用可降低认知成本。",
+      "issues": [
+        "XJ-208",
+        "XJ-601"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D18",
+      "question": "徽章是否直接做完整徽章墙页面？",
+      "decision": "做完整徽章墙（XJ-403），依赖 `UserBadge` 表（XJ-301）；不做只读展示版。",
+      "why": "徽章只有「可展示、可分享」才有激励价值，一排只读图标无法承载 24 枚。",
+      "issues": [
+        "XJ-403"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D19",
+      "question": "小镜形象是否要上真实插画？",
+      "decision": "本期用 CSS 合成形象（已落地 XMascot），不引入位图 / 插画资源。",
+      "why": "零图片资源、零包体积增量、三套皮肤自动换色；插画需外部排期且无法随皮肤变化。",
+      "issues": [
+        "XJ-105",
+        "XJ-205"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D20",
+      "question": "趋势曲线 / 档案指标是否需要后端补结论字段？",
+      "decision": "后端补 `verdict`（一句人话结论）+ `targetPct`（达标百分比），前端只渲染不推断。",
+      "why": "结论涉及健康判断口径，必须与六维算法同源；前端自行推断会出现同一数据两种说法。",
+      "issues": [
+        "XJ-302",
+        "XJ-207"
+      ],
+      "status": "decided"
+    },
+    {
+      "id": "D21",
+      "question": "现有 `mirrorFab` 悬浮球保留还是替换？",
+      "decision": "**保留**悬浮球，问候栏头像作为**第二入口**（标准皮肤下两者并存）；乐龄皮肤下维持原设计，仍由底部语音条替代悬浮球以避免遮挡大字内容。",
+      "why": "悬浮球是现有用户已形成的操作习惯，贸然移除会造成「找不到小镜」；但乐龄版大字布局下悬浮球会遮挡内容，保持语音条替代。",
+      "issues": [
+        "XJ-201",
+        "XJ-203"
+      ],
+      "status": "decided"
+    }
+  ],
+  "decisionSummary": {
+    "total": 21,
+    "decided": 21,
+    "pending": 0
+  }
+}

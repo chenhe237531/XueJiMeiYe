@@ -19,12 +19,27 @@ const WHEEL_PAID_DAILY = 3
 const WHEEL_PAID_COST = 20
 const MATCH3_DAILY_CAP = 15
 
+/** 健康盲盒（XJ-304）：weight 即公示概率（总和 100）；知识卡常见、体验券稀有（玫瑰红标） */
+const BOX_PRIZES = [
+  { type: 'knowledge', value: 0, weight: 45, label: '健康知识卡' },
+  { type: 'points', value: 5, weight: 22, label: '5 积分' },
+  { type: 'points', value: 10, weight: 12, label: '10 积分' },
+  { type: 'points', value: 20, weight: 6, label: '20 积分' },
+  { type: 'lead', value: 'trial', weight: 3, label: '门店体验券' },
+  { type: 'none', value: 0, weight: 12, label: '谢谢参与' },
+]
+const BOX_FREE_DAILY = 1
+/** D4：知识卡固定免责标注（健康类内容的合规底线） */
+const BOX_CARD_DISCLAIMER = '内容仅供健康生活参考，不构成医学建议'
+
 const today = () => dayjs().format('YYYY-MM-DD')
 const dayStart = () => dayjs().startOf('day').toDate()
 
 type TreeState = { drops: number, stage: number, watered: number, date: string, checkinClaimed: boolean, quizClaimed: number }
 type WheelState = { freeDate: string, freeUsed: number, paidDate: string, paidUsed: number }
 type Match3State = { maxLevel: number }
+/** 盲盒状态：bonus.* = 当日加动次数是否已消耗（来源当日实时判定，不在这里存） */
+type BoxState = { date: string, freeUsed: number, bonus: { checkin: boolean, task: boolean, relay: boolean } }
 
 @Controller('app/games')
 @Aud('app')
@@ -183,11 +198,11 @@ export class GameController {
     }
   }
 
-  /** 实物类奖品（讲座名额 / 门店小样）：走线索 + 通知顾问跟进 */
-  private async awardLead(customerId: number, prize: { label: string }) {
+  /** 实物类奖品（讲座名额 / 门店小样 / 体验券）：走线索 + 通知顾问跟进 */
+  private async awardLead(customerId: number, prize: { label: string }, moduleCode = 'game_wheel', moduleName = '积分转盘奖品', notifyTitle = '转盘奖品待跟进') {
     const c = await this.prisma.customer.findUnique({ where: { id: customerId } })
-    await this.prisma.lead.create({ data: { leadNo: genNo('LD'), customerId, moduleCode: 'game_wheel', moduleName: '积分转盘奖品', type: 'other', formData: { prize: prize.label }, assigneeId: c?.advisorId, slaDueAt: addHours(48) } })
-    await this.wf.notifyStaff({ staffIds: [c?.advisorId], roles: ['ops'] }, '转盘奖品待跟进', `${c?.salutation || '客户'}抽中「${prize.label}」，请安排发放`, 'normal', '/marketing/leads')
+    await this.prisma.lead.create({ data: { leadNo: genNo('LD'), customerId, moduleCode, moduleName, type: 'other', formData: { prize: prize.label }, assigneeId: c?.advisorId, slaDueAt: addHours(48) } })
+    await this.wf.notifyStaff({ staffIds: [c?.advisorId], roles: ['ops'] }, notifyTitle, `${c?.salutation || '客户'}抽中「${prize.label}」，请安排发放`, 'normal', '/marketing/leads')
   }
 
   // ───────── 消消乐 ─────────
@@ -228,5 +243,89 @@ export class GameController {
     }
     await this.wf.event(u.id, 'game_play', { game: 'match3', action: 'complete', level: lv, moves: body.moves, score: body.score, seconds: body.seconds, points })
     return { points, maxLevel, capped: points === 0 }
+  }
+
+  // ───────── 健康盲盒（docs/07 §3.4，XJ-304） ─────────
+  // 与转盘的区别：转盘主打积分，盲盒主打知识卡收藏（D4：知识卡来自内容团队审校的题库，页面固定标注「不构成医学建议」）
+
+  private async boxState(customerId: number): Promise<{ s: BoxState, v: number }> {
+    let { s, v } = await this.state<BoxState>(customerId, 'box', { date: today(), freeUsed: 0, bonus: { checkin: false, task: false, relay: false } })
+    if (s.date !== today()) s = { date: today(), freeUsed: 0, bonus: { checkin: false, task: false, relay: false } }
+    return { s, v }
+  }
+
+  /** 次数获取来源（当日实时判定）：今日签到 +1 / 完成 1 项健康任务（睡眠/运动/喝水）+1 / 与家人接力成功 +1 */
+  private async boxBonuses(customerId: number) {
+    const [checkin, task, relay] = await Promise.all([
+      this.prisma.checkin.count({ where: { customerId, date: today() } }),
+      this.prisma.checkin.count({ where: { customerId, date: today(), type: { in: ['sleep', 'exercise', 'water'] } } }),
+      this.prisma.familyRelay.count({ where: { OR: [{ customerId }, { peerId: customerId }], date: today() } }),
+    ])
+    return { checkin: checkin > 0, task: task > 0, relay: relay > 0 }
+  }
+
+  /** 抽一张知识卡：从内容团队审校过的健康题库里随机取（D4），固定带免责标注 */
+  private async drawKnowledgeCard() {
+    const qs = await this.prisma.quizQuestion.findMany({ where: { status: 'active' }, select: { id: true, title: true, knowledge: true } })
+    const q = qs[Math.floor(Math.random() * qs.length)]
+    return {
+      id: q?.id ?? 0,
+      title: q?.title ?? '健康小贴士',
+      knowledge: q?.knowledge ?? '规律作息、均衡饮食、适度运动，是健康的三块基石。',
+      tag: '健康知识卡', source: '雪姬健康内容团队',
+      disclaimer: BOX_CARD_DISCLAIMER,
+    }
+  }
+
+  @Get('box')
+  async box(@CurrentUser() u: CustomerUser) {
+    const { s } = await this.boxState(u.id)
+    const avail = await this.boxBonuses(u.id)
+    const bonus = {
+      checkin: { available: avail.checkin, consumed: s.bonus.checkin, hint: '今日签到 +1' },
+      task: { available: avail.task, consumed: s.bonus.task, hint: '完成 1 项健康任务 +1' },
+      relay: { available: avail.relay, consumed: s.bonus.relay, hint: '与家人接力成功 +1' },
+    }
+    const freeLeft = Math.max(0, BOX_FREE_DAILY - s.freeUsed)
+    const bonusLeft = (avail.checkin && !s.bonus.checkin ? 1 : 0) + (avail.task && !s.bonus.task ? 1 : 0) + (avail.relay && !s.bonus.relay ? 1 : 0)
+    return {
+      prizes: BOX_PRIZES.map(p => ({ ...p, pct: p.weight })), // 概率公示（D4/合规）
+      freeLeft, bonus, totalLeft: freeLeft + bonusLeft,
+      balance: await this.wf.balance(u.id),
+      disclaimer: BOX_CARD_DISCLAIMER,
+    }
+  }
+
+  /** 拆盒：服务端加权随机（前端不可预知）；先写状态（乐观锁）再发奖，防连点超发 */
+  @Post('box/open')
+  async boxOpen(@CurrentUser() u: CustomerUser) {
+    let { s, v } = await this.boxState(u.id)
+    const avail = await this.boxBonuses(u.id)
+    let source: 'free' | 'checkin' | 'task' | 'relay'
+    if (s.freeUsed < BOX_FREE_DAILY) { source = 'free'; s = { ...s, freeUsed: s.freeUsed + 1 } }
+    else if (avail.checkin && !s.bonus.checkin) { source = 'checkin'; s = { ...s, bonus: { ...s.bonus, checkin: true } } }
+    else if (avail.task && !s.bonus.task) { source = 'task'; s = { ...s, bonus: { ...s.bonus, task: true } } }
+    else if (avail.relay && !s.bonus.relay) { source = 'relay'; s = { ...s, bonus: { ...s.bonus, relay: true } } }
+    else throw Err.bad('今天的盲盒已经拆完啦，明天再来')
+    await this.saveState(u.id, 'box', s, v)
+
+    const total = BOX_PRIZES.reduce((sum, p) => sum + p.weight, 0)
+    let r = Math.random() * total
+    let idx = 0
+    for (let i = 0; i < BOX_PRIZES.length; i++) {
+      r -= BOX_PRIZES[i].weight
+      if (r <= 0) { idx = i; break }
+    }
+    const prize = BOX_PRIZES[idx]
+    let card: any = null
+    if (prize.type === 'points') await this.wf.addPoints(u.id, (prize as any).value, 'box_win', `盲盒开出：${prize.label}`)
+    else if (prize.type === 'lead') await this.awardLead(u.id, prize, 'game_box', '健康盲盒奖品', '盲盒奖品待跟进')
+    else if (prize.type === 'knowledge') card = await this.drawKnowledgeCard()
+    await this.wf.event(u.id, 'game_play', { game: 'box', action: 'open', prize: prize.label, source })
+
+    const avail2 = await this.boxBonuses(u.id)
+    const freeLeft = Math.max(0, BOX_FREE_DAILY - s.freeUsed)
+    const bonusLeft = (avail2.checkin && !s.bonus.checkin ? 1 : 0) + (avail2.task && !s.bonus.task ? 1 : 0) + (avail2.relay && !s.bonus.relay ? 1 : 0)
+    return { prize: { ...prize, pct: prize.weight }, card, source, freeLeft, bonusLeft, totalLeft: freeLeft + bonusLeft }
   }
 }
