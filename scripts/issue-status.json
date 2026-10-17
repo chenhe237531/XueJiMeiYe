@@ -87,6 +87,11 @@
       "status": "done",
       "assignee": "hourly-agent",
       "updatedAt": "2026-10-17T01:20:07.222Z"
+    },
+    "XJ-304": {
+      "status": "claimed",
+      "assignee": "win-B",
+      "updatedAt": "2026-10-17T01:33:39.427Z"
     }
   }
 }
