@@ -6,6 +6,7 @@
 import { computed, ref } from 'vue'
 import HomeSignin from '@/components/home/HomeSignin.vue'
 import HomeTasks from '@/components/home/HomeTasks.vue'
+import { applyMatrix, GATE_TYPES } from '@/components/home/HomeGate.vue'
 import XIcon from '@/components/XIcon.vue'
 import XMascot from '@/components/XMascot.vue'
 import XRadar from '@/components/XRadar.vue'
@@ -16,8 +17,12 @@ import { absUrl, go, themeHex, toast } from '@/xj/utils'
 const props = defineProps<{ components: any[], night?: boolean }>()
 const xj = useXj()
 const elder = computed(() => xj.elderMode)
-const KNOWN = ['greeting', 'tierCard', 'healthCard', 'elderToday', 'checkinBar', 'taskList', 'entryGrid', 'banner', 'moduleList', 'activityCard', 'notice', 'mirrorFab', 'divider']
-const list = computed(() => (props.components || []).filter(c => KNOWN.includes(c.type)))
+// XJ-202：KNOWN 含矩阵全部类型，applyMatrix 按 §4.1 矩阵过滤 + 兜底注入
+const KNOWN = Array.from(new Set(['greeting', 'tierCard', 'healthCard', 'elderToday', 'checkinBar', 'taskList', 'entryGrid', 'banner', 'moduleList', 'activityCard', 'notice', 'mirrorFab', 'divider', ...GATE_TYPES]))
+const list = computed(() => {
+  const gated = applyMatrix(props.components || [], { tier: xj.tier, isGuest: !xj.loggedIn, elder: xj.elderMode })
+  return gated.filter(c => KNOWN.includes(c.type))
+})
 
 function open(item: any, component: string) {
   if (item?.code) http.post('/app/events', { event: 'home_component_click', props: { component, moduleCode: item.code } }, { silent: true }).catch(() => {})
@@ -322,7 +327,9 @@ const DIMS = [
                 <text v-else-if="it.priceText" class="t-md c-brand bold">{{ it.priceText }}</text>
                 <view v-else />
                 <!-- 有价格时收成圆形箭头，给「会员价 ¥4,680 起」留足宽度 -->
-                <view v-if="!elder && it.priceText" class="go-round"><XIcon name="chevron-right" :size="16" /></view>
+                <view v-if="!elder && it.priceText" class="go-round">
+                  <XIcon name="chevron-right" :size="16" />
+                </view>
                 <view v-else-if="!elder" class="go-pill">去看看<XIcon name="chevron-right" :size="14" /></view>
               </view>
             </view>
@@ -360,6 +367,92 @@ const DIMS = [
       <!-- 公告条 -->
       <view v-else-if="c.type === 'notice'" class="card hint row gap8" @click="go(c.props.link)">
         <XIcon name="info-circle" /><text class="t-sm">{{ c.props.text }}</text>
+      </view>
+
+      <!-- B 级：升级进度条（tierProgress，§4.1 矩阵 B 专属） -->
+      <view v-else-if="c.type === 'tierProgress'" class="card row gap12" @click="go('/pkg-me/tier')">
+        <view class="col flex1">
+          <view class="row-between">
+            <text class="t-sm c2">{{ c.props.title || '距下个等级' }}</text>
+            <text class="t-sm c-brand semi">{{ c.props.progress || '' }}</text>
+          </view>
+          <view v-if="c.props.pct != null" class="progress" style="margin-top: 8px">
+            <view :style="{ width: `${c.props.pct}%` }" />
+          </view>
+        </view>
+        <XIcon name="chevron-right" :size="20" color="#786E74" />
+      </view>
+
+      <!-- A 级：专属顾问卡（advisorCard，§4.1 矩阵 A 专属） -->
+      <view v-else-if="c.type === 'advisorCard'" class="card row gap12" @click="go('/pkg-me/advisor')">
+        <view class="ic-chip plum">
+          <XIcon name="headset" />
+        </view>
+        <view class="col flex1">
+          <text class="t-md semi">{{ c.props.name || '专属顾问' }}</text>
+          <text class="t-sm c2">{{ c.props.summary || '4 小时内响应' }}</text>
+        </view>
+        <XIcon name="chevron-right" :size="20" color="#786E74" />
+      </view>
+
+      <!-- A 级：权益网格（benefitGrid，§4.1 矩阵 A 专属 6 项） -->
+      <view v-else-if="c.type === 'benefitGrid'" class="card">
+        <text class="t-lg">
+          {{ c.props.title || '臻享权益' }}
+        </text>
+        <view class="dim-grid">
+          <view v-for="b in (c.props.items || c.props.benefits || [])" :key="b.text" class="dim col gap4">
+            <view class="icon-box sm plum">
+              <XIcon :name="b.icon" :size="18" />
+            </view>
+            <text class="t-xs">{{ b.text }}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- A 级：年度报告入口（annualReport，§4.1 矩阵 A 专属） -->
+      <view v-else-if="c.type === 'annualReport'" class="card row gap12" @click="go('/pages/archive/index')">
+        <view class="ic-chip ink">
+          <XIcon name="report-medical" />
+        </view>
+        <view class="col flex1">
+          <text class="t-md semi">{{ c.props.title || '年度个人健康报告' }}</text>
+          <text class="t-sm c2">{{ c.props.summary || '全年六维趋势与解读' }}</text>
+        </view>
+        <XIcon name="chevron-right" :size="20" color="#786E74" />
+      </view>
+
+      <!-- B 级：结伴拼团卡（groupCard，§4.1 矩阵 B 专属） -->
+      <view v-else-if="c.type === 'groupCard'" class="card row gap12" @click="go(c.props.link || '/pkg-module/detail')">
+        <view class="ic-chip terra">
+          <XIcon name="users-group" />
+        </view>
+        <view class="col flex1">
+          <text class="t-md semi">{{ c.props.name || '结伴拼团' }}</text>
+          <text class="t-sm c2">{{ c.props.summary || '和同龄人一起，更有动力' }}</text>
+        </view>
+        <XIcon name="chevron-right" :size="20" color="#786E74" />
+      </view>
+
+      <!-- 访客专属：测评引导卡（assessGuide，§4.1 矩阵访客专属） -->
+      <view v-else-if="c.type === 'assessGuide'" class="card col gap12" @click="go('/pkg-assess/intro')">
+        <text class="t-lg">{{ c.props.title || '六个维度是什么' }}</text>
+        <text class="c2">{{ c.props.summary || '完成免费测评，领体检券' }}</text>
+        <view class="btn small">
+          {{ c.props.cta || '开始测评' }}
+        </view>
+      </view>
+
+      <!-- 访客专属：门店与品牌（storeBrand，§4.1 矩阵访客专属） -->
+      <view v-else-if="c.type === 'storeBrand'" class="card row gap12" @click="go('/pkg-module/store')">
+        <view class="ic-chip brand">
+          <XIcon name="building-store" />
+        </view>
+        <view class="col flex1">
+          <text class="t-md semi">{{ c.props.name || '门店与品牌' }}</text>
+          <text class="t-sm c2">{{ c.props.summary || '' }}</text>
+        </view>
+        <XIcon name="chevron-right" :size="20" color="#786E74" />
       </view>
 
       <!-- 魔镜悬浮入口 -->
