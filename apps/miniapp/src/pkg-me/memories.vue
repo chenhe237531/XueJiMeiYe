@@ -19,7 +19,8 @@ async function load() {
 onShow(load)
 
 async function del(m: any) {
-  if (!(await confirm('删除这条记忆', m.text, '删除'))) return
+  if (!(await confirm('删除这条记忆', m.text, '删除')))
+    return
   await http.del(`/app/mirror/memories/${m.id}`)
   load()
 }
@@ -27,19 +28,25 @@ async function del(m: any) {
 
 <template>
   <view :class="xj.pageClass">
-    <view class="stack" style="padding-top: 12px">
+    <view class="stack mo-rise mo-d1" style="padding-top: 12px">
       <text class="t-sm c2">小镜只记得您主动说过的生活小事，不记诊断、用药、财务和证件信息。</text>
-      <view v-if="!c9" class="card hint stack">
+      <view v-if="!c9" class="card hint stack mo-rise mo-d2">
         <text class="t-md">您还没有开启"魔镜记忆"</text>
-        <view class="btn small" @click="go('/pkg-auth/consent?type=C9')">开启</view>
+        <view class="btn small mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="go('/pkg-auth/consent?type=C9')">
+          开启
+        </view>
       </view>
-      <view class="group">
+      <view class="group mo-rise mo-d3">
         <view v-for="m in list" :key="m.id" class="cell">
           <text class="tag">{{ m.category }}</text>
           <text class="flex1 t-body">{{ m.text }}</text>
-          <view @click="del(m)"><XIcon name="trash" :size="20" color="#786E74" /></view>
+          <view hover-class="mo-press-active" hover-stay-time="80" @click="del(m)">
+            <XIcon name="trash" :size="20" color="#786E74" />
+          </view>
         </view>
-        <view v-if="!list.length" class="empty">小镜还没有记住什么</view>
+        <view v-if="!list.length" class="empty">
+          小镜还没有记住什么
+        </view>
       </view>
     </view>
   </view>

@@ -15,14 +15,19 @@ const years = Array.from({ length: 70 }, (_, i) => new Date().getFullYear() - 18
 const yearIdx = ref(-1)
 
 onLoad(() => {
-  if (xj.me?.salutation) salutation.value = xj.me.salutation
-  if (xj.me?.birthYear) yearIdx.value = Math.max(0, years.indexOf(xj.me.birthYear))
+  if (xj.me?.salutation)
+    salutation.value = xj.me.salutation
+  if (xj.me?.birthYear)
+    yearIdx.value = Math.max(0, years.indexOf(xj.me.birthYear))
 })
 
 async function save(skip = false) {
-  if (!skip && !salutation.value) return toast('请填写您希望的称呼，如"王女士"')
-  if (!skip && yearIdx.value < 0) return toast('请选择出生年份')
-  if (skip && !(await confirm('跳过基础资料？', '出生年份会影响测评题目、体检券类型和养护方案。跳过后，开始测评前还会再请您选一次。', '先跳过'))) return
+  if (!skip && !salutation.value)
+    return toast('请填写您希望的称呼，如"王女士"')
+  if (!skip && yearIdx.value < 0)
+    return toast('请选择出生年份')
+  if (skip && !(await confirm('跳过基础资料？', '出生年份会影响测评题目、体检券类型和养护方案。跳过后，开始测评前还会再请您选一次。', '先跳过')))
+    return
   const res: any = skip ? {} : await http.patch('/app/me', { salutation: salutation.value, birthYear: years[yearIdx.value], gender: gender.value }, { loading: '保存中' })
   await xj.loadMe()
   if (res.elderAuto) {
@@ -33,8 +38,8 @@ async function save(skip = false) {
 </script>
 
 <template>
-  <view :class="[...xj.stdPageClass, 'washed']">
-    <view class="page-head" style="background: none">
+  <view class="washed" :class="[...xj.stdPageClass]">
+    <view class="page-head mo-rise mo-d1" style="background: none">
       <view class="ph-deco i-tabler-user-heart" />
       <text class="ph-title">怎么称呼您？</text>
       <text class="ph-sub">称呼用于问候和顾问联系；出生年份用于测评题目和方案</text>
@@ -43,29 +48,39 @@ async function save(skip = false) {
         <view><XIcon name="lock" :size="14" />仅您和顾问可见</view>
       </view>
     </view>
-    <view class="card raised stack">
+    <view class="card raised stack mo-rise mo-d2">
       <text class="t-md semi">称呼</text>
       <input v-model="salutation" class="input" placeholder="如：王女士、小李、Anna" maxlength="16">
       <text class="t-md semi">出生年份</text>
       <picker mode="selector" :range="years" :value="yearIdx < 0 ? 30 : yearIdx" @change="(e) => (yearIdx = Number(e.detail.value))">
-        <view class="input row-between"><text :class="{ c3: yearIdx < 0 }">{{ yearIdx < 0 ? '请选择' : `${years[yearIdx]} 年` }}</text><text class="c3">选择</text></view>
+        <view class="input row-between">
+          <text :class="{ c3: yearIdx < 0 }">{{ yearIdx < 0 ? '请选择' : `${years[yearIdx]} 年` }}</text><text class="c3">选择</text>
+        </view>
       </picker>
       <text class="t-sm c2">会影响测评题目和养护方案，请按实际选择</text>
       <text class="t-md semi">性别</text>
       <view class="choice-grid two">
-        <view class="choice" :class="{ on: gender === 'female' }" @click="gender = 'female'">
-          <view class="icon-box rose"><XIcon name="user-heart" /></view>
+        <view class="choice mo-press" :class="{ on: gender === 'female' }" hover-class="mo-press-active" hover-stay-time="80" @click="gender = 'female'">
+          <view class="icon-box rose">
+            <XIcon name="user-heart" />
+          </view>
           <text class="t-md">女士</text>
         </view>
-        <view class="choice" :class="{ on: gender === 'male' }" @click="gender = 'male'">
-          <view class="icon-box sky"><XIcon name="user" /></view>
+        <view class="choice mo-press" :class="{ on: gender === 'male' }" hover-class="mo-press-active" hover-stay-time="80" @click="gender = 'male'">
+          <view class="icon-box sky">
+            <XIcon name="user" />
+          </view>
           <text class="t-md">先生</text>
         </view>
       </view>
     </view>
-    <view class="stack mt24">
-      <view class="btn" @click="save()">保存</view>
-      <view class="t-body c2" style="text-align: center; padding: 8px" @click="save(true)">跳过</view>
+    <view class="stack mt24 mo-rise mo-d3">
+      <view class="btn mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="save()">
+        保存
+      </view>
+      <view class="t-body c2 mo-press" style="text-align: center; padding: 8px" hover-class="mo-press-active" hover-stay-time="80" @click="save(true)">
+        跳过
+      </view>
     </view>
   </view>
 </template>

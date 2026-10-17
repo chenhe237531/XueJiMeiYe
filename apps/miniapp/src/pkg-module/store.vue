@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import XIcon from '@/components/XIcon.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
+import { staggerStyle } from '@/xj/motion'
 import { absUrl, call, go, toast } from '@/xj/utils'
 
 definePage({ style: { navigationBarTitleText: '门店项目' } })
@@ -29,31 +30,40 @@ const badges = (it: any) => String(it.salesNote || '').split(' · ').filter(x =>
 
 /** 项目卡片：像美团团购一样在线购买，支付后再预约到店（而不是单纯预约） */
 function buy(item: any) {
-  if (!xj.loggedIn) return go('/pkg-auth/login')
+  if (!xj.loggedIn)
+    return go('/pkg-auth/login')
   go(`/pkg-module/buy?code=${item.code}`)
 }
 
 /** 底部"预约到店"：暂不选购具体项目，留意向由顾问电话确认 */
 function book() {
-  if (!xj.loggedIn) return go('/pkg-auth/login')
+  if (!xj.loggedIn)
+    return go('/pkg-auth/login')
   go('/pkg-module/lead-form?code=store_services')
 }
 
 function phone() {
   const p = d.value?.store?.phone || ''
-  if (/\d{6,}/.test(p)) call(p)
+  if (/\d{6,}/.test(p))
+    call(p)
   else toast('门店电话待补充，可先在线预约')
 }
 
 function copyAddr() {
   const s = d.value?.store
-  if (!s) return
+  if (!s)
+    return
   uni.setClipboardData({ data: `${s.name} ${s.address}${s.mall ? `（${s.mall}）` : ''}`, success: () => toast('地址已复制') })
 }
 </script>
 
 <template>
-  <view :class="[...xj.pageClass, 'has-footer']">
+  <view class="has-footer" :class="[...xj.pageClass]">
+    <template v-if="!d?.store">
+      <view class="skeleton" style="height: 180px; border-radius: var(--r-card)" />
+      <view class="card skeleton" style="height: 88px; margin-top: 12px" />
+      <view class="card skeleton" style="height: 160px; margin-top: 12px" />
+    </template>
     <template v-if="d?.store">
       <!-- 门店头图：实拍图到位前用插画占位 -->
       <view class="hero" :class="{ photo: d.cover && !heroErr }">
@@ -68,11 +78,15 @@ function copyAddr() {
         <text class="hero-tip">示意图</text>
       </view>
 
-      <view class="card head stack">
+      <view class="card head stack mo-rise mo-d1">
         <text class="t-lg" style="line-height: 1.4">{{ d.store.name }}</text>
         <view class="row gap8 wrap">
           <view v-if="d.store.rating" class="row gap6">
-            <view class="stars">★★★★★<view class="on" :style="{ width: starPct }">★★★★★</view></view>
+            <view class="stars">
+              ★★★★★<view class="on" :style="{ width: starPct }">
+                ★★★★★
+              </view>
+            </view>
             <text class="rating num">{{ d.store.rating }}</text>
           </view>
           <text v-if="d.store.reviewCount" class="t-sm c2">{{ d.store.reviewCount }} 条评价</text>
@@ -84,33 +98,45 @@ function copyAddr() {
         </view>
         <view class="divider" />
         <view class="row gap12">
-          <view class="col flex1" @click="copyAddr">
+          <view class="col flex1 mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="copyAddr">
             <text class="t-body semi">{{ d.store.address }}</text>
             <text class="t-xs c3">{{ d.store.mall }}{{ d.store.district ? ` · ${d.store.district}` : '' }}</text>
           </view>
-          <view class="act" @click="copyAddr"><XIcon name="copy" :size="20" /><text>地址</text></view>
-          <view class="act" @click="phone"><XIcon name="phone" :size="20" /><text>电话</text></view>
+          <view class="act mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="copyAddr">
+            <XIcon name="copy" :size="20" /><text>地址</text>
+          </view>
+          <view class="act mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="phone">
+            <XIcon name="phone" :size="20" /><text>电话</text>
+          </view>
         </view>
         <view v-if="d.store.facilities?.length" class="row gap6 wrap">
           <text v-for="f in d.store.facilities" :key="f" class="tag line">{{ f }}</text>
         </view>
       </view>
 
-      <view v-if="d.store.promises?.length" class="card">
-        <view class="section-title mb8" style="margin-top: 0"><text>门店承诺</text></view>
+      <view v-if="d.store.promises?.length" class="card mo-rise mo-d2">
+        <view class="section-title mb8 mo-rise mo-d3" style="margin-top: 0">
+          <text>门店承诺</text>
+        </view>
         <view class="promises">
-          <view v-for="p in d.store.promises" :key="p" class="row gap4"><XIcon name="circle-check" :size="15" color="var(--brand-ink)" /><text class="t-xs c2">{{ p }}</text></view>
+          <view v-for="p in d.store.promises" :key="p" class="row gap4">
+            <XIcon name="circle-check" :size="15" color="var(--brand-ink)" /><text class="t-xs c2">{{ p }}</text>
+          </view>
         </view>
       </view>
 
-      <view class="card deals">
-        <view class="section-title" style="margin-top: 0"><text>门店项目</text><text class="more">与美团团购同价</text></view>
+      <view class="card deals mo-rise mo-d4">
+        <view class="section-title mo-rise mo-d5" style="margin-top: 0">
+          <text>门店项目</text><text class="more">与美团团购同价</text>
+        </view>
         <scroll-view scroll-x class="tabs-scroll" :show-scrollbar="false">
           <view class="tabs">
-            <view v-for="t in tabs" :key="t.key" class="tab" :class="{ on: cat === t.key }" @click="cat = t.key">{{ t.title }}<text class="tab-n">{{ t.n }}</text></view>
+            <view v-for="t in tabs" :key="t.key" class="mo-press tab" :class="{ on: cat === t.key }" hover-class="mo-press-active" hover-stay-time="80" @click="cat = t.key">
+              {{ t.title }}<text class="tab-n">{{ t.n }}</text>
+            </view>
           </view>
         </scroll-view>
-        <view v-for="it in items" :key="it.code" class="deal" @click="buy(it)">
+        <view v-for="(it, i) in items" :key="it.code" class="deal mo-rise mo-press" :style="staggerStyle(i)" hover-class="mo-press-active" hover-stay-time="80" @click="buy(it)">
           <view class="thumb" :class="it.category === 'body' ? 'body' : 'face'">
             <XIcon :name="it.category === 'body' ? 'massage' : 'sparkles'" :size="xj.elderMode ? 38 : 34" />
             <text v-if="it.durationMin" class="thumb-label">{{ it.durationMin }} 分钟</text>
@@ -124,10 +150,14 @@ function copyAddr() {
             </view>
             <view class="row-between" style="align-items: flex-end">
               <view class="row gap6 flex1" style="align-items: baseline">
-                <view class="price"><text class="yen">¥</text><text class="amt">{{ it.groupPrice }}</text></view>
+                <view class="price">
+                  <text class="yen">¥</text><text class="amt">{{ it.groupPrice }}</text>
+                </view>
                 <text v-if="it.priceRef" class="price-orig">¥{{ it.priceRef }}</text>
               </view>
-              <view class="mini">购买</view>
+              <view class="mini">
+                购买
+              </view>
             </view>
           </view>
         </view>
@@ -137,44 +167,198 @@ function copyAddr() {
 
     <view class="footer-bar">
       <view class="row gap12">
-        <view class="foot-act" @click="phone"><XIcon name="phone" :size="22" /><text>电话</text></view>
-        <view class="foot-act" @click="go('/pkg-me/advisor')"><XIcon name="user-heart" :size="22" /><text>顾问</text></view>
-        <view class="btn flex1" @click="book()"><XIcon name="calendar-plus" />预约到店</view>
+        <view class="foot-act mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="phone">
+          <XIcon name="phone" :size="22" /><text>电话</text>
+        </view>
+        <view class="foot-act mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="go('/pkg-me/advisor')">
+          <XIcon name="user-heart" :size="22" /><text>顾问</text>
+        </view>
+        <view class="btn flex1 mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="book()">
+          <XIcon name="calendar-plus" />预约到店
+        </view>
       </view>
     </view>
   </view>
 </template>
 
 <style scoped>
-.hero { position: relative; overflow: hidden; margin: 0 calc(-1 * var(--pad)); padding: 22px var(--pad) 44px; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(120deg, #e3cdb0 0%, #c9a063 55%, #a8824d 100%); color: var(--on-brand); }
+.hero {
+  position: relative;
+  overflow: hidden;
+  margin: 0 calc(-1 * var(--pad));
+  padding: 22px var(--pad) 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(120deg, #e3cdb0 0%, #c9a063 55%, #a8824d 100%);
+  color: var(--on-brand);
+}
 /* 有照片时 image 会盖住底色，乐龄墨绿底只在无图时可见 */
-.elder .hero { background: linear-gradient(120deg, #7fa48a 0%, #3f6b4f 60%, #345a41 100%); color: #fff; }
+.elder .hero {
+  background: linear-gradient(120deg, #7fa48a 0%, #3f6b4f 60%, #345a41 100%);
+  color: #fff;
+}
 /* 有封面图时：照片铺底 + 左侧压暗，文字改白 */
-.hero.photo { min-height: 150px; color: #fff; }
-.hero-img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
-.hero-shade { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: linear-gradient(90deg, rgba(43, 32, 22, 0.78) 0%, rgba(43, 32, 22, 0.4) 60%, rgba(43, 32, 22, 0.1) 100%); }
-.hero-text { position: relative; z-index: 1; }
-.hero-brand { font-size: var(--fs-xs); opacity: 0.75; letter-spacing: 1px; }
-.hero-name { font-size: var(--fs-xl); font-weight: 700; line-height: 1.3; }
-.hero-sub { font-size: var(--fs-sm); opacity: 0.8; }
-.hero-tip { z-index: 1; position: absolute; right: 10px; bottom: 30px; font-size: 10px; padding: 0 6px; border-radius: 4px; background: rgba(0, 0, 0, 0.35); color: #fff; }
-.head { position: relative; margin-top: -24px; }
-.rating { color: var(--price); font-weight: 700; font-size: var(--fs-md); }
-.act { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--ink-2); font-size: var(--fs-xs); min-width: 40px; }
-.mb8 { margin-bottom: 8px; }
-.promises { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 4px; }
-.elder .promises { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.tabs-scroll { margin: 10px 0 2px; white-space: nowrap; }
-.tabs { display: inline-flex; gap: 8px; }
-.tab { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 12px; border-radius: 15px; background: var(--placeholder); color: var(--ink-2); font-size: var(--fs-sm); }
-.elder .tab { height: 40px; padding: 0 16px; border-radius: 20px; font-size: var(--fs-body); }
-.tab.on { background: linear-gradient(135deg, var(--brand-hi), var(--brand-dark)); color: var(--on-brand); font-weight: 700; }
-.tab-n { font-size: var(--fs-xs); opacity: 0.7; }
-.deal { display: flex; gap: 10px; padding: 12px 0; border-top: 1px solid var(--line); }
-.tabs-scroll + .deal { border-top: 0; }
-.deal-title { font-size: var(--fs-md); font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-.mini { height: 30px; padding: 0 14px; border-radius: 15px; background: linear-gradient(135deg, var(--brand-hi), var(--brand-dark)); color: var(--on-brand); box-shadow: 0 4px 10px -4px rgba(168, 130, 77, 0.6); font-weight: 700; font-size: var(--fs-sm); display: flex; align-items: center; flex-shrink: 0; }
-.elder .mini { height: 40px; padding: 0 18px; border-radius: 20px; font-size: var(--fs-body); }
-.note { display: block; line-height: 1.6; }
-.foot-act { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 48px; color: var(--ink-2); font-size: var(--fs-xs); }
+.hero.photo {
+  min-height: 150px;
+  color: #fff;
+}
+.hero-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero-shade {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(43, 32, 22, 0.78) 0%, rgba(43, 32, 22, 0.4) 60%, rgba(43, 32, 22, 0.1) 100%);
+}
+.hero-text {
+  position: relative;
+  z-index: 1;
+}
+.hero-brand {
+  font-size: var(--fs-xs);
+  opacity: 0.75;
+  letter-spacing: 1px;
+}
+.hero-name {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1.3;
+}
+.hero-sub {
+  font-size: var(--fs-sm);
+  opacity: 0.8;
+}
+.hero-tip {
+  z-index: 1;
+  position: absolute;
+  right: 10px;
+  bottom: 30px;
+  font-size: 10px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+}
+.head {
+  position: relative;
+  margin-top: -24px;
+}
+.rating {
+  color: var(--price);
+  font-weight: 700;
+  font-size: var(--fs-md);
+}
+.act {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  min-width: 40px;
+}
+.mb8 {
+  margin-bottom: 8px;
+}
+.promises {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 4px;
+}
+.elder .promises {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.tabs-scroll {
+  margin: 10px 0 2px;
+  white-space: nowrap;
+}
+.tabs {
+  display: inline-flex;
+  gap: 8px;
+}
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 15px;
+  background: var(--placeholder);
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+}
+.elder .tab {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 20px;
+  font-size: var(--fs-body);
+}
+.tab.on {
+  background: linear-gradient(135deg, var(--brand-hi), var(--brand-dark));
+  color: var(--on-brand);
+  font-weight: 700;
+}
+.tab-n {
+  font-size: var(--fs-xs);
+  opacity: 0.7;
+}
+.deal {
+  display: flex;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.tabs-scroll + .deal {
+  border-top: 0;
+}
+.deal-title {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.mini {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 15px;
+  background: linear-gradient(135deg, var(--brand-hi), var(--brand-dark));
+  color: var(--on-brand);
+  box-shadow: 0 4px 10px -4px rgba(168, 130, 77, 0.6);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.elder .mini {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 20px;
+  font-size: var(--fs-body);
+}
+.note {
+  display: block;
+  line-height: 1.6;
+}
+.foot-act {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 48px;
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+}
 </style>

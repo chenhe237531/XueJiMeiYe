@@ -15,7 +15,8 @@ const ITEMS = [
 
 async function req(type: string) {
   const text = type === 'export' ? '生成后通过站内消息提供下载，链接 24 小时有效。' : '注销后 15 个工作日内删除或匿名化您的个人数据（法律要求保留的除外）。'
-  if (!(await confirm(type === 'export' ? '申请导出个人数据' : '申请注销账号', text, '确认申请'))) return
+  if (!(await confirm(type === 'export' ? '申请导出个人数据' : '申请注销账号', text, '确认申请')))
+    return
   await http.post('/app/data-requests', { type })
   toast('申请已提交')
 }
@@ -27,12 +28,18 @@ async function req(type: string) {
       <text class="t-lg">我们收集了哪些信息</text>
       <view class="group">
         <view v-for="i in ITEMS" :key="i[0]" class="cell">
-          <view class="col flex1"><text class="t-md">{{ i[0] }}</text><text class="t-sm c2">{{ i[1] }}</text><text class="t-xs c3">用途：{{ i[2] }}</text></view>
+          <view class="col flex1">
+            <text class="t-md">{{ i[0] }}</text><text class="t-sm c2">{{ i[1] }}</text><text class="t-xs c3">用途：{{ i[2] }}</text>
+          </view>
         </view>
       </view>
       <text class="t-sm c2">健康数据单独加密保存，不用于营销推荐；医院只看到转介必需的信息。</text>
-      <view class="btn ghost" @click="req('export')">申请导出个人数据</view>
-      <view class="btn plain" @click="req('deactivate')">申请注销账号</view>
+      <view class="btn ghost mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="req('export')">
+        申请导出个人数据
+      </view>
+      <view class="btn plain mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="req('deactivate')">
+        申请注销账号
+      </view>
     </view>
   </view>
 </template>
