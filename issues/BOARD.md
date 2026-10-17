@@ -6,12 +6,12 @@
 
 | 状态 | 数量 | 含义 |
 |---|---:|---|
-| `ready` | 24 | 可认领（还需检查 deps 是否已 done） |
-| `claimed` | 1 | 已认领，开发中 |
+| `ready` | 15 | 可认领（还需检查 deps 是否已 done） |
+| `claimed` | 0 | 已认领，开发中 |
 | `in_review` | 0 | 已提交，待评审 / 合并 |
-| `done` | 17 | 已完成并合并 |
+| `done` | 27 | 已完成并合并 |
 
-**完成度：17 / 42（40%）** · 状态台账见 `scripts/issue-status.json`
+**完成度：27 / 42（64%）** · 状态台账见 `scripts/issue-status.json`
 
 ## 波次总览
 
@@ -122,14 +122,14 @@ graph LR
 
 | ID | 状态 | 标题 | Agent | 优先级 | 规模 | 前置 | 决策 |
 |---|---|---|---|---|---|---|---|
-| `XJ-201` | ready | 首页：连续签到激活条 + 「今日 3 件事」任务卡 + 小镜入口 | `fe` | P0 | L | `XJ-102` `XJ-105` `XJ-305` | D1 D8 D21 |
+| `XJ-201` | ✅ done | 首页：连续签到激活条 + 「今日 3 件事」任务卡 + 小镜入口 | `fe` | P0 | L | `XJ-102` `XJ-105` `XJ-305` | D1 D8 D21 |
 | `XJ-202` | ready | 首页组件启用矩阵：访客 / C 悦享 / B 尊享 / A 臻享 | `fe` | P1 | M | `XJ-201` | D6 |
 | `XJ-203` | ready | 乐龄版首页：墨绿大字号、家人入口前置、语音小镜条 | `fe` | P1 | M | `XJ-202` | D10 D21 |
 | `XJ-204` | ready | A 级臻享夜色金全站适配 | `ds` | P2 | M | `XJ-102` `XJ-103` | D6 |
 | `XJ-205` | ✅ done | 魔镜页人格化改造：小镜头像 + 状态 + 回复内行动卡 | `fe` | P0 | M | `XJ-105` | D19 |
 | `XJ-206` | ✅ done | 图表组件库：XIndexRing 指数环 + XTrendChart 可点按趋势曲线 | `ds` | P0 | M | — | — |
 | `XJ-207` | ✅ done | 档案页数据可视化升级：指数环 + 趋势曲线 + 达标条 + 人话结论 | `fe` | P0 | L | `XJ-102` `XJ-206` | D8 D20 |
-| `XJ-208` | ready | 测评流程可视化：答题进度环 + 雷达生长 + 结果分维度卡片化 | `fe` | P1 | M | `XJ-206` | D17 |
+| `XJ-208` | ✅ done | 测评流程可视化：答题进度环 + 雷达生长 + 结果分维度卡片化 | `fe` | P1 | M | `XJ-206` | D17 |
 
 ### W3 · 后端数据与服务
 
@@ -138,7 +138,7 @@ graph LR
 | `XJ-301` | ✅ done | Prisma 三张新表：UserBadge / FamilyRelay / StoreStamp | `be` | P0 | M | — | D2 D3 D7 |
 | `XJ-302` | ✅ done | 后端：签到扩展字段 + 六维周报聚合接口 + 档案结论字段 | `be` | P0 | M | — | D5 D20 |
 | `XJ-303` | ✅ done | 后端：成就徽章接口 + /app/me 扩字段 | `be` | P0 | M | `XJ-301` `XJ-302` | D2 |
-| `XJ-304` | 🚧 claimed | 后端：接力棒 / 健康盲盒 / 门店集章册接口 | `be` | P1 | L | `XJ-301` `XJ-302` | D3 D4 D7 |
+| `XJ-304` | ✅ done | 后端：接力棒 / 健康盲盒 / 门店集章册接口 | `be` | P1 | L | `XJ-301` `XJ-302` | D3 D4 D7 |
 | `XJ-305` | ✅ done | 后端：首页「今日 3 件事」动态生成 | `be` | P0 | M | `XJ-302` | D1 |
 
 ### W4 · 互动玩法
@@ -156,7 +156,7 @@ graph LR
 
 | ID | 状态 | 标题 | Agent | 优先级 | 规模 | 前置 | 决策 |
 |---|---|---|---|---|---|---|---|
-| `XJ-501` | ready | 「我的」页成长体系：等级进度条 + 徽章行 + 存折横幅 + 快完成了 | `fe` | P1 | M | `XJ-102` `XJ-303` | — |
+| `XJ-501` | ✅ done | 「我的」页成长体系：等级进度条 + 徽章行 + 存折横幅 + 快完成了 | `fe` | P1 | M | `XJ-102` `XJ-303` | — |
 
 ### W6 · 图形资源
 
@@ -170,14 +170,14 @@ graph LR
 
 | ID | 状态 | 标题 | Agent | 优先级 | 规模 | 前置 | 决策 |
 |---|---|---|---|---|---|---|---|
-| `XJ-701` | ready | 档案模块 5 页动态化（trend / report / timeline / hospital） | `fe` | P2 | M | `XJ-101` `XJ-103` | — |
-| `XJ-702` | ready | 测评模块动态化（intro / map / test-balance / test-chair） | `fe` | P2 | M | `XJ-208` | — |
-| `XJ-703` | ready | 方案与体检 3 页动态化（pkg-plan/detail、pkg-checkup/book、coupons） | `fe` | P2 | M | `XJ-101` `XJ-103` | — |
-| `XJ-704` | ready | 门店与模块 8 页动态化 | `fe` | P2 | L | `XJ-101` `XJ-103` | — |
+| `XJ-701` | ✅ done | 档案模块 5 页动态化（trend / report / timeline / hospital） | `fe` | P2 | M | `XJ-101` `XJ-103` | — |
+| `XJ-702` | ✅ done | 测评模块动态化（intro / map / test-balance / test-chair） | `fe` | P2 | M | `XJ-208` | — |
+| `XJ-703` | ✅ done | 方案与体检 3 页动态化（pkg-plan/detail、pkg-checkup/book、coupons） | `fe` | P2 | M | `XJ-101` `XJ-103` | — |
+| `XJ-704` | ✅ done | 门店与模块 8 页动态化 | `fe` | P2 | L | `XJ-101` `XJ-103` | — |
 | `XJ-705` | ready | 家人模块 3 页动态化（list / view / accept） | `fe` | P2 | M | `XJ-106` | — |
-| `XJ-706` | ready | 「我的」模块 6 页动态化（tier / requests / messages / settings / advisor / memories） | `fe` | P2 | M | `XJ-501` | D9 |
+| `XJ-706` | ✅ done | 「我的」模块 6 页动态化（tier / requests / messages / settings / advisor / memories） | `fe` | P2 | M | `XJ-501` | D9 |
 | `XJ-707` | ready | 积分与游戏 6 页动态化（passbook + wheel / cards / quiz / tree / match3） | `fe` | P2 | L | `XJ-401` | — |
-| `XJ-708` | ready | 认证 3 页 + 合规 3 页：认证补反馈、合规只提清晰度 | `fe` | P3 | M | `XJ-101` `XJ-103` | — |
+| `XJ-708` | ✅ done | 认证 3 页 + 合规 3 页：认证补反馈、合规只提清晰度 | `fe` | P3 | M | `XJ-101` `XJ-103` | — |
 
 ### W8 · 质量验收
 
