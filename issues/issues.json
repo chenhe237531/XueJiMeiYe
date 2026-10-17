@@ -703,8 +703,8 @@
       "priority": "P1",
       "size": "M",
       "agent": "fe",
-      "status": "ready",
-      "assignee": null,
+      "status": "claimed",
+      "assignee": "win-B",
       "note": "",
       "deps": [
         "XJ-106",
@@ -1121,8 +1121,8 @@
       "priority": "P2",
       "size": "L",
       "agent": "fe",
-      "status": "ready",
-      "assignee": null,
+      "status": "done",
+      "assignee": "win-A",
       "note": "",
       "deps": [
         "XJ-401"
@@ -1206,8 +1206,8 @@
       "priority": "P1",
       "size": "M",
       "agent": "qa",
-      "status": "ready",
-      "assignee": null,
+      "status": "done",
+      "assignee": "win-A",
       "note": "",
       "deps": [
         "XJ-204",
@@ -1257,17 +1257,17 @@
     }
   ],
   "progress": {
-    "ready": 9,
-    "claimed": 0,
+    "ready": 6,
+    "claimed": 1,
     "in_review": 0,
-    "done": 33,
+    "done": 35,
     "total": 42,
     "nextClaimable": [
-      "XJ-402",
       "XJ-404",
       "XJ-405",
       "XJ-406",
-      "XJ-705"
+      "XJ-705",
+      "XJ-801"
     ]
   },
   "decisions": [
