@@ -24,12 +24,18 @@ onLoad(async () => { d.value = await http.get('/app/about') })
       </view>
       <view v-if="d" class="card stack">
         <text class="t-md">合作机构与资质</text>
-        <view v-for="h in d.hospitals" :key="h.name" class="col"><text class="t-sm">{{ h.name }}</text><text class="t-xs c3">医疗机构执业许可证：{{ h.licenseNo }}</text></view>
-        <view v-for="p in d.partners" :key="p.name" class="col"><text class="t-sm">{{ p.name }}</text><text class="t-xs c3">{{ (p.licenses || []).map((l) => `${l.name} ${l.no}`).join('；') }}</text></view>
+        <view v-for="h in d.hospitals" :key="h.name" class="col">
+          <text class="t-sm">{{ h.name }}</text><text class="t-xs c3">医疗机构执业许可证：{{ h.licenseNo }}</text>
+        </view>
+        <view v-for="p in d.partners" :key="p.name" class="col">
+          <text class="t-sm">{{ p.name }}</text><text class="t-xs c3">{{ (p.licenses || []).map((l) => `${l.name} ${l.no}`).join('；') }}</text>
+        </view>
       </view>
       <view v-if="d" class="card stack">
         <text class="t-md">门店</text>
-        <view v-for="s in d.stores" :key="s.id" class="col"><text class="t-sm">{{ s.name }}</text><text class="t-xs c3">{{ [s.address, s.mall, s.openHours ? `营业 ${s.openHours}` : ''].filter(Boolean).join(' · ') }}</text></view>
+        <view v-for="s in d.stores" :key="s.id" class="col">
+          <text class="t-sm">{{ s.name }}</text><text class="t-xs c3">{{ [s.address, s.mall, s.openHours ? `营业 ${s.openHours}` : ''].filter(Boolean).join(' · ') }}</text>
+        </view>
       </view>
       <text class="t-xs c3" style="text-align: center">投诉与举报：请联系门店或客服电话 [客服电话]</text>
     </view>

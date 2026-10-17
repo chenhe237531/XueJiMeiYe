@@ -23,7 +23,8 @@ async function load() { list.value = await http.get('/app/consents') }
 onShow(load)
 
 async function revoke(c: any) {
-  if (!(await confirm(`撤回「${c.title}」`, EFFECT[c.type] || '确认撤回？', '确认撤回'))) return
+  if (!(await confirm(`撤回「${c.title}」`, EFFECT[c.type] || '确认撤回？', '确认撤回')))
+    return
   const r: any = await http.post(`/app/consents/${c.type}/revoke`, { keepData: true })
   toast(r.effects?.[0] || '已撤回')
   load()
@@ -41,8 +42,12 @@ async function revoke(c: any) {
             <text class="t-xs c2">{{ c.granted ? `${c.at} 同意，v${c.version}` : c.revoked ? `${c.at} 已撤回` : c.at ? '未同意' : '未开启' }}</text>
           </view>
           <text v-if="c.type === 'C1' && c.granted" class="t-sm c2">已同意</text>
-          <view v-else-if="c.granted" class="mini" @click="revoke(c)">撤回</view>
-          <view v-else-if="!['C3', 'C4', 'C6', 'C8'].includes(c.type)" class="mini on" @click="go(`/pkg-auth/consent?type=${c.type}`)">开启</view>
+          <view v-else-if="c.granted" class="mini mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="revoke(c)">
+            撤回
+          </view>
+          <view v-else-if="!['C3', 'C4', 'C6', 'C8'].includes(c.type)" class="mini on mo-press" hover-class="mo-press-active" hover-stay-time="80" @click="go(`/pkg-auth/consent?type=${c.type}`)">
+            开启
+          </view>
           <text v-else class="t-xs c3">使用时按需授权</text>
         </view>
       </view>
@@ -51,6 +56,19 @@ async function revoke(c: any) {
 </template>
 
 <style scoped>
-.mini { height: 30px; padding: 0 14px; border-radius: 15px; border: 1px solid #e0d8dc; display: flex; align-items: center; font-size: 13px; color: #3b3337; }
-.mini.on { border-color: var(--brand); color: var(--brand-ink); font-weight: 600; }
+.mini {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 15px;
+  border: 1px solid #e0d8dc;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #3b3337;
+}
+.mini.on {
+  border-color: var(--brand);
+  color: var(--brand-ink);
+  font-weight: 600;
+}
 </style>
