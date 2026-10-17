@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { http, TOKEN_KEY } from './request'
+import { syncMotion } from './motion'
+import type { MoTier } from './motion'
 
 /** 与当前登录用户绑定的本地缓存键 */
 const USER_CACHE_KEYS = ['xj_home_cache', 'xj_ack', 'xj_lead_prefill', 'xj_urgent', 'xj_elder', 'xj_tier', 'xj_theme']
@@ -16,21 +18,29 @@ export const useXj = defineStore('xj', () => {
 
   const loggedIn = computed(() => !!token.value)
   /**
+   * 动效档位（docs/08 第 6 章）：随乐龄与设备性能联动。
+   *   full 满效 / lite 低端机或省流 / off 乐龄强制（直接呈现终态）。
+   * 启动时按缓存的乐龄态先算一次；setElder / clearUserCache 时重算，
+   * 并同步 motion.ts 的模块级 tier（getTier() 的组件读模块级变量，两侧必须同源更新）。
+   */
+  const moTier = ref<MoTier>(syncMotion(elderMode.value))
+  /**
    * 夜色金下发（XJ-204，D6）：A 级默认挂 night，单点在 pageClass，49 页零改动生效。
    * 优先级：用户显式选浅色 > 乐龄模式 > 等级默认——乐龄的暖白底墨绿是可读性核心设计
    * （docs/03），且 .night 的令牌定义在 .elder 之后，同时挂两 class 会被夜色覆盖而致乐龄失效，
    * 故乐龄下不叠 night（AC#3 结论：乐龄优先，质感让位可访问性）。
    */
   const night = computed(() => tier.value === 'A' && !elderMode.value && themePref.value === 'auto')
-  const pageClass = computed(() => ['xj', elderMode.value ? 'elder' : 'std', ...(night.value ? ['night'] : [])])
-  /** 登录 / 资料填写 / 授权流程固定标准样式（issue #3）：不读乐龄模式，避免新用户被预设为大字号 */
-  const stdPageClass = computed(() => ['xj', 'std'])
+  const pageClass = computed(() => ['xj', elderMode.value ? 'elder' : 'std', `mo-${moTier.value}`, ...(night.value ? ['night'] : [])])
+  /** 登录 / 资料填写 / 授权流程固定标准样式（issue #3）：不读乐龄的皮肤与大字号，但动效档位仍随全局（乐龄下降级是全站硬约束） */
+  const stdPageClass = computed(() => ['xj', 'std', `mo-${moTier.value}`])
 
   /** 切换 / 退出账号时清掉上一位用户留在本机的数据（首页缓存、已读健康提示、表单预填等），避免串号 */
   function clearUserCache() {
     USER_CACHE_KEYS.forEach(k => uni.removeStorageSync(k))
     me.value = null
     elderMode.value = false
+    moTier.value = syncMotion(false)
     tier.value = 'C'
     themePref.value = 'auto'
   }
@@ -49,6 +59,7 @@ export const useXj = defineStore('xj', () => {
 
   function setElder(on: boolean) {
     elderMode.value = on
+    moTier.value = syncMotion(on)
     uni.setStorageSync('xj_elder', on ? 'on' : 'off')
   }
 
@@ -80,5 +91,5 @@ export const useXj = defineStore('xj', () => {
     uni.removeStorageSync(TOKEN_KEY)
   }
 
-  return { token, me, elderMode, tier, themePref, night, loggedIn, pageClass, stdPageClass, setToken, setElder, setThemePref, loadMe, toggleElder, logout }
+  return { token, me, elderMode, tier, themePref, night, loggedIn, moTier, pageClass, stdPageClass, setToken, setElder, setThemePref, loadMe, toggleElder, logout }
 })
