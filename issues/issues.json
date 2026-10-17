@@ -903,8 +903,8 @@
       "priority": "P1",
       "size": "S",
       "agent": "be",
-      "status": "ready",
-      "assignee": null,
+      "status": "done",
+      "assignee": "win-A",
       "note": "",
       "deps": [
         "XJ-601"
@@ -1257,17 +1257,17 @@
     }
   ],
   "progress": {
-    "ready": 11,
+    "ready": 10,
     "claimed": 0,
     "in_review": 0,
-    "done": 31,
+    "done": 32,
     "total": 42,
     "nextClaimable": [
       "XJ-402",
       "XJ-404",
       "XJ-405",
       "XJ-406",
-      "XJ-602"
+      "XJ-603"
     ]
   },
   "decisions": [
