@@ -13,6 +13,7 @@ import { CheckupService } from '../services/checkup.service'
 import { DemoSandboxService } from '../services/demo-sandbox.service'
 import { HomeService, moduleCard, moduleVisible, TIER_BENEFITS } from '../services/home.service'
 import { MirrorService } from '../services/mirror.service'
+import { TierService } from '../services/tier.service'
 import { WorkflowService } from '../services/workflow.service'
 
 const BENEFIT_TABLE = [
@@ -121,6 +122,7 @@ export class AppController {
     private wf: WorkflowService,
     private home: HomeService,
     private mirror: MirrorService,
+    private tierSvc: TierService,
   ) {}
 
   @Get('me')
@@ -141,7 +143,16 @@ export class AppController {
       advisor: advisor ? { id: advisor.id, name: advisor.name, phone: advisor.phone } : null,
       points: await this.wf.balance(c.id), unreadMessages: unread, familyCount: family, familyPending: pending, coupons,
       needProfile: !c.salutation || !c.birthYear, tierKeepUntil: c.tierKeepUntil ? fmt(c.tierKeepUntil, 'YYYY-MM-DD') : null,
+      // XJ-303：我的页成长体系扩字段（旧字段全部保留）
+      ...(await this.tierSvc.meGrowth({ id: c.id, tier: c.tier })),
     }
+  }
+
+  /** 成就徽章墙（XJ-303，docs/07 §3.3）：{ unlocked, total, groups[] } */
+  @Get('achievements')
+  @Aud('app')
+  async achievements(@CurrentUser() u: CustomerUser) {
+    return this.tierSvc.achievements(u.id)
   }
 
   @Patch('me')
