@@ -205,9 +205,14 @@
       "updatedAt": "2026-10-17T04:27:50.092Z"
     },
     "XJ-801": {
-      "status": "in_review",
+      "status": "done",
       "assignee": "win-B",
-      "updatedAt": "2026-10-17T06:57:31.646Z"
+      "updatedAt": "2026-10-17T07:08:36.345Z"
+    },
+    "XJ-803": {
+      "status": "done",
+      "assignee": "win-A",
+      "updatedAt": "2026-10-17T07:08:36.390Z"
     }
   }
 }
