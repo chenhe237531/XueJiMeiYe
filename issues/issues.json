@@ -761,8 +761,8 @@
       "priority": "P2",
       "size": "M",
       "agent": "fe",
-      "status": "ready",
-      "assignee": null,
+      "status": "claimed",
+      "assignee": "win-B",
       "note": "",
       "deps": [
         "XJ-106",
@@ -1257,13 +1257,12 @@
     }
   ],
   "progress": {
-    "ready": 6,
-    "claimed": 0,
+    "ready": 5,
+    "claimed": 1,
     "in_review": 0,
     "done": 36,
     "total": 42,
     "nextClaimable": [
-      "XJ-404",
       "XJ-405",
       "XJ-406",
       "XJ-705",
