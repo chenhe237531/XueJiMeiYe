@@ -98,6 +98,46 @@
       "status": "done",
       "assignee": "win-A",
       "updatedAt": "2026-10-17T02:12:31.175Z"
+    },
+    "XJ-208": {
+      "status": "done",
+      "assignee": "win-C",
+      "updatedAt": "2026-10-17T02:26:52.194Z"
+    },
+    "XJ-702": {
+      "status": "done",
+      "assignee": "win-C",
+      "updatedAt": "2026-10-17T02:26:52.297Z"
+    },
+    "XJ-501": {
+      "status": "done",
+      "assignee": "win-C",
+      "updatedAt": "2026-10-17T02:26:52.402Z"
+    },
+    "XJ-706": {
+      "status": "done",
+      "assignee": "win-C",
+      "updatedAt": "2026-10-17T02:26:52.506Z"
+    },
+    "XJ-701": {
+      "status": "done",
+      "assignee": "win-C",
+      "updatedAt": "2026-10-17T02:26:52.606Z"
+    },
+    "XJ-703": {
+      "status": "done",
+      "assignee": "win-C",
+      "updatedAt": "2026-10-17T02:26:52.713Z"
+    },
+    "XJ-708": {
+      "status": "done",
+      "assignee": "win-C",
+      "updatedAt": "2026-10-17T02:26:52.813Z"
+    },
+    "XJ-704": {
+      "status": "done",
+      "assignee": "win-C",
+      "updatedAt": "2026-10-17T02:26:52.918Z"
     }
   }
 }
