@@ -67,6 +67,12 @@
       "assignee": "hourly-agent",
       "updatedAt": "2026-10-17T00:40:28.564Z",
       "note": "分支 feat/XJ-107-motion-ownership（eb20da1 claim → ca3b509 实现），本机无 gh，走本地分支合并。**这是 R1 收口卡**：6 个零归属底座文件首次入库，+683 −1，只动 files_own：style/motion.scss（新，246 行，入库前 eslint --fix 修掉 30 条 format/prettier 纯格式）、xj/motion.ts（新，178 行，零改动）、XGraphic.vue（新，73）、XBadge.vue（新，159）、XReveal.vue（新，25）、main.ts（+2 −1，追加 motion.scss 入口 import，入口顺序视觉→令牌→动效未乱）。验证全绿：eslint 6 文件 RC=0；关沙箱 uni build -p mp-weixin → DONE Build complete.；自写产物断言 11/11（解析 selector→declarations，非数次数）；负向对照（注释掉 motion 入口重建）11/11→3/11，还原后 main.ts sha256 逐字节一致 1207e598…；运行时探针（esbuild 打包真实 motion.ts + uni 桩）14/14，证明 off 档 useReveal 首帧即 true 且全程未创建 IntersectionObserver（乐龄不闪空白），full 档为 false（反证非空洞）；语义保全检查 motion.scss 源侧 17 类/15 变量/5 关键帧 100% 进 app.wxss，重排未丢声明。证据 .preview/XJ-107_selfcheck.txt。⚠️ 遗留给下一棒：① scripts/ci-check.sh 的 R3「定义存在」断言（xj-rise+--mo-ease / xj-gd-bob+--gd-bob）至今仍是**未提交 WIP**，该文件属 XJ-101（done）的 files_own，本卡按一个文件一个 Owner 未越权提交 → main 上仍是宽前缀旧断言，需 XJ-101 owner 入库或另开小卡；② 归属空洞只收口一半：xj/graphics.ts + src/icons/graphics/** + uno.config.ts 仍属 XJ-601 且未入库，已提交的 components/archive/DimCard.vue import @/xj/graphics → 在这三者入库前纯 main 仍无法构建；③ .xj.night 未重定义 --alert/--star（夜色约 2.5:1）仍待开卡。"
+    },
+    "XJ-305": {
+      "status": "claimed",
+      "assignee": "hourly-agent",
+      "updatedAt": "2026-10-17T00:42:07.000Z",
+      "note": "按用户指示（第二梯队·前置一解除立刻接）提前开工：前置 XJ-302 已交付 in_review（未合并），分支 feat/XJ-305-home-today-tasks 基于 main（已含 206/207/107 合并）+ merge feat/XJ-302-checkin-weekly-verdict 构建，合并顺序天然保持 302 → 305。--claim 因 302 未 done 被挡，状态经台账手工登记为 claimed，交付时用 --set-status XJ-305 in_review 落账。"
     }
   }
 }
