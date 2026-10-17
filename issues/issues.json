@@ -1178,7 +1178,7 @@
       "priority": "P0",
       "size": "M",
       "agent": "qa",
-      "status": "claimed",
+      "status": "in_review",
       "assignee": "win-B",
       "note": "",
       "deps": [
@@ -1258,8 +1258,8 @@
   ],
   "progress": {
     "ready": 1,
-    "claimed": 1,
-    "in_review": 0,
+    "claimed": 0,
+    "in_review": 1,
     "done": 40,
     "total": 42,
     "nextClaimable": [
