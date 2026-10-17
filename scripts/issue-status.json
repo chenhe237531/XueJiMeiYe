@@ -163,6 +163,11 @@
       "status": "done",
       "assignee": "win-A",
       "updatedAt": "2026-10-17T03:08:46.494Z"
+    },
+    "XJ-603": {
+      "status": "in_review",
+      "assignee": "win-A",
+      "updatedAt": "2026-10-17T03:11:30.359Z"
     }
   }
 }
