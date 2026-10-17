@@ -193,6 +193,11 @@
       "status": "done",
       "assignee": "win-B",
       "updatedAt": "2026-10-17T04:02:27.819Z"
+    },
+    "XJ-405": {
+      "status": "claimed",
+      "assignee": "win-B",
+      "updatedAt": "2026-10-17T04:02:46.887Z"
     }
   }
 }
