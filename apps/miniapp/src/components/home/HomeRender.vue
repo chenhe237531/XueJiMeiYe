@@ -4,7 +4,10 @@
  * 不认识的组件类型直接跳过，保证老版本兼容。
  */
 import { computed, ref } from 'vue'
+import HomeSignin from '@/components/home/HomeSignin.vue'
+import HomeTasks from '@/components/home/HomeTasks.vue'
 import XIcon from '@/components/XIcon.vue'
+import XMascot from '@/components/XMascot.vue'
 import XRadar from '@/components/XRadar.vue'
 import { http } from '@/xj/request'
 import { useXj } from '@/xj/store'
@@ -13,7 +16,7 @@ import { absUrl, go, themeHex, toast } from '@/xj/utils'
 const props = defineProps<{ components: any[], night?: boolean }>()
 const xj = useXj()
 const elder = computed(() => xj.elderMode)
-const KNOWN = ['greeting', 'tierCard', 'healthCard', 'elderToday', 'entryGrid', 'banner', 'moduleList', 'activityCard', 'notice', 'mirrorFab', 'divider']
+const KNOWN = ['greeting', 'tierCard', 'healthCard', 'elderToday', 'checkinBar', 'taskList', 'entryGrid', 'banner', 'moduleList', 'activityCard', 'notice', 'mirrorFab', 'divider']
 const list = computed(() => (props.components || []).filter(c => KNOWN.includes(c.type)))
 
 function open(item: any, component: string) {
@@ -115,9 +118,15 @@ const DIMS = [
             <text v-if="c.props.isGuest" class="t-sm c-brand semi" @click="go('/pkg-auth/login')">登录 / 注册</text>
           </view>
         </view>
-        <view v-if="c.props.showElderToggle" class="col gap4" style="align-items: flex-end" @click="xj.toggleElder()">
-          <text class="t-sm c2">乐龄模式</text>
-          <view class="toggle" :class="{ on: elder }"><view class="knob" /></view>
+        <view class="row gap12" style="align-items: center">
+          <view v-if="c.props.showElderToggle" class="col gap4" style="align-items: flex-end" @click="xj.toggleElder()">
+            <text class="t-sm c2">乐龄模式</text>
+            <view class="toggle" :class="{ on: elder }"><view class="knob" /></view>
+          </view>
+          <!-- 小镜入口（D21）：问候栏头像为魔镜第二入口，与 mirrorFab 悬浮球并存 -->
+          <view class="mascot-entry" hover-class="mo-press-active" :hover-stay-time="80" @click="go('/pages/mirror/index')">
+            <XMascot :size="32" state="online" />
+          </view>
         </view>
       </view>
 
@@ -142,6 +151,12 @@ const DIMS = [
           </view>
         </view>
       </view>
+
+      <!-- 连续签到激活条（XJ-201）：数据由 HomeSignin 自取 /app/checkins -->
+      <HomeSignin v-else-if="c.type === 'checkinBar'" :night="night" />
+
+      <!-- 今日 3 件事任务卡（XJ-201 / XJ-305 / D1）：任务由后端动态生成 -->
+      <HomeTasks v-else-if="c.type === 'taskList'" :title="c.props.title" :tasks="c.props.tasks" :done-today="c.props.doneToday" />
 
       <!-- 健康卡 -->
       <view v-else-if="c.type === 'healthCard'" class="card raised health">
@@ -358,6 +373,16 @@ const DIMS = [
 
 <style scoped lang="scss">
 .greet { padding-top: 4px; }
+/* 小镜头像入口：按压反馈走 hover-class，热区比 32px 头像大一圈 */
+.mascot-entry {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
 .toggle { width: 50px; height: 30px; border-radius: 15px; background: #d8d0d4; position: relative; transition: background 0.2s; }
 .toggle .knob { position: absolute; left: 3px; top: 3px; width: 24px; height: 24px; border-radius: 12px; background: #fff; box-shadow: 0 1px 2px rgba(60, 24, 44, 0.25); transition: left 0.2s; }
 .toggle.on { background: var(--brand); }

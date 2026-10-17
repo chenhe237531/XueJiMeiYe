@@ -16,6 +16,25 @@ const data = ref<any>(cached && cached.owner === xj.token ? cached.data : null)
 const offline = ref(false)
 const night = computed(() => data.value?.tier === 'A')
 
+/**
+ * XJ-201：C 级登录用户（非乐龄）插入「连续签到」激活条。
+ * 后端 home.service 已自动补 taskList（XJ-305），但 layout 未配置 checkinBar 组件类型，
+ * 前端按 docs/07 §4.2 组件矩阵兜底插入（访客 / B / A / 乐龄不显示）。
+ * 位置：taskList 之前；无 taskList 时插健康卡 / 问候栏之后。
+ */
+const components = computed(() => {
+  const list = [...(data.value?.components || [])]
+  const showSignin = xj.loggedIn && data.value?.tier === 'C' && !xj.elderMode && !list.some(c => c.type === 'checkinBar')
+  if (!showSignin)
+    return list
+  const at = Math.max(
+    list.findIndex(c => c.type === 'taskList'),
+    list.findIndex(c => c.type === 'healthCard' || c.type === 'elderToday' || c.type === 'greeting'),
+  )
+  list.splice(at + 1, 0, { type: 'checkinBar', props: {} })
+  return list
+})
+
 async function load() {
   const owner = xj.token
   try {
@@ -51,7 +70,7 @@ onPullDownRefresh(async () => { await load(); uni.stopPullDownRefresh() })
       <view class="card skeleton" style="height: 180px" />
       <view class="card skeleton" style="height: 220px" />
     </view>
-    <HomeRender v-else :components="data.components" :night="night" />
+    <HomeRender v-else :components="components" :night="night" />
     <view class="t-xs c3" style="text-align: center; margin-top: 24px">雪姬美业 | 价格与权益按公开会员规则</view>
   </view>
 </template>
