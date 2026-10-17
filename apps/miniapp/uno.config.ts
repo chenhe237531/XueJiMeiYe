@@ -50,6 +50,17 @@ export default defineConfig({
             return svgStr
           },
         ),
+        /**
+         * 彩色图形集合（开源图形，MIT 许可，见 src/icons/graphics/LICENSE.md）。
+         *
+         * ⚠️ 这里**故意不做 transform**：绝不能像 my-icons 那样注入 fill="currentColor"。
+         * UnoCSS 的图标模式是 auto —— SVG 里出现 currentColor 会判定为 mask（单色遮罩），
+         * 颜色会被抹掉；不含 currentColor 才判定为 bg，保留图形原色。
+         * 本目录图形全部为硬编码 fill，因此保持原样即可呈现彩色。
+         *
+         * 资源更新：node ./scripts/fetch-graphics.js --force
+         */
+        'graphics': FileSystemIconLoader('./src/icons/graphics'),
       },
     }),
     // TODO: check 是否会有别的影响
@@ -185,6 +196,61 @@ export default defineConfig({
     'i-tabler-home-filled',
     'i-tabler-sparkles-filled',
     'i-tabler-user-filled',
+    // 徽章未解锁态的线稿图标（配合 XBadge 的 outline 属性使用）
+    'i-tabler-trophy',
+    'i-tabler-flame',
+    'i-tabler-medal',
+    'i-tabler-clover',
+    'i-tabler-lock-open',
+    // ── 彩色图形（i-graphics-*）：由 scripts/fetch-graphics.js 生成，见 src/xj/graphics.ts ──
+    // 组件里虽已写成完整字面量，仍在此冗余登记，避免 UnoCSS 扫描范围变化导致图标静默丢失
+    'i-graphics-dim-skin',
+    'i-graphics-dim-shape',
+    'i-graphics-dim-contour',
+    'i-graphics-dim-fitness',
+    'i-graphics-dim-posture',
+    'i-graphics-dim-mind',
+    'i-graphics-badge-trophy',
+    'i-graphics-badge-medal-gold',
+    'i-graphics-badge-medal-honor',
+    'i-graphics-badge-star',
+    'i-graphics-badge-fire',
+    'i-graphics-badge-crown',
+    'i-graphics-badge-clover',
+    'i-graphics-play-gift',
+    'i-graphics-play-celebrate',
+    'i-graphics-play-wand',
+    'i-graphics-play-ball',
+    'i-graphics-play-dice',
+    'i-graphics-play-ticket',
+    'i-graphics-play-balloon',
+    'i-graphics-play-sparkle',
+    'i-graphics-play-ring',
+    'i-graphics-care-salad',
+    'i-graphics-care-pill',
+    'i-graphics-care-stethoscope',
+    'i-graphics-care-moon',
+    'i-graphics-care-sun',
+    'i-graphics-care-bell',
+    'i-graphics-care-wait',
+    'i-graphics-care-done',
+    'i-graphics-care-cross',
+    'i-graphics-care-warn',
+    'i-graphics-care-heart',
+    'i-graphics-care-up',
+    'i-graphics-care-chart',
+    'i-graphics-care-seed',
+    'i-graphics-talk-bubble',
+    'i-graphics-talk-megaphone',
+    'i-graphics-store-bag',
+    'i-graphics-store-house',
+    'i-graphics-doc-memo',
+    'i-graphics-doc-calendar',
+    'i-graphics-doc-scroll',
+    'i-graphics-mood-smile',
+    'i-graphics-mood-love',
+    'i-graphics-mood-think',
+    'i-graphics-mood-hug',
   ],
   rules: [
     [
