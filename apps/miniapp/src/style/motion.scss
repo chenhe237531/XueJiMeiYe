@@ -1,0 +1,246 @@
+/**
+ * 雪姬美业 · 动效令牌与动效类（见 docs/08）
+ *
+ * 三级档位：满效 / 轻效 / 关闭。
+ * 档位由 xj/motion.ts 判定，随 store 的 xj.pageClass 下发到**每个页面的根节点**
+ * （49 个页面都已绑定 :class="xj.pageClass"，无需改动页面）。
+ *
+ * 关键实现选择：档位只改「自定义属性」，不依赖后代选择器。
+ *   自定义属性是继承属性，会跨小程序自定义组件边界继承（本项目组件已大量依赖
+ *   var(--brand) / var(--ink) 等来自 app.wxss 的变量，可证）。而后代选择器在组件
+ *   边界上的表现不可靠——微信官方明确提示「组件中使用后代选择器在一些极端情况下
+ *   会有非预期的表现」。因此 .mo-* 行为类全部写成「只读变量」的形式，
+ *   换档位时不需要后代选择器介入。文末保留一组最小兜底规则以防引擎异常。
+ *
+ * 性能约定（微信官方渲染性能建议）：
+ *   1. 只动 transform 与 opacity，不触发重排；
+ *   2. 滚动触发一律走 IntersectionObserver，不监听 scroll、不在回调里 setData；
+ *   3. 不使用通配选择器，避免老年页长列表的样式重算开销。
+ */
+
+page,
+.xj {
+  /* ── 时长阶梯：按压 → 微交互 → 标准 → 入场 → 强调 ── */
+  --mo-instant: 80ms;
+  --mo-fast: 160ms;
+  --mo-base: 240ms;
+  --mo-enter: 320ms;
+  --mo-emph: 420ms;
+  /* ── 缓动曲线 ── */
+  --mo-ease: cubic-bezier(0.2, 0, 0, 1);
+  --mo-ease-in: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --mo-ease-out: cubic-bezier(0.3, 0, 1, 1);
+  --mo-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* ── 位移与错峰 ── */
+  --mo-rise: 16px;
+  --mo-step: 60ms;
+  /* ── 初始态开关：关闭档位把它翻成终态 ── */
+  --mo-hide: 0;
+  --mo-grow: 0;
+  /* ── 扫光 ── */
+  --mo-sheen-dur: 1600ms;
+  --mo-shadow-lift: 0 2px 4px rgba(60, 48, 34, 0.05), 0 16px 34px -18px rgba(60, 48, 34, 0.28);
+}
+
+/* ═══════════════════════════════════════════════════
+   档位：只改自定义属性，不写后代选择器
+   ═══════════════════════════════════════════════════ */
+
+/* 轻效（低端机 / 省流模式）：保留透明度淡入与按压反馈，去掉位移、生长、回弹、错峰 */
+.mo-lite {
+  --mo-rise: 0px;
+  --mo-step: 0ms;
+  --mo-enter: 160ms;
+  --mo-base: 160ms;
+  --mo-emph: 1ms;
+}
+
+/* 关闭（乐龄模式 / 系统减弱动态效果）：直接呈现终态 */
+.mo-off {
+  --mo-instant: 1ms;
+  --mo-fast: 1ms;
+  --mo-base: 1ms;
+  --mo-enter: 1ms;
+  --mo-emph: 1ms;
+  --mo-rise: 0px;
+  --mo-step: 0ms;
+  --mo-hide: 1;
+  --mo-grow: 1;
+  --mo-sheen-dur: 1ms;
+}
+
+/* ═══════════════════════════════════════════════════
+   关键帧
+   ═══════════════════════════════════════════════════ */
+@keyframes xj-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--mo-rise, 16px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes xj-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes xj-pop {
+  0% {
+    transform: scale(1);
+  }
+  38% {
+    transform: scale(1.18) rotate(-5deg);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes xj-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+/* 与 style/index.scss 的 xj-shimmer 同形，供签到条 / 新徽章的一次性扫光使用 */
+@keyframes xj-sheen {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   一、入场：一次性播放（元素随渲染立即播放）
+   ═══════════════════════════════════════════════════ */
+.mo-rise {
+  animation: xj-rise var(--mo-enter, 320ms) var(--mo-ease-in) both;
+}
+.mo-fade {
+  animation: xj-fade var(--mo-base, 240ms) var(--mo-ease) both;
+}
+/* 错峰：第 n 个元素挂 .mo-d1 ~ .mo-d5，步长由 --mo-step 控制（封顶 300ms） */
+.mo-d1 {
+  animation-delay: calc(var(--mo-step, 60ms) * 1);
+}
+.mo-d2 {
+  animation-delay: calc(var(--mo-step, 60ms) * 2);
+}
+.mo-d3 {
+  animation-delay: calc(var(--mo-step, 60ms) * 3);
+}
+.mo-d4 {
+  animation-delay: calc(var(--mo-step, 60ms) * 4);
+}
+.mo-d5 {
+  animation-delay: calc(var(--mo-step, 60ms) * 5);
+}
+.mo-d6 {
+  animation-delay: calc(var(--mo-step, 60ms) * 5);
+}
+
+/* ═══════════════════════════════════════════════════
+   二、入场：滚动触发（配合 XReveal / useReveal，命中视口后加 .is-in）
+   ═══════════════════════════════════════════════════ */
+.mo-reveal {
+  opacity: var(--mo-hide, 0);
+  transform: translateY(var(--mo-rise, 16px));
+  transition:
+    opacity var(--mo-enter, 320ms) var(--mo-ease-in),
+    transform var(--mo-enter, 320ms) var(--mo-ease-in);
+  transition-delay: var(--mo-delay, 0ms);
+}
+.mo-reveal.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════════════════
+   三、反馈：按压与悬停
+   ═══════════════════════════════════════════════════ */
+.mo-press {
+  transition:
+    transform var(--mo-instant, 80ms) var(--mo-ease),
+    opacity var(--mo-fast, 160ms) var(--mo-ease);
+}
+/* 小程序不支持 :hover 与部分伪类，按压态用原生 hover-class 绑定本类 */
+.mo-press-active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+/* 桌面 / H5：按下与悬停 */
+/* #ifdef H5 */
+.mo-press:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+.mo-hover {
+  transition:
+    transform var(--mo-fast, 160ms) var(--mo-ease),
+    box-shadow var(--mo-base, 240ms) var(--mo-ease);
+}
+.mo-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mo-shadow-lift);
+}
+/* #endif */
+
+/* ═══════════════════════════════════════════════════
+   四、状态切换：回弹与生长
+   ═══════════════════════════════════════════════════ */
+.mo-pop {
+  animation: xj-pop var(--mo-base, 240ms) var(--mo-ease-spring);
+}
+.mo-grow-x {
+  transform-origin: left center;
+  transform: scaleX(var(--mo-grow, 0));
+  transition: transform var(--mo-emph, 420ms) var(--mo-ease-out);
+}
+.mo-grow-x.is-in {
+  transform: scaleX(1);
+}
+/* 数字滚动与指数环生长由组件内 JS + SVG stroke-dashoffset 完成，见 docs/08 第 3.5 节 */
+
+/* ═══════════════════════════════════════════════════
+   五、加载过渡：内容交叉淡入与一次性扫光
+   ═══════════════════════════════════════════════════ */
+.mo-cross {
+  transition: opacity var(--mo-base, 240ms) var(--mo-ease);
+}
+.mo-cross.is-out {
+  opacity: 0;
+}
+.mo-sheen {
+  background-image: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 32%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0) 68%
+  );
+  background-size: 200% 100%;
+  animation: xj-sheen var(--mo-sheen-dur, 1600ms) var(--mo-ease) 1;
+}
+
+/* ═══════════════════════════════════════════════════
+   兜底：若某些引擎未继承自定义属性，仍由后代选择器保证「关闭档位直接呈现」。
+   !important 的优先级高于动画，因此可稳定锁定终态。
+   ═══════════════════════════════════════════════════ */
+.mo-off .mo-rise,
+.mo-off .mo-fade,
+.mo-off .mo-reveal,
+.mo-off .mo-cross {
+  opacity: 1 !important;
+}
+.mo-off .mo-reveal,
+.mo-off .mo-grow-x {
+  transform: none !important;
+}
