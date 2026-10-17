@@ -1233,8 +1233,8 @@
       "priority": "P1",
       "size": "M",
       "agent": "qa",
-      "status": "ready",
-      "assignee": null,
+      "status": "in_review",
+      "assignee": "win-A",
       "note": "",
       "deps": [
         "XJ-104",
@@ -1257,14 +1257,13 @@
     }
   ],
   "progress": {
-    "ready": 2,
+    "ready": 1,
     "claimed": 0,
-    "in_review": 0,
+    "in_review": 1,
     "done": 40,
     "total": 42,
     "nextClaimable": [
-      "XJ-801",
-      "XJ-803"
+      "XJ-801"
     ]
   },
   "decisions": [
