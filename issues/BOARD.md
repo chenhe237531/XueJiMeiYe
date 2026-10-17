@@ -7,11 +7,11 @@
 | 状态 | 数量 | 含义 |
 |---|---:|---|
 | `ready` | 2 | 可认领（还需检查 deps 是否已 done） |
-| `claimed` | 1 | 已认领，开发中 |
+| `claimed` | 0 | 已认领，开发中 |
 | `in_review` | 0 | 已提交，待评审 / 合并 |
-| `done` | 39 | 已完成并合并 |
+| `done` | 40 | 已完成并合并 |
 
-**完成度：39 / 42（93%）** · 状态台账见 `scripts/issue-status.json`
+**完成度：40 / 42（95%）** · 状态台账见 `scripts/issue-status.json`
 
 ## 波次总览
 
@@ -174,7 +174,7 @@ graph LR
 | `XJ-702` | ✅ done | 测评模块动态化（intro / map / test-balance / test-chair） | `fe` | P2 | M | `XJ-208` | — |
 | `XJ-703` | ✅ done | 方案与体检 3 页动态化（pkg-plan/detail、pkg-checkup/book、coupons） | `fe` | P2 | M | `XJ-101` `XJ-103` | — |
 | `XJ-704` | ✅ done | 门店与模块 8 页动态化 | `fe` | P2 | L | `XJ-101` `XJ-103` | — |
-| `XJ-705` | 🚧 claimed | 家人模块 3 页动态化（list / view / accept） | `fe` | P2 | M | `XJ-106` | — |
+| `XJ-705` | ✅ done | 家人模块 3 页动态化（list / view / accept） | `fe` | P2 | M | `XJ-106` | — |
 | `XJ-706` | ✅ done | 「我的」模块 6 页动态化（tier / requests / messages / settings / advisor / memories） | `fe` | P2 | M | `XJ-501` | D9 |
 | `XJ-707` | ✅ done | 积分与游戏 6 页动态化（passbook + wheel / cards / quiz / tree / match3） | `fe` | P2 | L | `XJ-401` | — |
 | `XJ-708` | ✅ done | 认证 3 页 + 合规 3 页：认证补反馈、合规只提清晰度 | `fe` | P3 | M | `XJ-101` `XJ-103` | — |
