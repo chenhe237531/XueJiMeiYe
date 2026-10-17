@@ -173,6 +173,11 @@
       "status": "done",
       "assignee": "win-A",
       "updatedAt": "2026-10-17T03:29:19.724Z"
+    },
+    "XJ-802": {
+      "status": "claimed",
+      "assignee": "win-A",
+      "updatedAt": "2026-10-17T03:30:19.724Z"
     }
   }
 }
