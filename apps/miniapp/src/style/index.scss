@@ -209,8 +209,10 @@ page {
      暖黑底（#1c1712 / 卡片 #262019）上，默认皮肤的 --alert(#b3261e) 只有 2.5:1、
      --star 不足 3:1，直接沿用会不可读。故红 / 黄两族各提亮一档（实测 ≥5:1）；
      浅色软底（--brand-soft / --placeholder 已在 `.xj.night` 重定义为半透明金与暖黑）沿用即可。
-     附注（不属本次改动范围）：`.xj.night` 未重定义 --alert / --star 本身，因此夜色皮肤下
-     直接消费 --alert 的既有位置对比度仅约 2.5:1，建议后续单独开卡处理。 */
+     附注：--alert / --care / --warn-ink 的**本体**在夜色下保持原值（.btn.alert / .btn.care 等
+     以它们为底色配白字，提亮本体会让白字对比崩掉），「以文字色消费」的通道类（.c-alert /
+     .c-care / .c-warn）由 XJ-204 在下方按 3:1/4.5:1 实测值单独补偿；--star 夜色下实测
+     6.61:1（图形界 ≥3:1 达标）不动。 */
   --meter-ok: #8fbf7a; /* 达标：提亮一档的鼠尾草绿 */
   --meter-near: #eab254; /* 略偏：提亮一档的琥珀 */
   --meter-low: #e5736a; /* 警示：提亮一档的朱红 */
@@ -225,6 +227,22 @@ page {
   /* 周报封面：不随皮肤，与另两套皮肤同值（AC#3） */
   --report-bg: #1c1712;
   --report-ink: #d2b47a;
+}
+
+/* ── 夜色金文字通道补偿（XJ-204，AC#4 数值表见 .preview/XJ-204_contrast.mjs）──
+   --alert / --care / --warn-ink 本体不动（底色角色：.btn.alert 白字 6.54:1、
+   .btn.care 白字 4.81:1 实测达标），只补偿以文字色消费的三个通道类。
+   取值与 XJ-102 的语义色同族：#e5736a=--meter-low、#8fbf7a=--meter-ok、
+   #eab254=--meter-near，夜色卡底（#262019）实测分别 5.37 / 7.60 / 8.44:1，
+   均满足正文 4.5:1。皮肤层后代选择器是令牌层既有模式（见下方 .night .icon-box）。 */
+.night .c-alert {
+  color: #e5736a;
+}
+.night .c-care {
+  color: #8fbf7a;
+}
+.night .c-warn {
+  color: #eab254;
 }
 
 .num {
