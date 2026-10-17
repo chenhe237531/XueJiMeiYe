@@ -198,6 +198,11 @@
       "status": "done",
       "assignee": "win-B",
       "updatedAt": "2026-10-17T04:11:18.037Z"
+    },
+    "XJ-705": {
+      "status": "claimed",
+      "assignee": "win-B",
+      "updatedAt": "2026-10-17T04:12:10.043Z"
     }
   }
 }
