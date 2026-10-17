@@ -4,6 +4,7 @@
  * 不认识的组件类型直接跳过，保证老版本兼容。
  */
 import { computed, ref } from 'vue'
+import HomeElder from '@/components/home/HomeElder.vue'
 import HomeSignin from '@/components/home/HomeSignin.vue'
 import HomeTasks from '@/components/home/HomeTasks.vue'
 import { applyMatrix, GATE_TYPES } from '@/components/home/HomeGate.vue'
@@ -21,7 +22,18 @@ const elder = computed(() => xj.elderMode)
 const KNOWN = Array.from(new Set(['greeting', 'tierCard', 'healthCard', 'elderToday', 'checkinBar', 'taskList', 'entryGrid', 'banner', 'moduleList', 'activityCard', 'notice', 'mirrorFab', 'divider', ...GATE_TYPES]))
 const list = computed(() => {
   const gated = applyMatrix(props.components || [], { tier: xj.tier, isGuest: !xj.loggedIn, elder: xj.elderMode })
-  return gated.filter(c => KNOWN.includes(c.type))
+  // XJ-203 / D21：乐龄下不渲染 mirrorFab 悬浮球（避免遮挡大字内容），由底部语音条替代
+  return gated.filter(c => KNOWN.includes(c.type) && !(xj.elderMode && c.type === 'mirrorFab'))
+})
+
+/** XJ-203：乐龄「2 件小事」取自原始布局 taskList（矩阵按 §4.1 会剔除 taskList，故从过滤前取） */
+const elderTasks = computed(() => {
+  const tl = (props.components || []).find(c => c.type === 'taskList')
+  return (tl?.props?.tasks || []).slice(0, 2)
+})
+const elderDone = computed(() => {
+  const tl = (props.components || []).find(c => c.type === 'taskList')
+  return tl?.props?.doneToday || []
 })
 
 function open(item: any, component: string) {
@@ -200,56 +212,8 @@ const DIMS = [
         </view>
       </view>
 
-      <!-- 乐龄 · 今日健康（issue #8）：问候 + 健康概览 + 今日养护 + 家人大入口 -->
-      <view v-else-if="c.type === 'elderToday'" class="card elder-today">
-        <view class="row-between gap8">
-          <view class="col gap6 flex1">
-            <text class="t-title">{{ c.props.text }}</text>
-            <view class="row gap8">
-              <text class="tag">{{ c.props.isGuest ? '访客' : c.props.tierName }}</text>
-              <text v-if="c.props.isGuest" class="t-sm c-brand semi" @click="go('/pkg-auth/login')">登录 / 注册</text>
-            </view>
-          </view>
-          <view v-if="c.props.showElderToggle" class="col gap4" style="align-items: flex-end" @click="xj.toggleElder()">
-            <text class="t-sm c2">乐龄模式</text>
-            <view class="toggle" :class="{ on: elder }"><view class="knob" /></view>
-          </view>
-        </view>
-        <template v-if="c.props.health.hasAssessment">
-          <view class="row-between et-index" @click="go('/pages/archive/index')">
-            <view class="col gap4">
-              <text class="t-body c2">六维年轻化指数</text>
-              <view class="row gap8" style="align-items: baseline">
-                <text class="num bold" style="font-size: 60px; line-height: 1.05">{{ c.props.health.index }}</text>
-                <text v-if="c.props.health.delta" class="semi" :class="c.props.health.delta > 0 ? 'c-care' : 'c-warn'">比上次 {{ c.props.health.delta > 0 ? '+' : '' }}{{ c.props.health.delta }}</text>
-              </view>
-              <text class="t-sm c3">上次测评 {{ c.props.health.lastAssessedAt }}</text>
-            </view>
-            <XRadar :scores="c.props.health.dims" :size="104" :dark="night" />
-          </view>
-        </template>
-        <view v-else class="col gap8 et-cta" @click="go(xj.loggedIn ? '/pkg-assess/intro' : '/pkg-auth/login')">
-          <text class="t-lg">了解自己的六个维度</text>
-          <text class="c2">完成测评可以领取免费体检券。</text>
-          <view class="btn">{{ c.props.health.cta || '开始六维测评，约 8 分钟' }}</view>
-        </view>
-        <view v-for="t in c.props.health.todos" :key="t.text" class="todo row gap12" @click="go(t.link)">
-          <view class="ic-chip" :class="t.tone === 'care' ? 'care' : 'brand'"><XIcon :name="t.icon" /></view>
-          <view class="col flex1">
-            <text class="t-md">{{ t.text }}</text>
-            <text v-if="t.sub" class="t-sm c2">{{ t.sub }}</text>
-          </view>
-          <XIcon name="chevron-right" :size="22" color="#786E74" />
-        </view>
-        <view class="et-family row gap12" @click="go('/pkg-family/list')">
-          <view class="icon-box family-ic"><XIcon name="users" :size="26" /></view>
-          <view class="col flex1">
-            <text class="et-family-t">家人</text>
-            <text class="t-sm" style="opacity: 0.92">让子女随时了解您的健康情况，更放心</text>
-          </view>
-          <XIcon name="chevron-right" :size="22" color="rgba(255,255,255,0.9)" />
-        </view>
-      </view>
+      <!-- 乐龄 · 今日健康（XJ-203 / docs/07 §4.3）：问候 + 2 件小事 + 家人前置 + 健康概览，由 HomeElder 承载 -->
+      <HomeElder v-else-if="c.type === 'elderToday'" :c="c" :tasks="elderTasks" :done-today="elderDone" :night="night" />
 
       <!-- 入口宫格 -->
       <view v-else-if="c.type === 'entryGrid'">
@@ -455,12 +419,18 @@ const DIMS = [
         <XIcon name="chevron-right" :size="20" color="#786E74" />
       </view>
 
-      <!-- 魔镜悬浮入口 -->
-      <view v-else-if="c.type === 'mirrorFab'" class="fab" :class="{ elder, night }" @click="go('/pages/mirror/index')">
-        <XIcon name="sparkles" :size="elder ? 26 : 22" />
-        <text>{{ elder ? (c.props.label || '和小镜聊聊') : (c.props.label || '小镜') }}</text>
+      <!-- 魔镜悬浮入口（乐龄下已被 list 过滤剔除，由底部语音条替代，XJ-203 / D21） -->
+      <view v-else-if="c.type === 'mirrorFab'" class="fab" :class="{ night }" @click="go('/pages/mirror/index')">
+        <XIcon name="sparkles" :size="22" />
+        <text>{{ c.props.label || '小镜' }}</text>
       </view>
     </template>
+
+    <!-- 乐龄语音小镜条（XJ-203 / D21）：替代 mirrorFab 悬浮球，一次点击直达小镜 -->
+    <view v-if="elder" class="voice-bar" hover-class="mo-press-active" :hover-stay-time="80" @click="go('/pages/mirror/index')">
+      <XIcon name="microphone" :size="24" />
+      <text>按住说话，问问小镜</text>
+    </view>
   </view>
 </template>
 
@@ -563,13 +533,26 @@ const DIMS = [
 .night .ph-fallback { color: #d2b47a; background: radial-gradient(circle at 78% 18%, rgba(210, 180, 122, 0.28) 0, rgba(210, 180, 122, 0) 45%), linear-gradient(145deg, #3a3026, #2a231c); box-shadow: inset 0 0 0 1px rgba(210, 180, 122, 0.22); }
 
 .fab { position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 60; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--brand); color: var(--on-brand); display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; box-shadow: 0 8px 24px -8px rgba(168, 130, 77, 0.5); }
-.fab.elder { height: 58px; padding: 0 20px; font-size: 18px; bottom: calc(88px + env(safe-area-inset-bottom)); }
 .fab.night { color: #1c1712; }
 
-.elder-today { padding: 18px 16px 8px; }
-.et-index { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 14px; }
-.et-cta { margin-top: 14px; }
-.et-family { margin: 14px 0 10px; border-radius: var(--r-inner); background: var(--care); color: #fff; padding: 16px 14px; min-height: 64px; }
-.et-family .icon-box.family-ic { background: rgba(255, 255, 255, 0.2); color: #fff; }
-.et-family-t { font-size: var(--fs-lg); font-weight: 700; line-height: 1.3; }
+/* 乐龄语音小镜条（XJ-203 / D21）：固定在 tabbar 之上（对齐 .xj.has-tabbar 的 96px + 安全区留白），
+   只在乐龄态渲染，--care 继承乐龄皮肤墨绿 #5c7a52；全宽热区 52px ≥44px */
+.voice-bar {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(96px + env(safe-area-inset-bottom));
+  z-index: 60;
+  height: 52px;
+  border-radius: 26px;
+  background: var(--care);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  box-shadow: 0 8px 24px -10px rgba(63, 107, 79, 0.55);
+}
 </style>
