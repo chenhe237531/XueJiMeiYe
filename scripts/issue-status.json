@@ -93,6 +93,11 @@
       "assignee": "win-B",
       "updatedAt": "2026-10-17T01:44:59.012Z",
       "note": "分支 feat/XJ-304-play-apis（1e0fd2c claim → 实现提交，基座=main@98de524）。三玩法 6 接口：接力棒 GET/POST /app/family/relay（D3 未绑定 bound=false 空状态；事务内双向查重，双方各+5 写 PointsLedger reasonCode=relay；周格子 rest/passed/today/future 不惩罚）；盲盒 GET/POST /app/games/box（服务端加权随机 BOX_PRIZES 概率公示总和100；免费1次+签到/任务/接力三个加成来源当日实时判定；GameProgress 乐观锁先写状态再发奖；知识卡取自审校题库带 D4 免责标注；体验券走 Lead game_box）；集章册 GET/POST /app/stores/stamps（N 家门店结构 D7 不硬编码；一店一月一枚 P2002→409 拒绝；staffNo 校验记经办人）。验证：tsc 0 错、ci-check 全绿、起服务 curl 实测 6 接口 14 场景全过（含双向重复接棒拒、拆盒耗尽拒、重复盖章拒、无效工号拒、门店404）。"
+    },
+    "XJ-403": {
+      "status": "claimed",
+      "assignee": "win-B",
+      "updatedAt": "2026-10-17T01:45:10.146Z"
     }
   }
 }
